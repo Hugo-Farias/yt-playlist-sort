@@ -1,4 +1,4 @@
-import { getIdFromUrl } from "@/helpers.ts";
+import { getListId } from "@/helper.ts";
 
 let timeout: NodeJS.Timeout;
 
@@ -10,7 +10,9 @@ export type MessageType = {
 };
 
 const sendMsg = function (tabId: number, message: MessageType) {
-  setTimeout(() => {
+  clearTimeout(timeout);
+
+  timeout = setTimeout(() => {
     chrome.tabs.sendMessage(tabId, message).catch(() => {
       if (++messagesSent > 50) {
         console.error("failed to send message");
@@ -19,15 +21,16 @@ const sendMsg = function (tabId: number, message: MessageType) {
       console.log("Attempt #", messagesSent, "to send message");
       sendMsg(tabId, message);
     });
-  }, 100);
+  }, 400);
 };
 
+// noinspection JSUnusedGlobalSymbols
 export default defineBackground(() => {
   console.log("Hello background!", { id: browser.runtime.id });
 
   chrome.tabs.onUpdated.addListener(function (
     tabId: number,
-    changeInfo: chrome.tabs.TabChangeInfo,
+    _: chrome.tabs.TabChangeInfo,
     tab: chrome.tabs.Tab,
   ) {
     if (!tab.url?.includes("&list=PL")) return null;
@@ -35,18 +38,9 @@ export default defineBackground(() => {
 
     messagesSent = 0;
 
-    console.log(tab.url);
-    console.log(!tab.url?.includes("&list=PL"));
-
     const { url } = tab;
     if (!url) return null;
 
-    console.log(getIdFromUrl(url));
-
-    clearTimeout(timeout);
-
-    timeout = setTimeout(() => {
-      sendMsg(tabId, { url: url, id: getIdFromUrl(url) || null });
-    }, 1000);
+    sendMsg(tabId, { url: url, id: getListId(url) || null });
   });
 });
