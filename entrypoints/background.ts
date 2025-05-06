@@ -26,8 +26,6 @@ const sendMsg = function (tabId: number, message: MessageType) {
 
 // noinspection JSUnusedGlobalSymbols
 export default defineBackground(() => {
-  console.log("Hello background!", { id: browser.runtime.id });
-
   chrome.tabs.onUpdated.addListener(function (
     tabId: number,
     _: chrome.tabs.TabChangeInfo,

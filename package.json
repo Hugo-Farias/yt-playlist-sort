@@ -17,7 +17,6 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
-    "googleapis": "^148.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

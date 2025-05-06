@@ -1,5 +1,8 @@
 import { MessageType } from "@/entrypoints/background.ts";
-import { fetchPlaylistItems } from "@/chromeAPI.ts";
+import { getPlaylistVideoUploadDatesFetch } from "@/chromeAPI.ts";
+import { API_KEY } from "@/config.ts";
+
+const dummyPlaylistId = "PL9QdAxhqglB_h9lGh7kcXDewZZA";
 
 // noinspection JSUnusedGlobalSymbols
 export default defineContentScript({
@@ -7,6 +10,9 @@ export default defineContentScript({
   main() {
     chrome.runtime.onMessage.addListener((message: MessageType) => {
       // console.log(fetchPlaylistItems());
+      getPlaylistVideoUploadDatesFetch(dummyPlaylistId, API_KEY).then((res) => {
+        console.log(res);
+      });
 
       const { id } = message;
       if (!id) return null;
