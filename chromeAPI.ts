@@ -1,25 +1,27 @@
-interface PlaylistItem {
-  snippet?: {
-    publishedAt?: string;
-    title?: string;
-    // Add other relevant snippet properties if needed
-  };
-}
+import { fetchURL } from "@/helper.ts";
+import dummydata from "@/data/DUMMYDATA.json";
+import { YouTubePlaylistItemListResponse } from "@/types.ts";
 
-interface PlaylistItemsResponse {
-  items: PlaylistItem[];
-  nextPageToken?: string;
-}
+// interface PlaylistItem {
+//   snippet?: {
+//     publishedAt?: string;
+//     title?: string;
+//   };
+// }
 
-export const getPlaylistVideoUploadDatesFetch = async function (
+// interface PlaylistItemsResponse {
+//   items: PlaylistItem[];
+//   nextPageToken?: string;
+// }
+
+export const getPlaylistInfo = function (
   playlistId: string,
   apiKey: string,
-): Promise<null> {
+): YouTubePlaylistItemListResponse {
   const baseUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}`;
-  let nextPageToken: string | undefined;
-  let allItems: PlaylistItem[] = [];
+  // let nextPageToken: string | undefined;
+  // let allItems: PlaylistItem[] = [];
 
-  // const fet
-
-  return null;
+  // return fetchURL(baseUrl);
+  return dummydata;
 };

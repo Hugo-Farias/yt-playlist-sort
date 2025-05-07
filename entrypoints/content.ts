@@ -1,23 +1,25 @@
 import { MessageType } from "@/entrypoints/background.ts";
-import { getPlaylistVideoUploadDatesFetch } from "@/chromeAPI.ts";
-import { API_KEY } from "@/config.ts";
+import { getPlaylistInfo } from "@/chromeAPI.ts";
+// import { API_KEY } from "@/config.ts";
+import { YouTubePlaylistItemListResponse } from "@/types.ts";
 
-const dummyPlaylistId = "PL9QdAxhqglB_h9lGh7kcXDewZZA";
+const dummyPlaylistId = "PL9QdAxhqglB_h9lGh7kcXDewZZA-B6AEL";
 
 // noinspection JSUnusedGlobalSymbols
 export default defineContentScript({
-  matches: ["*://*.youtube.com/*"],
   main() {
     chrome.runtime.onMessage.addListener((message: MessageType) => {
-      // console.log(fetchPlaylistItems());
-      getPlaylistVideoUploadDatesFetch(dummyPlaylistId, API_KEY).then((res) => {
-        console.log(res);
-      });
+      const data: YouTubePlaylistItemListResponse = getPlaylistInfo(
+        dummyPlaylistId,
+        "AIzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY",
+      );
+
+      console.log("=>(content.ts:16) data", data.items);
 
       const { id } = message;
       if (!id) return null;
 
-      console.log(id);
+      // console.log(id);
 
       let videoItemSelector =
         "ytd-playlist-panel-video-renderer:not([within-miniplayer])";
@@ -38,8 +40,7 @@ export default defineContentScript({
           videoId: new URL(urlEl.href).searchParams.get("v"),
         };
       });
-
-      console.log(playlistItems);
     });
   },
+  matches: ["*://*.youtube.com/*"],
 });
