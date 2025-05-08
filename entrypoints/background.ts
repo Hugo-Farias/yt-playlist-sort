@@ -39,6 +39,6 @@ export default defineBackground(() => {
     const { url } = tab;
     if (!url) return null;
 
-    sendMsg(tabId, { url: url, id: getListId(url) || null });
+    sendMsg(tabId, { url: url, id: getListId(url) });
   });
 });

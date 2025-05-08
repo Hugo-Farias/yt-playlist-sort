@@ -1,6 +1,6 @@
 import { MessageType } from "@/entrypoints/background.ts";
 import { getPlaylistInfo } from "@/chromeAPI.ts";
-// import { API_KEY } from "@/config.ts";
+import { API_KEY } from "@/config.ts";
 import { YouTubePlaylistItemListResponse } from "@/types.ts";
 
 const dummyPlaylistId = "PL9QdAxhqglB_h9lGh7kcXDewZZA-B6AEL";
@@ -9,12 +9,10 @@ const dummyPlaylistId = "PL9QdAxhqglB_h9lGh7kcXDewZZA-B6AEL";
 export default defineContentScript({
   main() {
     chrome.runtime.onMessage.addListener((message: MessageType) => {
-      const data: YouTubePlaylistItemListResponse = getPlaylistInfo(
-        dummyPlaylistId,
-        "AIzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY",
-      );
-
-      console.log("=>(content.ts:16) data", data.items);
+      getPlaylistInfo(message.id!, API_KEY)?.then((data) => {
+        if (!data) return null;
+        console.log("=>(content.ts:16) data", data.items);
+      });
 
       const { id } = message;
       if (!id) return null;
