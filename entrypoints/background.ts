@@ -1,4 +1,4 @@
-import { getListId } from "@/helper.ts";
+import { getListId, getVideoId } from "@/helper.ts";
 
 let timeout: NodeJS.Timeout;
 
@@ -6,9 +6,11 @@ let messagesSent = 0;
 
 export type MessageType = {
   url: string;
-  id: string | null;
+  listId: string | null;
+  videoId: string | null;
 };
 
+//TODO figure out a way to make this consistently only fire once.
 const sendMsg = function (tabId: number, message: MessageType) {
   clearTimeout(timeout);
 
@@ -21,7 +23,7 @@ const sendMsg = function (tabId: number, message: MessageType) {
       console.log("Attempt #", messagesSent, "to send message");
       sendMsg(tabId, message);
     });
-  }, 400);
+  }, 600);
 };
 
 // noinspection JSUnusedGlobalSymbols
@@ -31,6 +33,7 @@ export default defineBackground(() => {
     _: chrome.tabs.TabChangeInfo,
     tab: chrome.tabs.Tab,
   ) {
+    // console.log(runcount);
     if (!tab.url?.includes("&list=PL")) return null;
     if (tab.status !== "complete") return null;
 
@@ -39,6 +42,10 @@ export default defineBackground(() => {
     const { url } = tab;
     if (!url) return null;
 
-    sendMsg(tabId, { url: url, id: getListId(url) });
+    sendMsg(tabId, {
+      url: url,
+      listId: getListId(url),
+      videoId: getVideoId(url),
+    });
   });
 });

@@ -1,21 +1,31 @@
 import { MessageType } from "@/entrypoints/background.ts";
 import { getPlaylistInfo } from "@/chromeAPI.ts";
 import { API_KEY } from "@/config.ts";
-import { YouTubePlaylistItemListResponse } from "@/types.ts";
+import { getVideoId } from "@/helper.ts";
 
-const dummyPlaylistId = "PL9QdAxhqglB_h9lGh7kcXDewZZA-B6AEL";
+let previousURL = "";
 
 // noinspection JSUnusedGlobalSymbols
 export default defineContentScript({
   main() {
     chrome.runtime.onMessage.addListener((message: MessageType) => {
-      getPlaylistInfo(message.id!, API_KEY)?.then((data) => {
+      console.log(message.videoId === getVideoId(previousURL));
+      console.log("message.videoId", message.videoId);
+      console.log("getVideoId(previousURL)", getVideoId(previousURL));
+
+      if (previousURL === message.url) return null;
+
+      previousURL = location.href;
+      console.log("content exec");
+
+      getPlaylistInfo(message.videoId!, API_KEY)?.then((data) => {
         if (!data) return null;
-        console.log("=>(content.ts:16) data", data.items);
+        // console.log(data);
+        // data.items.forEach((v) => console.log(v.snippet.title));
       });
 
-      const { id } = message;
-      if (!id) return null;
+      const { listId } = message;
+      if (!listId) return null;
 
       // console.log(id);
 
@@ -38,6 +48,8 @@ export default defineContentScript({
           videoId: new URL(urlEl.href).searchParams.get("v"),
         };
       });
+
+      // playlistItems.forEach((v) => console.log(v));
     });
   },
   matches: ["*://*.youtube.com/*"],
