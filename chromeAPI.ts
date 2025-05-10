@@ -3,7 +3,7 @@ import { YouTubePlaylistItemListResponse } from "@/types.ts";
 import dummydata from "@/data/DUMMYDATA.json";
 import Promise from "lie";
 
-export const getPlaylistInfo = function (
+const chromeAPI = function (
   playlistId: string,
   apiKey: string,
   //parameter for testing purposes
@@ -33,3 +33,5 @@ export const getPlaylistInfo = function (
       return null;
     });
 };
+
+export default chromeAPI;

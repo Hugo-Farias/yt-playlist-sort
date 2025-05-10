@@ -1,12 +1,7 @@
+import chromeAPI from "@/chromeAPI.ts";
 import { MessageType } from "@/entrypoints/background.ts";
-import { getPlaylistInfo } from "@/chromeAPI.ts";
 import { API_KEY } from "@/config.ts";
-import {
-  getVideoId,
-  checkPlaylist,
-  storeApiData,
-  getApiData,
-} from "@/helper.ts";
+import { getVideoId, checkPlaylist, storeCache, getCache } from "@/helper.ts";
 import { localPlaylistItem } from "@/types.ts";
 
 let previousURL = "";
@@ -38,19 +33,19 @@ export default defineContentScript({
         };
       });
 
-      const apidata = getApiData();
+      const cachedData = getCache(message.listId);
 
       const check: boolean = checkPlaylist(
-        apidata ? apidata.items : null,
+        cachedData ? cachedData.items : null,
         localPlaylistItems,
       );
 
-      if (check && apidata) {
-        console.log("check", apidata.items);
+      if (check && cachedData) {
+        console.log("check", cachedData.items);
       } else {
-        getPlaylistInfo(message.listId, API_KEY, true)?.then((data) => {
-          if (!data) return null;
-          storeApiData(data);
+        chromeAPI(message.listId, API_KEY)?.then((data) => {
+          if (!data || !message.listId) return null;
+          storeCache(message.listId, data);
           return data;
         });
       }
