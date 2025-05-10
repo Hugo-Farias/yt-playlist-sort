@@ -26,7 +26,7 @@ export default defineContentScript({
       const video = document.querySelector<HTMLVideoElement>("video");
       if (video) video.pause();
 
-      const playlistItems = [
+      const localPlaylistItems = [
         ...document.querySelectorAll<HTMLDivElement>(videoItemSelector),
       ].map((el): localPlaylistItem => {
         const titleEl = el.querySelector("#video-title");
@@ -42,11 +42,11 @@ export default defineContentScript({
 
       const check: boolean = checkPlaylist(
         apidata ? apidata.items : null,
-        playlistItems,
+        localPlaylistItems,
       );
 
-      if (check) {
-        console.log("=>(content.ts:42) apidata", apidata);
+      if (check && apidata) {
+        console.log("check", apidata.items);
       } else {
         getPlaylistInfo(message.listId, API_KEY, true)?.then((data) => {
           if (!data) return null;

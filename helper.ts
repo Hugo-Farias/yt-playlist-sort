@@ -14,12 +14,12 @@ export const getVideoId = (url: string): string | null => {
   return new URL(url).searchParams.get("v");
 };
 
-export const storeApiData = (data: YouTubePlaylistItemListResponse) => {
-  localStorage.setItem("playlistApiData", JSON.stringify(data));
+export const storeCache = (data: YouTubePlaylistItemListResponse) => {
+  localStorage.setItem("playlistCache", JSON.stringify(data));
 };
 
-export const getApiData = (): YouTubePlaylistItemListResponse | null => {
-  const data = localStorage.getItem("playlistApiData");
+export const getCache = (): YouTubePlaylistItemListResponse | null => {
+  const data = localStorage.getItem("playlistCache");
   if (!data) return null;
   return JSON.parse(data);
 };
