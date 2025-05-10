@@ -1,3 +1,5 @@
+import { localPlaylistItem, YouTubePlaylistItem } from "@/types.ts";
+
 export const getListId = (url: string) => {
   if (url.length <= 0) return null;
   return new URL(url).searchParams.get("list");
@@ -6,4 +8,17 @@ export const getListId = (url: string) => {
 export const getVideoId = (url: string) => {
   if (url.length <= 0) return null;
   return new URL(url).searchParams.get("v");
+};
+
+export const comparePlaylist = (
+  a: YouTubePlaylistItem[] | null,
+  b: localPlaylistItem[] | null,
+): boolean => {
+  if (!a || !b) return false;
+  if (typeof a !== typeof b) return false;
+  if (a.length !== b.length) return false;
+
+  return a.every((v, i) => {
+    return v.snippet.resourceId.videoId === b[i].videoId;
+  });
 };

@@ -1,55 +1,55 @@
 import { MessageType } from "@/entrypoints/background.ts";
 import { getPlaylistInfo } from "@/chromeAPI.ts";
 import { API_KEY } from "@/config.ts";
-import { getVideoId } from "@/helper.ts";
+import { getVideoId, comparePlaylist } from "@/helper.ts";
+import dummyList from "../data/DUMMYLIST.json";
+import { localPlaylistItem } from "@/types.ts";
 
 let previousURL = "";
+let videoItemSelector =
+  "ytd-playlist-panel-video-renderer:not([within-miniplayer])";
+
+// TODO compare api return with rendered playlist items
 
 // noinspection JSUnusedGlobalSymbols
 export default defineContentScript({
   main() {
     chrome.runtime.onMessage.addListener((message: MessageType) => {
-      console.log(message.videoId === getVideoId(previousURL));
-      console.log("message.videoId", message.videoId);
-      console.log("getVideoId(previousURL)", getVideoId(previousURL));
-
-      if (previousURL === message.url) return null;
+      if (!message.videoId || !message.listId) return null;
+      if (getVideoId(previousURL) === message.videoId) return null;
 
       previousURL = location.href;
-      console.log("content exec");
+      console.log("content init");
 
-      getPlaylistInfo(message.videoId!, API_KEY)?.then((data) => {
+      getPlaylistInfo(message.listId, API_KEY, true)?.then((data) => {
         if (!data) return null;
-        // console.log(data);
-        // data.items.forEach((v) => console.log(v.snippet.title));
+        // console.log(data.items);
+        // data.items.forEach((v) => console.log(v.etag));
+
+        const video = document.querySelector<HTMLVideoElement>("video");
+        if (video) video.pause();
+
+        const playlistItems = [
+          ...document.querySelectorAll<HTMLDivElement>(videoItemSelector),
+        ].map((el): localPlaylistItem => {
+          const titleEl = el.querySelector("#video-title");
+          const urlEl = el.querySelector("a");
+
+          // if (!titleEl?.textContent || !urlEl) {
+          //   return {
+          //     title: "null",
+          //     videoId: "null",
+          //   };
+          // }
+
+          return {
+            title: titleEl?.textContent ? titleEl?.textContent.trim() : "",
+            videoId: urlEl ? getVideoId(urlEl.href) : "",
+          };
+        });
+
+        console.log(comparePlaylist(data.items, playlistItems));
       });
-
-      const { listId } = message;
-      if (!listId) return null;
-
-      // console.log(id);
-
-      let videoItemSelector =
-        "ytd-playlist-panel-video-renderer:not([within-miniplayer])";
-
-      const video = document.querySelector<HTMLVideoElement>("video");
-      if (video) video.pause();
-
-      const playlistItems = [
-        ...document.querySelectorAll<HTMLDivElement>(videoItemSelector),
-      ].map((el) => {
-        const titleEl = el.querySelector("#video-title");
-        const urlEl = el.querySelector("a");
-
-        if (!titleEl?.textContent || !urlEl) return null;
-
-        return {
-          title: titleEl.textContent.trim(),
-          videoId: new URL(urlEl.href).searchParams.get("v"),
-        };
-      });
-
-      // playlistItems.forEach((v) => console.log(v));
     });
   },
   matches: ["*://*.youtube.com/*"],

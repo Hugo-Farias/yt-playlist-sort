@@ -1,10 +1,15 @@
+export type localPlaylistItem = {
+  title: string;
+  videoId: string | null;
+};
+
 export type YouTubePlaylistItemListResponse = {
   kind: string;
   etag: string;
   items: YouTubePlaylistItem[];
 };
 
-type YouTubePlaylistItem = {
+export type YouTubePlaylistItem = {
   kind: string;
   etag: string;
   id: string;

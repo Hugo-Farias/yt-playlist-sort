@@ -10,7 +10,6 @@ export type MessageType = {
   videoId: string | null;
 };
 
-//TODO figure out a way to make this consistently only fire once.
 const sendMsg = function (tabId: number, message: MessageType) {
   clearTimeout(timeout);
 
@@ -23,29 +22,29 @@ const sendMsg = function (tabId: number, message: MessageType) {
       console.log("Attempt #", messagesSent, "to send message");
       sendMsg(tabId, message);
     });
-  }, 600);
+  }, 1000);
 };
 
 // noinspection JSUnusedGlobalSymbols
-export default defineBackground(() => {
-  chrome.tabs.onUpdated.addListener(function (
-    tabId: number,
-    _: chrome.tabs.TabChangeInfo,
-    tab: chrome.tabs.Tab,
-  ) {
-    // console.log(runcount);
-    if (!tab.url?.includes("&list=PL")) return null;
-    if (tab.status !== "complete") return null;
+chrome.tabs.onUpdated.addListener(function (
+  tabId: number,
+  _: chrome.tabs.TabChangeInfo,
+  tab: chrome.tabs.Tab,
+) {
+  // console.log(runcount);
+  if (!tab.url?.includes("&list=PL")) return null;
+  if (tab.status !== "complete") return null;
 
-    messagesSent = 0;
+  messagesSent = 0;
 
-    const { url } = tab;
-    if (!url) return null;
+  const { url } = tab;
+  if (!url) return null;
 
-    sendMsg(tabId, {
-      url: url,
-      listId: getListId(url),
-      videoId: getVideoId(url),
-    });
+  sendMsg(tabId, {
+    url: url,
+    listId: getListId(url),
+    videoId: getVideoId(url),
   });
 });
+
+export default defineBackground(() => {});
