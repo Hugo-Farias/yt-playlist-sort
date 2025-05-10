@@ -35,16 +35,9 @@ export default defineContentScript({
           const titleEl = el.querySelector("#video-title");
           const urlEl = el.querySelector("a");
 
-          // if (!titleEl?.textContent || !urlEl) {
-          //   return {
-          //     title: "null",
-          //     videoId: "null",
-          //   };
-          // }
-
           return {
-            title: titleEl?.textContent ? titleEl?.textContent.trim() : "",
-            videoId: urlEl ? getVideoId(urlEl.href) : "",
+            title: titleEl?.textContent ? titleEl?.textContent.trim() : "null",
+            videoId: urlEl ? getVideoId(urlEl.href) : "null",
           };
         });
 

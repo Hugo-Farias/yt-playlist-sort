@@ -10,6 +10,16 @@ export const getVideoId = (url: string) => {
   return new URL(url).searchParams.get("v");
 };
 
+export const storeApiData = (data: YouTubePlaylistItem[]) => {
+  localStorage.setItem("playlistApiData", JSON.stringify(data));
+};
+
+export const getApiData = () => {
+  const data = localStorage.getItem("playlistApiData");
+  if (!data) return null;
+  return JSON.parse(data);
+};
+
 export const comparePlaylist = (
   a: YouTubePlaylistItem[] | null,
   b: localPlaylistItem[] | null,
