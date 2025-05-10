@@ -1,4 +1,4 @@
-export type localPlaylistItem = {
+export type renderedPlaylistItem = {
   title: string;
   videoId: string | null;
 };

@@ -2,7 +2,7 @@ import chromeAPI from "@/chromeAPI.ts";
 import { MessageType } from "@/entrypoints/background.ts";
 import { API_KEY } from "@/config.ts";
 import { getVideoId, checkPlaylist, storeCache, getCache } from "@/helper.ts";
-import { localPlaylistItem } from "@/types.ts";
+import { renderedPlaylistItem } from "@/types.ts";
 
 let previousURL = "";
 let videoItemSelector =
@@ -21,9 +21,9 @@ export default defineContentScript({
       const video = document.querySelector<HTMLVideoElement>("video");
       if (video) video.pause();
 
-      const localPlaylistItems = [
+      const renderedPlaylistItems = [
         ...document.querySelectorAll<HTMLDivElement>(videoItemSelector),
-      ].map((el): localPlaylistItem => {
+      ].map((el): renderedPlaylistItem => {
         const titleEl = el.querySelector("#video-title");
         const urlEl = el.querySelector("a");
 
@@ -37,7 +37,7 @@ export default defineContentScript({
 
       const check: boolean = checkPlaylist(
         cachedData ? cachedData.items : null,
-        localPlaylistItems,
+        renderedPlaylistItems,
       );
 
       if (check && cachedData) {
