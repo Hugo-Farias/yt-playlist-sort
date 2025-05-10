@@ -11,6 +11,8 @@ export const getPlaylistInfo = function (
 ): Promise<YouTubePlaylistItemListResponse | null> | null {
   if (!playlistId || !apiKey) return null;
 
+  console.log("chromeAPI triggered");
+
   if (dummy) {
     // Simulate network delay and return dummy data
     return new Promise<YouTubePlaylistItemListResponse | null>((resolve) => {

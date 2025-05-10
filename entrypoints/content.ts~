@@ -51,7 +51,7 @@ export default defineContentScript({
         getPlaylistInfo(message.listId, API_KEY, true)?.then((data) => {
           if (!data) return null;
           storeApiData(data);
-          return data;
+          return data
         });
       }
     });
