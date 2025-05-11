@@ -22,3 +22,8 @@ export type YouTubePlaylistContentDetails = {
     resultsPerPage: number;
   };
 };
+
+export type CachedPlaylistData = YouTubePlaylistContentDetails & {
+  listId: string;
+  storeTime: number;
+};

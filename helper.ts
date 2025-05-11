@@ -1,4 +1,5 @@
 import {
+  CachedPlaylistData,
   renderedPlaylistItem,
   YouTubePlaylistContentDetails,
   YouTubePlaylistItem,
@@ -28,20 +29,14 @@ export const storeCache = (
     "playlistCache",
     JSON.stringify({
       ...getCache(null),
-      [playlistId]: data,
+      [playlistId]: { ...data, listId: playlistId, storeTime: Date.now() },
     }),
   );
-
-  const temp = getCache(null) || {};
-
-  console.log(temp);
-
-  console.log("cache size: ", Object.keys(temp).length);
 };
 
 export const getCache = (
   playlistId: string | null,
-): YouTubePlaylistContentDetails | null => {
+): CachedPlaylistData | null => {
   const data = localStorage.getItem("playlistCache");
   if (!data) return null;
   if (!playlistId) return JSON.parse(data);
