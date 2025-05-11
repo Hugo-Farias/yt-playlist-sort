@@ -15,16 +15,10 @@ export const getVideoId = (url: string): string | null => {
   return new URL(url).searchParams.get("v");
 };
 
-//TODO make new function that trims down the fat from the api data
-
 export const storeCache = (
   playlistId: string,
   data: YouTubePlaylistContentDetails,
 ) => {
-  // const cachedData = getCache(playlistId) || {};
-
-  // console.log("=>(helper.ts:22) cachedData", cachedData);
-
   localStorage.setItem(
     "playlistCache",
     JSON.stringify({

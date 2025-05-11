@@ -16,6 +16,8 @@ export type YouTubePlaylistItem = {
 export type YouTubePlaylistContentDetails = {
   kind: "youtube#playlistItemListResponse";
   etag: string;
+  nextPageToken?: string;
+  prevPageToken?: string;
   items: YouTubePlaylistItem[];
   pageInfo: {
     totalResults: number;

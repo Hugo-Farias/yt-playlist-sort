@@ -8,9 +8,9 @@ import { API_KEY } from "@/env.ts";
 const chromeAPI = function (
   playlistId: string,
   apiKey: string = API_KEY,
-  //parameter for testing purposes
-  dummy: boolean = false,
-): Promise<YouTubePlaylistContentDetails | null> | null {
+  nextpageToken: string | null = null,
+  dummy: boolean = false, //parameter for testing purposes
+): Promise<YouTubePlaylistContentDetails | null | undefined> | null {
   if (!playlistId || !apiKey) return null;
 
   console.log("chromeAPI triggered");
@@ -24,9 +24,17 @@ const chromeAPI = function (
     });
   }
 
-  return get(API_URI + `&playlistId=${playlistId}&key=${apiKey}`)
+  return get<YouTubePlaylistContentDetails>(
+    API_URI +
+      `&playlistId=${playlistId}&key=${apiKey}` +
+      (nextpageToken ? `&pageToken=${nextpageToken}` : ""),
+  )
     .then((res) => {
-      return res.data;
+      console.log("data response =>", res.data);
+      if (res.data.nextPageToken) {
+        chromeAPI(playlistId, apiKey, res.data.nextPageToken);
+      }
+      if (res.data) return { ...res.data, items: [...res.data.items] };
     })
     .catch((err) => {
       console.error("axios fetch error", err);

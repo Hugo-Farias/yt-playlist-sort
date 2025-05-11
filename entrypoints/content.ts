@@ -2,6 +2,8 @@ import chromeAPI from "@/chromeAPI.ts";
 import { MessageType } from "@/entrypoints/background.ts";
 import { getVideoId, checkPlaylist, storeCache, getCache } from "@/helper.ts";
 import { renderedPlaylistItem } from "@/types.ts";
+import { API_URI } from "@/config.ts";
+import { API_KEY } from "@/env.ts";
 
 let previousURL = "";
 let videoItemSelector =
@@ -11,11 +13,13 @@ let videoItemSelector =
 export default defineContentScript({
   main() {
     chrome.runtime.onMessage.addListener((message: MessageType) => {
+      console.clear();
       if (!message.videoId || !message.listId) return null;
       if (getVideoId(previousURL) === message.videoId) return null;
 
       previousURL = location.href;
-      console.log("content init");
+      // console.log("content init");
+      // console.log(API_URI + `&playlistId=${message.listId}&key=${API_KEY}`);
 
       const video = document.querySelector<HTMLVideoElement>("video");
       if (video) video.pause();
