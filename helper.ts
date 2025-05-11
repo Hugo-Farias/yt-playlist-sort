@@ -1,7 +1,7 @@
 import {
   renderedPlaylistItem,
+  YouTubePlaylistContentDetails,
   YouTubePlaylistItem,
-  YouTubePlaylistItemListResponse,
 } from "@/types.ts";
 
 export const getListId = (url: string) => {
@@ -18,7 +18,7 @@ export const getVideoId = (url: string): string | null => {
 
 export const storeCache = (
   playlistId: string,
-  data: YouTubePlaylistItemListResponse,
+  data: YouTubePlaylistContentDetails,
 ) => {
   // const cachedData = getCache(playlistId) || {};
 
@@ -41,7 +41,7 @@ export const storeCache = (
 
 export const getCache = (
   playlistId: string | null,
-): YouTubePlaylistItemListResponse | null => {
+): YouTubePlaylistContentDetails | null => {
   const data = localStorage.getItem("playlistCache");
   if (!data) return null;
   if (!playlistId) return JSON.parse(data);
@@ -57,6 +57,6 @@ export const checkPlaylist = (
   if (a.length !== b.length) return false;
 
   return a.every((v, i) => {
-    return v.snippet.resourceId.videoId === b[i].videoId;
+    return v.contentDetails.videoId === b[i].videoId;
   });
 };

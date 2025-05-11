@@ -3,42 +3,22 @@ export type renderedPlaylistItem = {
   videoId: string | null;
 };
 
-export type YouTubePlaylistItemListResponse = {
-  kind: string;
-  etag: string;
-  items: YouTubePlaylistItem[];
-};
-
 export type YouTubePlaylistItem = {
-  kind: string;
+  kind: "youtube#playlistItem";
   etag: string;
   id: string;
-  snippet: {
-    publishedAt: string;
-    channelId: string;
-    title: string;
-    description: string;
-    thumbnails: {
-      default: YouTubeThumbnail;
-      medium: YouTubeThumbnail;
-      high: YouTubeThumbnail;
-      standard?: YouTubeThumbnail;
-      maxres?: YouTubeThumbnail;
-    };
-    channelTitle: string;
-    playlistId: string;
-    position: number;
-    resourceId: {
-      kind: string;
-      videoId: string;
-    };
-    videoOwnerChannelTitle: string;
-    videoOwnerChannelId: string;
+  contentDetails: {
+    videoId: string;
+    videoPublishedAt: string; // ISO 8601 date-time string
   };
 };
 
-type YouTubeThumbnail = {
-  url: string;
-  width: number;
-  height: number;
+export type YouTubePlaylistContentDetails = {
+  kind: "youtube#playlistItemListResponse";
+  etag: string;
+  items: YouTubePlaylistItem[];
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
 };

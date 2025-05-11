@@ -1,5 +1,5 @@
 import get from "axios";
-import { YouTubePlaylistItemListResponse } from "@/types.ts";
+import { YouTubePlaylistContentDetails } from "@/types.ts";
 import dummydata from "@/data/DUMMYDATA.json";
 import Promise from "lie";
 import { API_URI } from "@/config.ts";
@@ -10,16 +10,16 @@ const chromeAPI = function (
   apiKey: string = API_KEY,
   //parameter for testing purposes
   dummy: boolean = false,
-): Promise<YouTubePlaylistItemListResponse | null> | null {
+): Promise<YouTubePlaylistContentDetails | null> | null {
   if (!playlistId || !apiKey) return null;
 
   console.log("chromeAPI triggered");
 
   if (dummy) {
     // Simulate network delay and return dummy data
-    return new Promise<YouTubePlaylistItemListResponse | null>((resolve) => {
+    return new Promise<YouTubePlaylistContentDetails | null>((resolve) => {
       setTimeout(() => {
-        resolve(dummydata as YouTubePlaylistItemListResponse);
+        resolve(dummydata as YouTubePlaylistContentDetails);
       }, 1000); // Simulate network delay
     });
   }
