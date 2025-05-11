@@ -1,6 +1,5 @@
 import chromeAPI from "@/chromeAPI.ts";
 import { MessageType } from "@/entrypoints/background.ts";
-import { API_KEY } from "@/config.ts";
 import { getVideoId, checkPlaylist, storeCache, getCache } from "@/helper.ts";
 import { renderedPlaylistItem } from "@/types.ts";
 
@@ -43,7 +42,7 @@ export default defineContentScript({
       if (check && cachedData) {
         console.log("check", cachedData.items);
       } else {
-        chromeAPI(message.listId, API_KEY)?.then((data) => {
+        chromeAPI(message.listId)?.then((data) => {
           if (!data || !message.listId) return null;
           storeCache(message.listId, data);
           return data;

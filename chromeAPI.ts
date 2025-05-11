@@ -2,10 +2,12 @@ import get from "axios";
 import { YouTubePlaylistItemListResponse } from "@/types.ts";
 import dummydata from "@/data/DUMMYDATA.json";
 import Promise from "lie";
+import { API_URI } from "@/config.ts";
+import { API_KEY } from "@/env.ts";
 
 const chromeAPI = function (
   playlistId: string,
-  apiKey: string,
+  apiKey: string = API_KEY,
   //parameter for testing purposes
   dummy: boolean = false,
 ): Promise<YouTubePlaylistItemListResponse | null> | null {
@@ -22,9 +24,7 @@ const chromeAPI = function (
     });
   }
 
-  return get(
-    `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}`,
-  )
+  return get(API_URI + `&playlistId=${playlistId}&key=${apiKey}`)
     .then((res) => {
       return res.data;
     })

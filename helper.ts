@@ -14,7 +14,8 @@ export const getVideoId = (url: string): string | null => {
   return new URL(url).searchParams.get("v");
 };
 
-//TODO reduce size of cache before storing, IT'S TOO DAMN BIG!!!
+//TODO make new function that trims down the fat from the api data
+
 export const storeCache = (
   playlistId: string,
   data: YouTubePlaylistItemListResponse,
