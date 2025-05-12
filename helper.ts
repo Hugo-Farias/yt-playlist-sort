@@ -43,9 +43,10 @@ export const checkPlaylist = (
 ): boolean => {
   if (!a || !b) return false;
   if (typeof a !== typeof b) return false;
-  if (a.length !== b.length) return false;
+  // if (a.length !== b.length) return false;
 
   return a.every((v, i) => {
+    console.log(i, v.contentDetails.videoId, b[i].videoId);
     return v.contentDetails.videoId === b[i].videoId;
   });
 };

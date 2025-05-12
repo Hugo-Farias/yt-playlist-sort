@@ -13,13 +13,13 @@ let videoItemSelector =
 export default defineContentScript({
   main() {
     chrome.runtime.onMessage.addListener((message: MessageType) => {
-      console.clear();
+      // console.clear();
       if (!message.videoId || !message.listId) return null;
       if (getVideoId(previousURL) === message.videoId) return null;
 
       previousURL = location.href;
-      // console.log("content init");
-      // console.log(API_URI + `&playlistId=${message.listId}&key=${API_KEY}`);
+      console.log("content init");
+      console.log(API_URI + `&playlistId=${message.listId}&key=${API_KEY}`);
 
       const video = document.querySelector<HTMLVideoElement>("video");
       if (video) video.pause();
@@ -47,6 +47,7 @@ export default defineContentScript({
         console.log("check", cachedData.items);
       } else {
         chromeAPI(message.listId)?.then((data) => {
+          // console.log(data);
           if (!data || !message.listId) return null;
           storeCache(message.listId, data);
           return data;

@@ -5,6 +5,8 @@ import Promise from "lie";
 import { API_URI } from "@/config.ts";
 import { API_KEY } from "@/env.ts";
 
+const items: YouTubePlaylistContentDetails["items"][] = [];
+
 const chromeAPI = function (
   playlistId: string,
   apiKey: string = API_KEY,
@@ -24,17 +26,27 @@ const chromeAPI = function (
     });
   }
 
-  return get<YouTubePlaylistContentDetails>(
+  // TODO this is returning null
+  return get(
     API_URI +
       `&playlistId=${playlistId}&key=${apiKey}` +
       (nextpageToken ? `&pageToken=${nextpageToken}` : ""),
   )
     .then((res) => {
-      console.log("data response =>", res.data);
+      // console.log("data response =>", res.data);
       if (res.data.nextPageToken) {
-        chromeAPI(playlistId, apiKey, res.data.nextPageToken);
+        return chromeAPI(playlistId, apiKey, res.data.nextPageToken)?.then(
+          (recurData) => {
+            // console.log("=>(chromeAPI.ts:40) recurData", recurData);
+            if (!recurData) return null;
+            return {
+              ...res.data,
+              items: [...res.data.items, ...recurData?.items],
+            };
+          },
+        );
       }
-      if (res.data) return { ...res.data, items: [...res.data.items] };
+      return res.data;
     })
     .catch((err) => {
       console.error("axios fetch error", err);
