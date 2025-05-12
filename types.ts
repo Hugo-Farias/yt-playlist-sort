@@ -34,3 +34,38 @@ export type countryIs = {
   ip: string;
   country: string;
 };
+
+export type YouTubeVideoResponse = {
+  kind: "youtube#videoListResponse";
+  etag: string;
+  items: Array<{
+    kind: "youtube#video";
+    etag: string;
+    id: string;
+    contentDetails: {
+      duration: string; // ISO 8601 duration
+      dimension: "2d" | "3d";
+      definition: "sd" | "hd";
+      caption: "true" | "false";
+      licensedContent: boolean;
+      regionRestriction?: {
+        blocked?: string[];
+        allowed?: string[];
+      };
+      contentRating: Record<string, unknown>; // could be more specific if needed
+      projection: string;
+    };
+    status: {
+      uploadStatus: string;
+      privacyStatus: string;
+      license: string;
+      embeddable: boolean;
+      publicStatsViewable: boolean;
+      madeForKids: boolean;
+    };
+  }>;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
+};

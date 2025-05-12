@@ -71,5 +71,6 @@ export const checkPlaylist = (
 
 const checkVideoAvailability = async (videoId: string): Promise<string> => {
   const { country } = await fetchJson<countryIs>("https://api.country.is/");
-  return "string";
+
+  return country;
 };
