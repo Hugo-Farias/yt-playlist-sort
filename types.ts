@@ -12,7 +12,7 @@ export type YouTubePlaylistItem = {
     videoPublishedAt: string; // ISO 8601 date-time string
   };
 };
-
+1;
 export type YouTubePlaylistContentDetails = {
   kind: "youtube#playlistItemListResponse";
   etag: string;
@@ -28,4 +28,9 @@ export type YouTubePlaylistContentDetails = {
 export type CachedPlaylistData = YouTubePlaylistContentDetails & {
   listId: string;
   storeTime: number;
+};
+
+export type countryIs = {
+  ip: string;
+  country: string;
 };

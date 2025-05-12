@@ -1,13 +1,11 @@
-import get from "axios";
 import { YouTubePlaylistContentDetails } from "@/types.ts";
 import dummydata from "@/data/DUMMYDATA.json";
 import Promise from "lie";
 import { API_URI } from "@/config.ts";
 import { API_KEY } from "@/env.ts";
+import { fetchJson } from "@/helper.ts";
 
-const items: YouTubePlaylistContentDetails["items"][] = [];
-
-const chromeAPI = function (
+export const playlistAPI = function (
   playlistId: string,
   apiKey: string = API_KEY,
   nextpageToken: string | null = null,
@@ -27,31 +25,29 @@ const chromeAPI = function (
   }
 
   // TODO this is returning null
-  return get(
+  return fetchJson<YouTubePlaylistContentDetails>(
     API_URI +
       `&playlistId=${playlistId}&key=${apiKey}` +
       (nextpageToken ? `&pageToken=${nextpageToken}` : ""),
   )
     .then((res) => {
       // console.log("data response =>", res.data);
-      if (res.data.nextPageToken) {
-        return chromeAPI(playlistId, apiKey, res.data.nextPageToken)?.then(
+      if (res.nextPageToken) {
+        return playlistAPI(playlistId, apiKey, res.nextPageToken)?.then(
           (recurData) => {
             // console.log("=>(chromeAPI.ts:40) recurData", recurData);
             if (!recurData) return null;
             return {
-              ...res.data,
-              items: [...res.data.items, ...recurData?.items],
+              ...res,
+              items: [...res.items, ...recurData?.items],
             };
           },
         );
       }
-      return res.data;
+      return res;
     })
     .catch((err) => {
       console.error("axios fetch error", err);
       return null;
     });
 };
-
-export default chromeAPI;

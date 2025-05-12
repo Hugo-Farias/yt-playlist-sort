@@ -1,9 +1,24 @@
 import {
   CachedPlaylistData,
+  countryIs,
   renderedPlaylistItem,
   YouTubePlaylistContentDetails,
   YouTubePlaylistItem,
 } from "@/types.ts";
+
+export async function fetchJson<T = unknown>(
+  input: RequestInfo,
+  init?: RequestInit,
+): Promise<T> {
+  const res = await fetch(input, init);
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Fetch error ${res.status}: ${errorText}`);
+  }
+
+  return (await res.json()) as Promise<T>;
+}
 
 export const getListId = (url: string) => {
   if (url.length <= 0) return null;
@@ -46,7 +61,16 @@ export const checkPlaylist = (
   // if (a.length !== b.length) return false;
 
   return a.every((v, i) => {
-    console.log(i, v.contentDetails.videoId, b[i].videoId);
-    return v.contentDetails.videoId === b[i].videoId;
+    if (v.contentDetails.videoId === b[i].videoId) {
+      checkVideoAvailability(v.contentDetails.videoId).then((value) => {
+        console.log(value);
+      });
+    }
   });
+};
+
+const checkVideoAvailability = async (videoId: string): Promise<string> => {
+  const response = await fetchJson<countryIs>("https://api.country.is/");
+  // const response = await response.json();
+  return response.country;
 };
