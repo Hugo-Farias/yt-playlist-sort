@@ -38,21 +38,21 @@ export default defineContentScript({
 
       const cachedData = getCache(message.listId);
 
-      const check: boolean = checkPlaylist(
+      checkPlaylist(
         cachedData ? cachedData.items : null,
         renderedPlaylistItems,
-      );
-
-      if (check && cachedData) {
-        console.log("check", cachedData.items);
-      } else {
-        playlistAPI(message.listId)?.then((data) => {
-          // console.log(data);
-          if (!data || !message.listId) return null;
-          storeCache(message.listId, data);
-          return data;
-        });
-      }
+      ).then((check) => {
+        if (check && cachedData) {
+          console.log("check", cachedData.items);
+        } else {
+          playlistAPI(message.listId!)?.then((data) => {
+            // console.log(data);
+            if (!data || !message.listId) return null;
+            storeCache(message.listId, data);
+            return data;
+          });
+        }
+      });
     });
   },
   matches: ["*://*.youtube.com/*"],

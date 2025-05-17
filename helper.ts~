@@ -54,7 +54,7 @@ export const checkPlaylist = async (
   for (let i = 0; i < a.length; i++) {
     // if (i === 53) debugger;
 
-    if (b[i] === null) {
+    if (a[i] === null) {
       continue;
     } else if (a[i].contentDetails.videoId === b[i]?.videoId) {
       continue;
