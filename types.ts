@@ -1,7 +1,7 @@
 export type renderedPlaylistItem = {
   title: string;
   videoId: string | null;
-};
+} | null;
 
 export type YouTubePlaylistItem = {
   kind: "youtube#playlistItem";
@@ -50,7 +50,6 @@ export type YouTubeVideoResponse = {
       licensedContent: boolean;
       regionRestriction?: {
         blocked?: string[];
-        allowed?: string[];
       };
       contentRating: Record<string, unknown>; // could be more specific if needed
       projection: string;

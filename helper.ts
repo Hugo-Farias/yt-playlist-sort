@@ -5,6 +5,7 @@ import {
   YouTubePlaylistContentDetails,
   YouTubePlaylistItem,
 } from "@/types.ts";
+import { videoAPI } from "@/chromeAPI.ts";
 
 export async function fetchJson<T = unknown>(
   input: RequestInfo,
@@ -43,6 +44,39 @@ export const storeCache = (
   );
 };
 
+export const checkPlaylist = (
+  a: YouTubePlaylistItem[] | null,
+  b: renderedPlaylistItem[] | null,
+): boolean => {
+  if (!a || !b) return false;
+  if (typeof a !== typeof b) return false;
+  // if (a.length !== b.length) return false;
+
+  // TODO change this to standard "for" loop
+  return a.every(async (_, i) => {
+    if (i === 53) debugger;
+
+    const { videoId } = a[i].contentDetails;
+    // console.log(i, videoId);
+    if (b[i] === null || videoId === b[i].videoId) {
+      return true;
+    } else if (videoId !== b[i].videoId) {
+      // TODO this is checking every video after first not available
+      return await checkVideoAvailability(videoId).then((isAvailable) => {
+        console.log("=>(helper.ts:62) isAvailable", isAvailable);
+        if (!isAvailable) {
+          console.log("=>(helper.ts:65) b[i]", b[i]);
+          b.splice(i, 0, null);
+          console.log("=>(helper.ts:65) b", b);
+          return true;
+          // console.log(videoId, "sliced");
+        }
+        return false;
+      });
+    }
+  });
+};
+
 export const getCache = (
   playlistId: string | null,
 ): CachedPlaylistData | null => {
@@ -52,25 +86,16 @@ export const getCache = (
   return JSON.parse(data)[playlistId];
 };
 
-export const checkPlaylist = (
-  a: YouTubePlaylistItem[] | null,
-  b: renderedPlaylistItem[] | null,
-): boolean => {
-  if (!a || !b) return false;
-  if (typeof a !== typeof b) return false;
-  // if (a.length !== b.length) return false;
+const checkVideoAvailability = async (
+  videoId: string,
+): Promise<boolean | undefined> => {
+  const videoInfo = await videoAPI(videoId);
+  if (!videoInfo) return false;
+  if (!videoInfo.items[0].contentDetails.regionRestriction) return true;
 
-  return a.every((v, i) => {
-    if (v.contentDetails.videoId === b[i].videoId) {
-      checkVideoAvailability(v.contentDetails.videoId).then((value) => {
-        console.log(value);
-      });
-    }
-  });
-};
-
-const checkVideoAvailability = async (videoId: string): Promise<string> => {
   const { country } = await fetchJson<countryIs>("https://api.country.is/");
 
-  return country;
+  return !videoInfo.items[0].contentDetails.regionRestriction?.blocked?.includes(
+    country,
+  );
 };
