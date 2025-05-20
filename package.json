@@ -7,6 +7,7 @@
   "scripts": {
     "git": "git add -A && tsc -noEmit && git commit -m",
     "dev": "wxt -b chromium",
+    "check": "tsc --noEmit",
     "dev:chromium": "wxt -b chromium",
     "dev:firefox": "wxt -b firefox",
     "build": "wxt build",
