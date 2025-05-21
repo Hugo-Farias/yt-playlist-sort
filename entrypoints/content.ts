@@ -1,6 +1,6 @@
 import { playlistAPI } from "@/chromeAPI.ts";
 import { MessageType } from "@/entrypoints/background.ts";
-import { getVideoId, checkPlaylist, storeCache, getCache } from "@/helper.ts";
+import { getVideoId, comparePlaylist, storeCache, getCache } from "@/helper.ts";
 import { renderedPlaylistItem } from "@/types.ts";
 import { API_URI } from "@/config.ts";
 import { API_KEY } from "@/env.ts";
@@ -38,21 +38,22 @@ export default defineContentScript({
 
       const cachedData = getCache(message.listId);
 
-      checkPlaylist(
-        cachedData ? cachedData.items : null,
-        renderedPlaylistItems,
-      ).then((check) => {
-        if (check && cachedData) {
-          console.log("check", cachedData.items);
-        } else {
-          playlistAPI(message.listId!)?.then((data) => {
-            // console.log(data);
-            if (!data || !message.listId) return null;
-            storeCache(message.listId, data);
-            return data;
-          });
-        }
-      });
+      let check = false;
+
+      if (cachedData) {
+        check = comparePlaylist(cachedData.items, renderedPlaylistItems);
+      }
+
+      if (check && cachedData) {
+        console.log("check", cachedData.items);
+      } else {
+        playlistAPI(message.listId!)?.then((data) => {
+          // console.log(data);
+          if (!data || !message.listId) return null;
+          storeCache(message.listId, data);
+          return data;
+        });
+      }
     });
   },
   matches: ["*://*.youtube.com/*"],
