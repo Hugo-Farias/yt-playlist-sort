@@ -1,7 +1,7 @@
 export type renderedPlaylistItem = {
   title: string;
   videoId: string | null;
-} | null;
+};
 
 export type YouTubePlaylistItem = {
   kind: "youtube#playlistItem";

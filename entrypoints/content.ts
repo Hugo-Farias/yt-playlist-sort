@@ -38,19 +38,15 @@ export default defineContentScript({
 
       const cachedData = getCache(message.listId);
 
-      let check = false;
-
-      if (cachedData) {
-        check = comparePlaylist(cachedData.items, renderedPlaylistItems);
-      }
-
-      if (check && cachedData) {
+      if (
+        cachedData &&
+        comparePlaylist(cachedData.items, renderedPlaylistItems)
+      ) {
         console.log("check", cachedData.items);
       } else {
         playlistAPI(message.listId!)?.then((data) => {
-          // console.log(data);
-          if (!data || !message.listId) return null;
-          storeCache(message.listId, data);
+          if (!data) return null;
+          storeCache(message.listId!, data);
           return data;
         });
       }

@@ -44,37 +44,38 @@ export const storeCache = (
   );
 };
 
-export const checkPlaylist = async (
-  a: YouTubePlaylistItem[] | null,
-  b: renderedPlaylistItem[] | null,
-): Promise<boolean> => {
+export const comparePlaylist = (
+  a: YouTubePlaylistItem[],
+  b: renderedPlaylistItem[],
+): boolean => {
   if (!a || !b) return false;
   if (typeof a !== typeof b) return false;
 
-  for (let i = 0; i < a.length; i++) {
-    // if (i === 53) debugger;
+  const idList = b.map((item) => {
+    // console.log("=>(helper.ts:58) item.videoId", item.videoId);
+    return item.videoId;
+  });
 
-    if (b[i] === null) {
-      continue;
-    } else if (a[i].contentDetails.videoId === b[i]?.videoId) {
-      continue;
-    } else if (a[i].contentDetails.videoId !== b[i]?.videoId) {
-      const isAvailable = await checkVideoAvailability(
-        a[i].contentDetails.videoId,
-      );
-      console.log("=>(helper.ts:62) isAvailable", isAvailable);
+  console.log("=>(helper.ts:58) idList", idList);
 
-      if (!isAvailable) {
-        b.splice(i, 0, null);
-        i--;
-        continue;
-      }
+  return a.every((item, index) => {
+    if (item === null || idList.includes(item.contentDetails.videoId))
+      return true;
 
-      return false;
-    }
-  }
-
-  return true;
+    console.log(
+      "=>(helper.ts:66) item.contentDetails.videoId",
+      item.contentDetails.videoId,
+    );
+    debugger;
+    return checkVideoAvailability(item.contentDetails.videoId).then(
+      (isAvailable) => {
+        if (isAvailable) {
+          return false;
+        }
+        return !isAvailable;
+      },
+    );
+  });
 };
 
 export const getCache = (
