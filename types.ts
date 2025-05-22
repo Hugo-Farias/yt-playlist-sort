@@ -7,13 +7,14 @@ export type YouTubePlaylistItem = {
   kind: "youtube#playlistItem";
   etag: string;
   id: string;
+  available?: boolean;
   contentDetails: {
     videoId: string;
     videoPublishedAt: string; // ISO 8601 date-time string
   };
-} | null;
+};
 
-export type YouTubePlaylistContentDetails = {
+export type YoutubePlaylistResponse = {
   kind: "youtube#playlistItemListResponse";
   etag: string;
   nextPageToken?: string;
@@ -25,7 +26,7 @@ export type YouTubePlaylistContentDetails = {
   };
 };
 
-export type CachedPlaylistData = YouTubePlaylistContentDetails & {
+export type CachedPlaylistData = YoutubePlaylistResponse & {
   listId: string;
   storeTime: number;
 };

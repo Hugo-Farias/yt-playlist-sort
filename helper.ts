@@ -2,8 +2,7 @@ import {
   CachedPlaylistData,
   countryIs,
   renderedPlaylistItem,
-  YouTubePlaylistContentDetails,
-  YouTubePlaylistItem,
+  YoutubePlaylistResponse,
 } from "@/types.ts";
 import { videoAPI } from "@/chromeAPI.ts";
 
@@ -33,7 +32,7 @@ export const getVideoId = (url: string): string | null => {
 
 export const storeCache = (
   playlistId: string,
-  data: YouTubePlaylistContentDetails,
+  data: YoutubePlaylistResponse,
 ) => {
   localStorage.setItem(
     "playlistCache",
@@ -44,34 +43,35 @@ export const storeCache = (
   );
 };
 
+//TODO this has to compare the rendered playlist to a chached version of the rendered playlist instead of the data from the API
 export const comparePlaylist = (
-  a: YouTubePlaylistItem[],
+  a: CachedPlaylistData,
   b: renderedPlaylistItem[],
 ): boolean => {
   if (!a || !b) return false;
   if (typeof a !== typeof b) return false;
 
-  const idList = b.map((item) => {
-    // console.log("=>(helper.ts:58) item.videoId", item.videoId);
-    return item.videoId;
-  });
+  const renderedIdList = b.map((item) => item.videoId);
 
-  console.log("=>(helper.ts:58) idList", idList);
+  // console.log("=>(helper.ts:58) renderedIdList", renderedIdList);
 
-  return a.every((item, index) => {
-    if (item === null || idList.includes(item.contentDetails.videoId))
+  return a.items.every((item, index) => {
+    if (
+      !item.available ||
+      renderedIdList.includes(item.contentDetails.videoId)
+    ) {
       return true;
+    }
 
-    console.log(
-      "=>(helper.ts:66) item.contentDetails.videoId",
-      item.contentDetails.videoId,
-    );
-    debugger;
     return checkVideoAvailability(item.contentDetails.videoId).then(
       (isAvailable) => {
-        if (isAvailable) {
-          return false;
-        }
+        storeCache(a.listId, {
+          ...a,
+          items: a.items.map((value, i) =>
+            i === index ? { ...value, available: isAvailable } : value,
+          ),
+        });
+
         return !isAvailable;
       },
     );

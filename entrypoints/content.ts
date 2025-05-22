@@ -38,10 +38,7 @@ export default defineContentScript({
 
       const cachedData = getCache(message.listId);
 
-      if (
-        cachedData &&
-        comparePlaylist(cachedData.items, renderedPlaylistItems)
-      ) {
+      if (cachedData && comparePlaylist(cachedData, renderedPlaylistItems)) {
         console.log("check", cachedData.items);
       } else {
         playlistAPI(message.listId!)?.then((data) => {
