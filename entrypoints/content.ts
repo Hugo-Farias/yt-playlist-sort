@@ -1,7 +1,7 @@
 import { playlistAPI } from "@/chromeAPI.ts";
 import { MessageType } from "@/entrypoints/background.ts";
 import { getVideoId, comparePlaylist, storeCache, getCache } from "@/helper.ts";
-import { renderedPlaylistItem } from "@/types.ts";
+import { RenderedPlaylistItem } from "@/types.ts";
 import { API_URI } from "@/config.ts";
 import { API_KEY } from "@/env.ts";
 
@@ -26,7 +26,7 @@ export default defineContentScript({
 
       const renderedPlaylistItems = [
         ...document.querySelectorAll<HTMLDivElement>(videoItemSelector),
-      ].map((el): renderedPlaylistItem => {
+      ].map((el): RenderedPlaylistItem => {
         const titleEl = el.querySelector("#video-title");
         const urlEl = el.querySelector("a");
 
@@ -36,14 +36,15 @@ export default defineContentScript({
         };
       });
 
-      const cachedData = getCache(message.listId);
+      const cachedData = getCache("renderedCache", message.listId);
 
       if (cachedData && comparePlaylist(cachedData, renderedPlaylistItems)) {
-        console.log("check", cachedData.items);
+        console.log("check", cachedData);
       } else {
+        storeCache("renderedCache", renderedPlaylistItems);
         playlistAPI(message.listId!)?.then((data) => {
           if (!data) return null;
-          storeCache(message.listId!, data);
+          storeCache("playlistCache", data, message.listId!);
           return data;
         });
       }

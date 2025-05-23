@@ -65,9 +65,7 @@ export const comparePlaylist = (
 };
 
 // TODO make this storagekey type determine the return type of the function
-type ResultType<T extends string> = T extends "playlistCache"
-  ? CachedPlaylistData
-  : RenderedPlaylistItem[];
+type ResultType<T extends string> = T extends "playlistCache" ? CachedPlaylistData : RenderedPlaylistItem[];
 
 export const getCache = <T extends "playlistCache" | "renderedCache">(
   storageKey: T,
