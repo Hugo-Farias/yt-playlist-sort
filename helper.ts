@@ -6,6 +6,37 @@ import {
 } from "@/types.ts";
 import { videoAPI } from "@/chromeAPI.ts";
 
+export const waitForElement = async <T extends Element>(
+  selector: string,
+  timeout: number = 5000,
+): Promise<NodeListOf<T> | null> => {
+  return new Promise((resolve, reject) => {
+    const observer = new MutationObserver((mutations) => {
+      console.log("=>(helper.ts:17) mutations", mutations);
+      const elementList = document.querySelectorAll(selector);
+      if (elementList) {
+        observer.disconnect();
+        clearTimeout(timer);
+        // TODO what the hell is this type error?
+        resolve(elementList as NodeListOf<T>);
+      } else {
+        resolve(null);
+      }
+    });
+
+    const timer = setTimeout(() => {
+      observer.disconnect();
+      reject(
+        new Error(
+          `Element with selector '${selector}' not found within ${timeout}ms`,
+        ),
+      );
+    }, timeout);
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+};
+
 export async function fetchJson<T = unknown>(
   input: RequestInfo,
   init?: RequestInit,
@@ -33,50 +64,67 @@ export const getVideoId = (url: string): string | null => {
 export const storeCache = (
   storageKey: "playlistCache" | "renderedCache",
   data: YoutubePlaylistResponse | RenderedPlaylistItem[] | null,
-  playlistId: string | null = null,
+  playlistId: string,
 ) => {
   if (!data || !playlistId) return null;
+  console.log("storeCache =>", playlistId);
 
   if (storageKey === "renderedCache") {
-    localStorage.setItem(storageKey, JSON.stringify({ [playlistId]: data }));
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({ ...getFullCache(storageKey), [playlistId]: data }),
+    );
   } else if (storageKey === "playlistCache") {
     localStorage.setItem(
       storageKey,
       JSON.stringify({
-        ...getCache(storageKey, null),
-        [playlistId]: { ...data, listId: playlistId, storeTime: Date.now() },
+        ...getFullCache(storageKey),
+        [playlistId]: {
+          ...data,
+          listId: playlistId,
+          storeTime: Date.now(),
+          extVersion: "0.0.0",
+        },
       }),
     );
   }
 };
 
 export const comparePlaylist = (
-  listA: RenderedPlaylistItem[],
-  listB: RenderedPlaylistItem[],
+  listA: RenderedPlaylistItem[] | null,
+  listB: RenderedPlaylistItem[] | null,
 ): boolean => {
   if (!listA || !listB) return false;
   if (listA.length !== listB.length) return false;
 
   const currentIdList = listA.map((item) => item.videoId);
 
-  return currentIdList.every((id, index) => {
-    return id === listB[index].videoId;
-  });
+  return currentIdList.every((id, index) => id === listB[index].videoId);
 };
 
-// TODO make this storagekey type determine the return type of the function
-type ResultType<T extends string> = T extends "playlistCache"
+type getCacheRT<T extends string> = T extends "playlistCache"
   ? CachedPlaylistData
   : RenderedPlaylistItem[];
 
 export const getCache = <T extends "playlistCache" | "renderedCache">(
   storageKey: T,
-  playlistId: string | null,
-): ResultType<T> | null => {
+  playlistId: string,
+): getCacheRT<T> | null => {
+  const data = localStorage.getItem(storageKey);
+  if (!data || !playlistId) return null;
+  return JSON.parse(data)[playlistId] as getCacheRT<T>;
+};
+
+type getFullCacheRT<T extends string> = T extends "playlistCache"
+  ? { [key: string]: CachedPlaylistData }
+  : { [key: string]: RenderedPlaylistItem[] };
+
+export const getFullCache = <T extends "playlistCache" | "renderedCache">(
+  storageKey: T,
+): getFullCacheRT<T> | null => {
   const data = localStorage.getItem(storageKey);
   if (!data) return null;
-  if (!playlistId) return JSON.parse(data) as ResultType<T>;
-  return JSON.parse(data)[playlistId] as ResultType<T>;
+  return JSON.parse(data) as getFullCacheRT<T>;
 };
 
 const checkVideoAvailability = async (

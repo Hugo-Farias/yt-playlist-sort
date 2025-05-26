@@ -29,6 +29,7 @@ export type YoutubePlaylistResponse = {
 export type CachedPlaylistData = YoutubePlaylistResponse & {
   listId: string;
   storeTime: number;
+  extVersion: string;
 };
 
 export type countryIs = {

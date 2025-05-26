@@ -22,7 +22,7 @@ const sendMsg = function (tabId: number, message: MessageType) {
       console.log("Attempt #", messagesSent, "to send message");
       sendMsg(tabId, message);
     });
-  }, 1000);
+  }, 50);
 };
 
 // noinspection JSUnusedGlobalSymbols
@@ -38,6 +38,7 @@ chrome.tabs.onUpdated.addListener(function (
   messagesSent = 0;
 
   const { url } = tab;
+  console.log("=>(background.ts:39) background init", getListId(url));
   if (!url) return null;
 
   sendMsg(tabId, {
