@@ -6,29 +6,33 @@ import {
 } from "@/types.ts";
 import { videoAPI } from "@/chromeAPI.ts";
 
-export const waitForElement = async <T extends Element>(
+export const waitForPlaylistRender = async <T extends Element>(
   selector: string,
-  timeout: number = 5000,
+  timeout: number = 10000,
 ): Promise<NodeListOf<T> | null> => {
-  return new Promise((resolve, reject) => {
-    const observer = new MutationObserver((mutations) => {
-      console.log("=>(helper.ts:17) mutations", mutations);
+  const browserListId = getListId(window.location.href);
+  return await new Promise((resolve, reject) => {
+    const observer = new MutationObserver(() => {
       const elementList = document.querySelectorAll(selector);
-      if (elementList) {
-        observer.disconnect();
-        clearTimeout(timer);
-        // TODO what the hell is this type error?
-        resolve(elementList as NodeListOf<T>);
-      } else {
-        resolve(null);
-      }
+
+      if (elementList.length === 0) return null;
+
+      const elementListId = getListId(
+        elementList[elementList.length - 1].querySelector("a")?.href ?? "",
+      );
+
+      if (browserListId !== elementListId) return null;
+
+      observer.disconnect();
+      clearTimeout(timer);
+      resolve(elementList as NodeListOf<T>);
     });
 
     const timer = setTimeout(() => {
       observer.disconnect();
       reject(
         new Error(
-          `Element with selector '${selector}' not found within ${timeout}ms`,
+          `Element with selector '${selector}' not found jwithin ${timeout}ms`,
         ),
       );
     }, timeout);
