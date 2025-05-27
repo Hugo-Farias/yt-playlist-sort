@@ -32,7 +32,6 @@ export const playlistAPI = async function (
 
   if (data.nextPageToken) {
     const recurData = await playlistAPI(playlistId, apiKey, data.nextPageToken);
-    // console.log("=>(chromeAPI.ts:40) recurData", recurData);
     if (!recurData) return null;
     return {
       ...data,

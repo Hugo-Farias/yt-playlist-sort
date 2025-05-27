@@ -67,7 +67,7 @@ export const getVideoId = (url: string): string | null => {
 
 export const storeCache = (
   storageKey: "playlistCache" | "renderedCache",
-  data: YoutubePlaylistResponse | RenderedPlaylistItem[] | null,
+  data: YoutubePlaylistResponse | string[] | null,
   playlistId: string,
 ) => {
   if (!data || !playlistId) return null;
@@ -95,20 +95,18 @@ export const storeCache = (
 };
 
 export const comparePlaylist = (
-  listA: RenderedPlaylistItem[] | null,
-  listB: RenderedPlaylistItem[] | null,
+  listA: string[] | null,
+  listB: string[] | null,
 ): boolean => {
   if (!listA || !listB) return false;
   if (listA.length !== listB.length) return false;
 
-  const currentIdList = listA.map((item) => item.videoId);
-
-  return currentIdList.every((id, index) => id === listB[index].videoId);
+  return listA.every((id, index) => id === listB[index]);
 };
 
 type getCacheRT<T extends string> = T extends "playlistCache"
   ? CachedPlaylistData
-  : RenderedPlaylistItem[];
+  : string[];
 
 export const getCache = <T extends "playlistCache" | "renderedCache">(
   storageKey: T,

@@ -1,9 +1,8 @@
 export type RenderedPlaylistItem = {
-  title: string;
   videoId: string | null;
 };
 
-export type YouTubePlaylistItem = {
+type YouTubePlaylistItem = {
   kind: "youtube#playlistItem";
   etag: string;
   id: string;

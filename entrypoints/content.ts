@@ -7,7 +7,6 @@ import {
   getCache,
   waitForPlaylistRender,
 } from "@/helper.ts";
-import { RenderedPlaylistItem } from "@/types.ts";
 
 let previousURL = "";
 let videoItemSelector =
@@ -36,13 +35,10 @@ export default defineContentScript({
       if (!nodePlaylistRender) return null;
 
       const renderedPlaylistItems = [...nodePlaylistRender].map(
-        (el): RenderedPlaylistItem => {
-          const titleEl = el.querySelector("#video-title");
-          const urlEl = el.querySelector("a");
-          return {
-            title: titleEl?.textContent ? titleEl?.textContent.trim() : "null",
-            videoId: urlEl ? getVideoId(urlEl.href) : "null",
-          };
+        (el): string => {
+          const urlId = getVideoId(el.querySelector("a")?.href ?? "");
+          if (!urlId) return "";
+          return urlId;
         },
       );
 
