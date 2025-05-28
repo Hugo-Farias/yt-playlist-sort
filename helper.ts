@@ -2,15 +2,17 @@ import {
   CachedPlaylistData,
   countryIs,
   RenderedPlaylistItem,
+  YouTubePlaylistItem,
   YoutubePlaylistResponse,
 } from "@/types.ts";
 import { videoAPI } from "@/chromeAPI.ts";
+import { videoItemSelector } from "@/config.ts";
 
-export const waitForPlaylistRender = async <T extends Element>(
+export const waitForElements = async <T extends Element>(
   selector: string,
   timeout: number = 10000,
 ): Promise<NodeListOf<T> | null> => {
-  const browserListId = getListId(window.location.href);
+  const browserListId = getListId(location.href);
   return await new Promise((resolve, reject) => {
     const observer = new MutationObserver(() => {
       const elementList = document.querySelectorAll(selector);
@@ -18,7 +20,9 @@ export const waitForPlaylistRender = async <T extends Element>(
       if (elementList.length === 0) return null;
 
       const elementListId = getListId(
-        elementList[elementList.length - 1].querySelector("a")?.href ?? "",
+        document
+          .querySelectorAll(videoItemSelector)
+          [elementList.length - 1]?.querySelector("a")?.href,
       );
 
       if (browserListId !== elementListId) return null;
@@ -32,7 +36,7 @@ export const waitForPlaylistRender = async <T extends Element>(
       observer.disconnect();
       reject(
         new Error(
-          `Element with selector '${selector}' not found jwithin ${timeout}ms`,
+          `Element with selector '${selector}' not found within ${timeout}ms`,
         ),
       );
     }, timeout);
@@ -55,19 +59,23 @@ export async function fetchJson<T = unknown>(
   return (await res.json()) as Promise<T>;
 }
 
-export const getListId = (url: string) => {
-  if (url.length <= 0) return null;
-  return new URL(url).searchParams.get("list");
+export const getListId = (url: string | undefined) => {
+  if (!url || url.length <= 0) return "";
+  return new URL(url).searchParams.get("list") ?? "";
 };
 
-export const getVideoId = (url: string): string | null => {
-  if (url.length <= 0) return null;
-  return new URL(url).searchParams.get("v");
+export const getVideoId = (url: string | undefined): string => {
+  if (!url || url.length <= 0) return "";
+  return new URL(url).searchParams.get("v") ?? "";
 };
 
-export const storeCache = (
-  storageKey: "playlistCache" | "renderedCache",
-  data: YoutubePlaylistResponse | string[] | null,
+type storeCacheDataParam<T extends string> = T extends "playlistCache"
+  ? YoutubePlaylistResponse
+  : string[];
+
+export const storeCache = <T extends "playlistCache" | "renderedCache">(
+  storageKey: T,
+  data: storeCacheDataParam<T>,
   playlistId: string,
 ) => {
   if (!data || !playlistId) return null;
@@ -79,12 +87,22 @@ export const storeCache = (
       JSON.stringify({ ...getFullCache(storageKey), [playlistId]: data }),
     );
   } else if (storageKey === "playlistCache") {
+    const playlistData = data as YoutubePlaylistResponse;
+    const newItems = playlistData.items.reduce(
+      (acc, item) => {
+        acc[item.contentDetails.videoId] = item;
+        return acc;
+      },
+      {} as Record<string, YouTubePlaylistItem>,
+    );
+
     localStorage.setItem(
       storageKey,
       JSON.stringify({
         ...getFullCache(storageKey),
         [playlistId]: {
-          ...data,
+          ...playlistData,
+          items: newItems,
           listId: playlistId,
           storeTime: Date.now(),
           extVersion: "0.0.0",
@@ -92,16 +110,6 @@ export const storeCache = (
       }),
     );
   }
-};
-
-export const comparePlaylist = (
-  listA: string[] | null,
-  listB: string[] | null,
-): boolean => {
-  if (!listA || !listB) return false;
-  if (listA.length !== listB.length) return false;
-
-  return listA.every((id, index) => id === listB[index]);
 };
 
 type getCacheRT<T extends string> = T extends "playlistCache"
@@ -115,6 +123,15 @@ export const getCache = <T extends "playlistCache" | "renderedCache">(
   const data = localStorage.getItem(storageKey);
   if (!data || !playlistId) return null;
   return JSON.parse(data)[playlistId] as getCacheRT<T>;
+};
+export const comparePlaylist = (
+  listA: string[] | null,
+  listB: string[] | null,
+): boolean => {
+  if (!listA || !listB) return false;
+  if (listA.length !== listB.length) return false;
+
+  return listA.every((id, index) => id === listB[index]);
 };
 
 type getFullCacheRT<T extends string> = T extends "playlistCache"

@@ -2,7 +2,7 @@ export type RenderedPlaylistItem = {
   videoId: string | null;
 };
 
-type YouTubePlaylistItem = {
+export type YouTubePlaylistItem = {
   kind: "youtube#playlistItem";
   etag: string;
   id: string;
@@ -26,6 +26,10 @@ export type YoutubePlaylistResponse = {
 };
 
 export type CachedPlaylistData = YoutubePlaylistResponse & {
+  items: Record<
+    YouTubePlaylistItem["contentDetails"]["videoId"],
+    YouTubePlaylistItem
+  >;
   listId: string;
   storeTime: number;
   extVersion: string;

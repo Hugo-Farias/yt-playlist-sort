@@ -5,47 +5,45 @@ import {
   comparePlaylist,
   storeCache,
   getCache,
-  waitForPlaylistRender,
+  waitForElements,
+  getListId,
 } from "@/helper.ts";
+import { videoItemSelector } from "@/config.ts";
 
 let previousURL = "";
-let videoItemSelector =
-  "ytd-playlist-panel-video-renderer:not([within-miniplayer])";
 
 // noinspection JSUnusedGlobalSymbols
 export default defineContentScript({
   main() {
     chrome.runtime.onMessage.addListener(async (message: MessageType) => {
       if (!message.videoId || !message.listId) return null;
-      if (getVideoId(previousURL) === message.videoId) return null;
-
+      if (previousURL === message.url) return null; // Prevents duplicate execution
       previousURL = location.href;
+
       console.log("content init");
 
-      const video = document.querySelector<HTMLVideoElement>("video");
+      const nodeVideo = await waitForElements<HTMLVideoElement>("video");
+      console.log(nodeVideo);
 
-      if (!video) return null;
+      if (!nodeVideo || [...nodeVideo].length === 0) return null;
       else {
-        video.pause();
+        nodeVideo[0].pause();
       }
 
+      // const video = [...nodeVideo].filter((el) => !el.paused);
+
       const nodePlaylistRender =
-        await waitForPlaylistRender<HTMLDivElement>(videoItemSelector);
+        await waitForElements<HTMLDivElement>(videoItemSelector);
 
       if (!nodePlaylistRender) return null;
 
-      const renderedPlaylistItems = [...nodePlaylistRender].map(
-        (el): string => {
-          const urlId = getVideoId(el.querySelector("a")?.href ?? "");
-          if (!urlId) return "";
-          return urlId;
-        },
+      const renderedPlaylistItems = [...nodePlaylistRender].map((el): string =>
+        getVideoId(el.querySelector("a")?.href),
       );
-
       const renderedCache = getCache("renderedCache", message.listId);
 
-      console.log("=>renderedPlaylistItems", renderedPlaylistItems);
-      console.log("=>renderedCache", renderedCache);
+      // console.log("=>renderedPlaylistItems", renderedPlaylistItems);
+      // console.log("=>renderedCache", renderedCache);
 
       if (
         renderedCache &&
@@ -53,6 +51,12 @@ export default defineContentScript({
         comparePlaylist(renderedCache, renderedPlaylistItems)
       ) {
         console.log("check!!!");
+        //TODO use this data to organize the playlist
+        console.log(
+          getCache("playlistCache", getListId(location.href))?.items[
+            message.videoId
+          ].contentDetails.videoPublishedAt,
+        );
       } else {
         storeCache("renderedCache", renderedPlaylistItems, message.listId);
         playlistAPI(message.listId)?.then((data) => {
