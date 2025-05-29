@@ -8,7 +8,7 @@ import {
   waitForElements,
   getListId,
 } from "@/helper.ts";
-import { videoItemSelector } from "@/config.ts";
+import { playlistItemSelector } from "@/config.ts";
 
 let previousURL = "";
 
@@ -22,18 +22,15 @@ export default defineContentScript({
 
       console.log("content init");
 
-      const nodeVideo = await waitForElements<HTMLVideoElement>("video");
-      console.log(nodeVideo);
-
-      if (!nodeVideo || [...nodeVideo].length === 0) return null;
-      else {
-        nodeVideo[0].pause();
-      }
-
-      // const video = [...nodeVideo].filter((el) => !el.paused);
-
       const nodePlaylistRender =
-        await waitForElements<HTMLDivElement>(videoItemSelector);
+        await waitForElements<HTMLDivElement>(playlistItemSelector);
+
+      // development only paragraph
+      const videoEl = document.querySelector("video");
+      if (!videoEl) return null;
+      else {
+        videoEl.pause();
+      }
 
       if (!nodePlaylistRender) return null;
 
@@ -46,25 +43,24 @@ export default defineContentScript({
       // console.log("=>renderedCache", renderedCache);
 
       if (
-        renderedCache &&
-        !!renderedCache?.length &&
-        comparePlaylist(renderedCache, renderedPlaylistItems)
+        !renderedCache ||
+        renderedCache.length === 0 ||
+        !comparePlaylist(renderedCache, renderedPlaylistItems)
       ) {
-        console.log("check!!!");
-        //TODO use this data to organize the playlist
-        console.log(
-          getCache("playlistCache", getListId(location.href))?.items[
-            message.videoId
-          ].contentDetails.videoPublishedAt,
-        );
-      } else {
+        console.log("Cache hit!!!");
         storeCache("renderedCache", renderedPlaylistItems, message.listId);
-        playlistAPI(message.listId)?.then((data) => {
-          if (!data) return null;
+        const data = await playlistAPI(message.listId);
+        if (data) {
           storeCache("playlistCache", data, message.listId!);
-          return data;
-        });
+        }
       }
+
+      //TODO use this data to organize the playlist,
+      console.log(
+        getCache("playlistCache", getListId(location.href))?.items[
+          message.videoId
+        ].contentDetails.videoPublishedAt,
+      );
     });
   },
   matches: ["*://*.youtube.com/*"],

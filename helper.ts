@@ -1,12 +1,10 @@
 import {
   CachedPlaylistData,
-  countryIs,
   RenderedPlaylistItem,
   YouTubePlaylistItem,
   YoutubePlaylistResponse,
 } from "@/types.ts";
-import { videoAPI } from "@/chromeAPI.ts";
-import { videoItemSelector } from "@/config.ts";
+import { playlistItemSelector } from "@/config.ts";
 
 export const waitForElements = async <T extends Element>(
   selector: string,
@@ -21,7 +19,7 @@ export const waitForElements = async <T extends Element>(
 
       const elementListId = getListId(
         document
-          .querySelectorAll(videoItemSelector)
+          .querySelectorAll(playlistItemSelector)
           [elementList.length - 1]?.querySelector("a")?.href,
       );
 
@@ -130,8 +128,8 @@ export const comparePlaylist = (
 ): boolean => {
   if (!listA || !listB) return false;
   if (listA.length !== listB.length) return false;
-
-  return listA.every((id, index) => id === listB[index]);
+  const listBsorted = listB.sort();
+  return listA.sort().every((id, index) => id === listBsorted[index]);
 };
 
 type getFullCacheRT<T extends string> = T extends "playlistCache"
@@ -146,16 +144,16 @@ export const getFullCache = <T extends "playlistCache" | "renderedCache">(
   return JSON.parse(data) as getFullCacheRT<T>;
 };
 
-const checkVideoAvailability = async (
-  videoId: string,
-): Promise<boolean | undefined> => {
-  const videoInfo = await videoAPI(videoId);
-  if (!videoInfo) return false;
-  if (!videoInfo.items[0].contentDetails.regionRestriction) return true;
-
-  const { country } = await fetchJson<countryIs>("https://api.country.is/");
-
-  return !videoInfo.items[0].contentDetails.regionRestriction?.blocked?.includes(
-    country,
-  );
-};
+// const checkVideoAvailability = async (
+//   videoId: string,
+// ): Promise<boolean | undefined> => {
+//   const videoInfo = await videoAPI(videoId);
+//   if (!videoInfo) return false;
+//   if (!videoInfo.items[0].contentDetails.regionRestriction) return true;
+//
+//   const { country } = await fetchJson<countryIs>("https://api.country.is/");
+//
+//   return !videoInfo.items[0].contentDetails.regionRestriction?.blocked?.includes(
+//     country,
+//   );
+// };
