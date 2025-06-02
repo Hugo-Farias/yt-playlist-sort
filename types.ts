@@ -25,11 +25,8 @@ export type YoutubePlaylistResponse = {
   };
 };
 
-export type CachedPlaylistData = YoutubePlaylistResponse & {
-  items: Record<
-    YouTubePlaylistItem["contentDetails"]["videoId"],
-    YouTubePlaylistItem
-  >;
+export type CachedPlaylistData = {
+  items: { [videoId: string]: { videoPublishedAt: string } };
   listId: string;
   storeTime: number;
   extVersion: string;

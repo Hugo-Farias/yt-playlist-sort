@@ -1,10 +1,9 @@
 import {
   CachedPlaylistData,
   RenderedPlaylistItem,
-  YouTubePlaylistItem,
   YoutubePlaylistResponse,
 } from "@/types.ts";
-import { playlistItemSelector } from "@/config.ts";
+import { API_URL, playlistItemSelector } from "@/config.ts";
 
 export const waitForElements = async <T extends Element>(
   selector: string,
@@ -88,10 +87,13 @@ export const storeCache = <T extends "playlistCache" | "renderedCache">(
     const playlistData = data as YoutubePlaylistResponse;
     const newItems = playlistData.items.reduce(
       (acc, item) => {
-        acc[item.contentDetails.videoId] = item;
+        acc[item.contentDetails.videoId] = {
+          videoPublishedAt: item.contentDetails.videoPublishedAt,
+        };
+
         return acc;
       },
-      {} as Record<string, YouTubePlaylistItem>,
+      {} as CachedPlaylistData["items"],
     );
 
     localStorage.setItem(
@@ -99,7 +101,6 @@ export const storeCache = <T extends "playlistCache" | "renderedCache">(
       JSON.stringify({
         ...getFullCache(storageKey),
         [playlistId]: {
-          ...playlistData,
           items: newItems,
           listId: playlistId,
           storeTime: Date.now(),

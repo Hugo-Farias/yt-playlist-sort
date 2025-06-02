@@ -8,7 +8,8 @@ import {
   waitForElements,
   getListId,
 } from "@/helper.ts";
-import { playlistItemSelector } from "@/config.ts";
+import { API_URL, playlistItemSelector } from "@/config.ts";
+import { API_KEY } from "@/env.ts";
 
 let previousURL = "";
 
@@ -21,6 +22,8 @@ export default defineContentScript({
       previousURL = location.href;
 
       console.log("content init");
+
+      console.log(API_URL + `&playlistId=${message.listId}&key=${API_KEY}`);
 
       const nodePlaylistRender =
         await waitForElements<HTMLDivElement>(playlistItemSelector);
@@ -39,15 +42,11 @@ export default defineContentScript({
       );
       const renderedCache = getCache("renderedCache", message.listId);
 
-      // console.log("=>renderedPlaylistItems", renderedPlaylistItems);
-      // console.log("=>renderedCache", renderedCache);
-
       if (
-        !renderedCache ||
-        renderedCache.length === 0 ||
+        !renderedCache?.length ||
         !comparePlaylist(renderedCache, renderedPlaylistItems)
       ) {
-        console.log("Cache hit!!!");
+        console.log("Cache hydration!!!");
         storeCache("renderedCache", renderedPlaylistItems, message.listId);
         const data = await playlistAPI(message.listId);
         if (data) {
@@ -59,7 +58,7 @@ export default defineContentScript({
       console.log(
         getCache("playlistCache", getListId(location.href))?.items[
           message.videoId
-        ].contentDetails.videoPublishedAt,
+        ].videoPublishedAt,
       );
     });
   },

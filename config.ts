@@ -1,4 +1,4 @@
-export const API_URI =
+export const API_URL =
   "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50";
 
 export const playlistItemSelector =

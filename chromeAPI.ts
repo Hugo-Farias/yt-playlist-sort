@@ -1,6 +1,6 @@
 import { YoutubePlaylistResponse, YouTubeVideoResponse } from "@/types.ts";
 import dummydata from "@/data/DUMMYDATA.json";
-import { API_URI } from "@/config.ts";
+import { API_URL } from "@/config.ts";
 import { API_KEY } from "@/env.ts";
 import { fetchJson } from "@/helper.ts";
 
@@ -25,7 +25,7 @@ export const playlistAPI = async function (
   }
 
   const data = await fetchJson<YoutubePlaylistResponse>(
-    API_URI +
+    API_URL +
       `&playlistId=${playlistId}&key=${apiKey}` +
       (nextpageToken ? `&pageToken=${nextpageToken}` : ""),
   );
