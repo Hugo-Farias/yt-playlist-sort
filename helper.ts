@@ -4,6 +4,7 @@ import {
   YoutubePlaylistResponse,
 } from "@/types.ts";
 import { API_URL, playlistItemSelector } from "@/config.ts";
+import { API_KEY } from "@/env.ts";
 
 export const waitForElements = async <T extends Element>(
   selector: string,
@@ -143,6 +144,14 @@ export const getFullCache = <T extends "playlistCache" | "renderedCache">(
   const data = localStorage.getItem(storageKey);
   if (!data) return null;
   return JSON.parse(data) as getFullCacheRT<T>;
+};
+
+export const getPlaylistItemsUrl = (
+  playlistId: string,
+  apiKey: string,
+  nextPageToken: string | null = null,
+): string => {
+  return `${API_URL}&playlistId=${playlistId}&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ""}`;
 };
 
 // const checkVideoAvailability = async (

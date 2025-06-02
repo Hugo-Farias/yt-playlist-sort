@@ -2,11 +2,10 @@ import { YoutubePlaylistResponse, YouTubeVideoResponse } from "@/types.ts";
 import dummydata from "@/data/DUMMYDATA.json";
 import { API_URL } from "@/config.ts";
 import { API_KEY } from "@/env.ts";
-import { fetchJson } from "@/helper.ts";
+import { fetchJson, getPlaylistItemsUrl } from "@/helper.ts";
 
 export const playlistAPI = async function (
   playlistId: string,
-  apiKey: string | null = API_KEY,
   nextpageToken: string | null = null,
   dummy: boolean = false, //parameter for testing purposes
 ): Promise<YoutubePlaylistResponse | null> {
@@ -25,13 +24,11 @@ export const playlistAPI = async function (
   }
 
   const data = await fetchJson<YoutubePlaylistResponse>(
-    API_URL +
-      `&playlistId=${playlistId}&key=${apiKey}` +
-      (nextpageToken ? `&pageToken=${nextpageToken}` : ""),
+    getPlaylistItemsUrl(playlistId, API_KEY, nextpageToken),
   );
 
   if (data.nextPageToken) {
-    const recurData = await playlistAPI(playlistId, apiKey, data.nextPageToken);
+    const recurData = await playlistAPI(playlistId, data.nextPageToken);
     if (!recurData) return null;
     return {
       ...data,
@@ -44,11 +41,10 @@ export const playlistAPI = async function (
 
 export const videoAPI = async function (
   videoId: string,
-  apiKey: string = API_KEY,
 ): Promise<YouTubeVideoResponse | null> {
-  if (!videoId || !apiKey) return null;
+  if (!videoId) return null;
   console.log("chromeAPI.video triggered");
   return await fetchJson<YouTubeVideoResponse>(
-    `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=${apiKey}`,
+    `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=${API_KEY}`,
   );
 };
