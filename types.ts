@@ -25,8 +25,8 @@ export type YoutubePlaylistResponse = {
   };
 };
 
-export type CachedPlaylistData = {
-  items: { [videoId: string]: { videoPublishedAt: string } };
+export type ApiCache = {
+  items: { [videoId: string]: { videoPublishedAt: number } };
   listId: string;
   storeTime: number;
   extVersion: string;

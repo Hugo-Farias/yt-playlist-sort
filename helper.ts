@@ -1,10 +1,9 @@
 import {
-  CachedPlaylistData,
+  ApiCache,
   RenderedPlaylistItem,
   YoutubePlaylistResponse,
 } from "@/types.ts";
 import { API_URL, playlistItemSelector } from "@/config.ts";
-import { API_KEY } from "@/env.ts";
 
 export const waitForElements = async <T extends Element>(
   selector: string,
@@ -67,11 +66,11 @@ export const getVideoId = (url: string | undefined): string => {
   return new URL(url).searchParams.get("v") ?? "";
 };
 
-type storeCacheDataParam<T extends string> = T extends "playlistCache"
+type storeCacheDataParam<T extends string> = T extends "apiCache"
   ? YoutubePlaylistResponse
   : string[];
 
-export const storeCache = <T extends "playlistCache" | "renderedCache">(
+export const storeCache = <T extends "apiCache" | "renderedCache">(
   storageKey: T,
   data: storeCacheDataParam<T>,
   playlistId: string,
@@ -84,17 +83,19 @@ export const storeCache = <T extends "playlistCache" | "renderedCache">(
       storageKey,
       JSON.stringify({ ...getFullCache(storageKey), [playlistId]: data }),
     );
-  } else if (storageKey === "playlistCache") {
+  } else if (storageKey === "apiCache") {
     const playlistData = data as YoutubePlaylistResponse;
     const newItems = playlistData.items.reduce(
       (acc, item) => {
         acc[item.contentDetails.videoId] = {
-          videoPublishedAt: item.contentDetails.videoPublishedAt,
+          videoPublishedAt: new Date(
+            item.contentDetails.videoPublishedAt,
+          ).getTime(),
         };
 
         return acc;
       },
-      {} as CachedPlaylistData["items"],
+      {} as ApiCache["items"],
     );
 
     localStorage.setItem(
@@ -112,11 +113,9 @@ export const storeCache = <T extends "playlistCache" | "renderedCache">(
   }
 };
 
-type getCacheRT<T extends string> = T extends "playlistCache"
-  ? CachedPlaylistData
-  : string[];
+type getCacheRT<T extends string> = T extends "apiCache" ? ApiCache : string[];
 
-export const getCache = <T extends "playlistCache" | "renderedCache">(
+export const getCache = <T extends "apiCache" | "renderedCache">(
   storageKey: T,
   playlistId: string,
 ): getCacheRT<T> | null => {
@@ -134,11 +133,11 @@ export const comparePlaylist = (
   return listA.sort().every((id, index) => id === listBsorted[index]);
 };
 
-type getFullCacheRT<T extends string> = T extends "playlistCache"
-  ? { [key: string]: CachedPlaylistData }
+type getFullCacheRT<T extends string> = T extends "apiCache"
+  ? { [key: string]: ApiCache }
   : { [key: string]: RenderedPlaylistItem[] };
 
-export const getFullCache = <T extends "playlistCache" | "renderedCache">(
+export const getFullCache = <T extends "apiCache" | "renderedCache">(
   storageKey: T,
 ): getFullCacheRT<T> | null => {
   const data = localStorage.getItem(storageKey);
