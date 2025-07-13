@@ -1,6 +1,6 @@
 import { YoutubePlaylistResponse, YouTubeVideoResponse } from "@/types.ts";
 import dummydata from "@/data/DUMMYDATA.json";
-import { API_URL } from "@/config.ts";
+// import { API_URL } from "@/config.ts";
 import { API_KEY } from "@/env.ts";
 import { fetchJson, getPlaylistItemsUrl } from "@/helper.ts";
 

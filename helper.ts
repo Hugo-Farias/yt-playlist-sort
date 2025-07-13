@@ -56,7 +56,7 @@ export async function fetchJson<T = unknown>(
   return (await res.json()) as Promise<T>;
 }
 
-export const getListId = (url: string | undefined) => {
+export const getListId = (url: string | undefined): string => {
   if (!url || url.length <= 0) return "";
   return new URL(url).searchParams.get("list") ?? "";
 };
@@ -115,6 +115,7 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
 
 type getCacheRT<T extends string> = T extends "apiCache" ? ApiCache : string[];
 
+// Get a specific cache entry by playlist ID
 export const getCache = <T extends "apiCache" | "renderedCache">(
   storageKey: T,
   playlistId: string,
@@ -123,6 +124,8 @@ export const getCache = <T extends "apiCache" | "renderedCache">(
   if (!data || !playlistId) return null;
   return JSON.parse(data)[playlistId] as getCacheRT<T>;
 };
+
+// Compare two playlists by their video IDs returning true if they are identical
 export const comparePlaylist = (
   listA: string[] | null,
   listB: string[] | null,

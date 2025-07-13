@@ -6,8 +6,8 @@ let messagesSent = 0;
 
 export type MessageType = {
   url: string;
-  listId: string | null;
-  videoId: string | null;
+  listId: string;
+  videoId: string;
 };
 
 const sendMsg = function (tabId: number, message: MessageType) {
@@ -31,7 +31,7 @@ chrome.tabs.onUpdated.addListener(function (
   _: chrome.tabs.TabChangeInfo,
   tab: chrome.tabs.Tab,
 ) {
-  if (!tab.url?.includes("&list=PL")) return null;
+  // if (!tab.url?.includes("&list=PL")) return null;
   if (tab.status !== "complete") return null;
 
   messagesSent = 0;
