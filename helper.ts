@@ -42,20 +42,6 @@ export const waitForElements = async <T extends Element>(
   });
 };
 
-export async function fetchJson<T = unknown>(
-  input: RequestInfo,
-  init?: RequestInit,
-): Promise<T> {
-  const res = await fetch(input, init);
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`Fetch error ${res.status}: ${errorText}`);
-  }
-
-  return (await res.json()) as Promise<T>;
-}
-
 export const getListId = (url: string | undefined): string => {
   if (!url || url.length <= 0) return "";
   return new URL(url).searchParams.get("list") ?? "";
@@ -169,3 +155,17 @@ export const getPlaylistItemsUrl = (
 //     country,
 //   );
 // };
+
+// Format the date to a human-readable format
+export function formatDate(
+  dateInput: Date | string | number,
+  options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  },
+  locale = "en-CA",
+): string {
+  const date = new Date(dateInput);
+  return date.toLocaleDateString(locale, options);
+}

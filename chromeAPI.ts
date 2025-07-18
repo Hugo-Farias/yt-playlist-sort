@@ -2,8 +2,22 @@ import { YoutubePlaylistResponse, YouTubeVideoResponse } from "@/types.ts";
 import dummydata from "@/data/DUMMYDATA.json";
 // import { API_URL } from "@/config.ts";
 import { API_KEY } from "@/env.ts";
-import { fetchJson, getPlaylistItemsUrl } from "@/helper.ts";
+import { getPlaylistItemsUrl } from "@/helper.ts";
 
+// TODO change this to a variable function
+async function fetchJson<T = unknown>(
+  input: RequestInfo,
+  init?: RequestInit,
+): Promise<T> {
+  const res = await fetch(input, init);
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Fetch error ${res.status}: ${errorText}`);
+  }
+
+  return (await res.json()) as Promise<T>;
+}
 export const playlistAPI = async function (
   playlistId: string,
   nextpageToken: string | null = null,

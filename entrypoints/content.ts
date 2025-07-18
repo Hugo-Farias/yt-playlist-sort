@@ -35,78 +35,79 @@ export default defineContentScript({
       if (videoEl) {
         setTimeout(() => {
           videoEl.pause();
-          console.log("Video element found, pausing playback.");
-        }, 1000); // Wait for the video to load
+        }, 1000);
       }
 
-      if (nodePlaylistRender) {
-        const renderedPlaylistItems = [...nodePlaylistRender].map(
-          (el): string => getVideoId(el.querySelector("a")?.href),
+      if (!nodePlaylistRender) return null;
+
+      const nxtBtn = document.querySelector(".ytp-next-button");
+
+      nxtBtn?.addEventListener("click", (e) => {
+        const tgt = e.target as HTMLButtonElement;
+        console.log("Next button clicked", tgt);
+      });
+
+      const renderedPlaylistItems = [...nodePlaylistRender].map((el): string =>
+        getVideoId(el.querySelector("a")?.href),
+      );
+
+      const renderedCache = getCache("renderedCache", message.listId);
+
+      // if the rendered playlist items are different from the cache,
+      // hydrate the cache
+      if (
+        !renderedCache?.length ||
+        !comparePlaylist(renderedCache, renderedPlaylistItems)
+      ) {
+        console.log("YT-playlist-sort: Cache hydration!!!");
+        storeCache("renderedCache", renderedPlaylistItems, message.listId);
+        const data = await playlistAPI(message.listId);
+        if (data) {
+          storeCache("apiCache", data, message.listId!);
+        }
+      }
+
+      const apiCache = getCache("apiCache", message.listId!);
+
+      // Stop if the playlist id has not changed
+      if (previousPlaylistId === message.listId || message.listId === "") {
+        console.log("Same Playlist!!! Halting!!! 🔴🔴🔴");
+        previousPlaylistId = message.listId;
+        return null;
+      }
+
+      previousPlaylistId = message.listId;
+
+      console.log("New Playlist!!! Continuing!!! 🟢🟢🟢");
+
+      // Render the date of the video if the API cache is available
+      nodePlaylistRender.forEach((value) => {
+        const videoId = getVideoId(value.querySelector("a")?.href);
+
+        if (!apiCache?.items[videoId]) return null;
+
+        const itemEl = value.querySelector("#byline-container");
+        if (!itemEl) return null;
+
+        const { videoPublishedAt } = apiCache?.items[videoId];
+
+        const formattedDate = new Date(videoPublishedAt).toLocaleDateString(
+          "en-US",
+          {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          },
         );
 
-        const renderedCache = getCache("renderedCache", message.listId);
+        const span = document.createElement("span");
+        span.textContent = `- ${formattedDate}`;
+        span.classList.add("style-scope", "ytd-playlist-panel-video-renderer");
+        span.id = "byline";
+        span.style.marginLeft = "-5px";
 
-        if (
-          !renderedCache?.length ||
-          !comparePlaylist(renderedCache, renderedPlaylistItems)
-        ) {
-          console.log("YT-playlist-sort: Cache hydration!!!");
-          storeCache("renderedCache", renderedPlaylistItems, message.listId);
-          const data = await playlistAPI(message.listId);
-          if (data) {
-            storeCache("apiCache", data, message.listId!);
-          }
-        }
-
-        const apiCache = getCache("apiCache", message.listId!);
-
-        // Stop if the playlist id has not changed
-        try {
-          if (previousPlaylistId === message.listId || message.listId === "") {
-            console.log("Same Playlist!!! Halting!!! 🔴🔴🔴");
-            // previousPlaylistId = message.listId;
-            return null;
-          }
-        } finally {
-          console.log("Playlist ID updated!!!");
-          previousPlaylistId = message.listId;
-        }
-
-        console.log("New Playlist!!! Continuing!!! 🟢🟢🟢");
-
-        // Render the date of the video if the API cache is available
-        nodePlaylistRender.forEach((value) => {
-          const videoId = getVideoId(value.querySelector("a")?.href);
-          if (!message.videoId) return null;
-
-          if (!apiCache?.items[videoId]) return null;
-
-          const itemEl = value.querySelector("#byline-container");
-          if (!itemEl) return null;
-
-          const { videoPublishedAt } = apiCache?.items[videoId];
-
-          const formattedDate = new Date(videoPublishedAt).toLocaleDateString(
-            "en-US",
-            {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            },
-          );
-
-          const span = document.createElement("span");
-          span.textContent = `- ${formattedDate}`;
-          span.classList.add(
-            "style-scope",
-            "ytd-playlist-panel-video-renderer",
-          );
-          span.id = "byline";
-          span.style.marginLeft = "-5px";
-
-          itemEl.appendChild(span);
-        });
-      }
+        itemEl.appendChild(span);
+      });
     });
   },
   matches: ["*://*.youtube.com/*"],
