@@ -4,6 +4,7 @@ import {
   YoutubePlaylistResponse,
 } from "@/types.ts";
 import { API_URL, playlistItemSelector } from "@/config.ts";
+import pkg from "@/package.json";
 
 export const waitForElements = async <T extends Element>(
   selector: string,
@@ -58,7 +59,7 @@ type storeCacheDataParam<T extends string> = T extends "apiCache"
 
 export const storeCache = <T extends "apiCache" | "renderedCache">(
   storageKey: T,
-  data: storeCacheDataParam<T>,
+  data: storeCacheDataParam<T> | null,
   playlistId: string,
 ) => {
   if (!data || !playlistId) return null;
@@ -92,7 +93,7 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
           items: newItems,
           listId: playlistId,
           storeTime: Date.now(),
-          extVersion: "0.0.0",
+          extVersion: pkg.version,
         },
       }),
     );
@@ -114,11 +115,11 @@ export const getCache = <T extends "apiCache" | "renderedCache">(
 // Compare two playlists by their video IDs returning true if they are identical
 export const comparePlaylist = (
   listA: string[] | null,
-  listB: string[] | null,
+  idList: string[] | null,
 ): boolean => {
-  if (!listA || !listB) return false;
-  if (listA.length !== listB.length) return false;
-  const listBsorted = listB.sort();
+  if (!listA || !idList) return false;
+  if (listA.length !== idList.length) return false;
+  const listBsorted = idList.sort();
   return listA.sort().every((id, index) => id === listBsorted[index]);
 };
 
@@ -142,20 +143,6 @@ export const getPlaylistItemsUrl = (
   return `${API_URL}&playlistId=${playlistId}&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ""}`;
 };
 
-// const checkVideoAvailability = async (
-//   videoId: string,
-// ): Promise<boolean | undefined> => {
-//   const videoInfo = await videoAPI(videoId);
-//   if (!videoInfo) return false;
-//   if (!videoInfo.items[0].contentDetails.regionRestriction) return true;
-//
-//   const { country } = await fetchJson<countryIs>("https://api.country.is/");
-//
-//   return !videoInfo.items[0].contentDetails.regionRestriction?.blocked?.includes(
-//     country,
-//   );
-// };
-
 // Format the date to a human-readable format
 export function formatDate(
   dateInput: Date | string | number,
@@ -169,3 +156,27 @@ export function formatDate(
   const date = new Date(dateInput);
   return date.toLocaleDateString(locale, options);
 }
+
+// Reorder the playlist items based on the provided id
+export const reorderPlaylistItems = (
+  items: NodeListOf<HTMLDivElement>,
+  cache: ApiCache,
+) => {
+  if (!cache) return items;
+  if (!items || items.length === 0) return items;
+
+  const itemsArray = Array.from(items);
+  const sortedItems = itemsArray.sort((a, b) => {
+    const aId = getVideoId(a.querySelector("a")?.href);
+    const bId = getVideoId(b.querySelector("a")?.href);
+
+    if (!aId || !bId) return 0;
+
+    const aDate = cache.items[aId]?.videoPublishedAt ?? 0;
+    const bDate = cache.items[bId]?.videoPublishedAt ?? 0;
+
+    return bDate - aDate;
+  });
+
+  return sortedItems;
+};

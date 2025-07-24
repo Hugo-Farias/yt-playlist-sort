@@ -4,11 +4,10 @@ import dummydata from "@/data/DUMMYDATA.json";
 import { API_KEY } from "@/env.ts";
 import { getPlaylistItemsUrl } from "@/helper.ts";
 
-// TODO change this to a variable function
-async function fetchJson<T = unknown>(
+const fetchJson = async <T = unknown>(
   input: RequestInfo,
   init?: RequestInit,
-): Promise<T> {
+): Promise<T> => {
   const res = await fetch(input, init);
 
   if (!res.ok) {
@@ -17,7 +16,8 @@ async function fetchJson<T = unknown>(
   }
 
   return (await res.json()) as Promise<T>;
-}
+};
+
 export const playlistAPI = async function (
   playlistId: string,
   nextpageToken: string | null = null,

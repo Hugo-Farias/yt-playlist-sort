@@ -30,44 +30,35 @@ export default defineContentScript({
         ? await waitForElements<HTMLDivElement>(playlistItemSelector)
         : null;
 
-      // development only paragraph
+      // NOTE: development block, remove in production
       const videoEl = document.querySelector("video");
       if (videoEl) {
         setTimeout(() => {
           videoEl.pause();
         }, 1000);
       }
+      // NOTE: development block end
 
       if (!nodePlaylistRender) return null;
 
-      const nxtBtn = document.querySelector(".ytp-next-button");
-
-      nxtBtn?.addEventListener("click", (e) => {
-        const tgt = e.target as HTMLButtonElement;
-        console.log("Next button clicked", tgt);
-      });
-
-      const renderedPlaylistItems = [...nodePlaylistRender].map((el): string =>
+      const renderedPlaylistIds = [...nodePlaylistRender].map((el): string =>
         getVideoId(el.querySelector("a")?.href),
       );
 
       const renderedCache = getCache("renderedCache", message.listId);
+      const apiCache = getCache("apiCache", message.listId!);
 
-      // if the rendered playlist items are different from the cache,
-      // hydrate the cache
+      // if the rendered playlist items are different from the cache, hydrate the cache
       if (
         !renderedCache?.length ||
-        !comparePlaylist(renderedCache, renderedPlaylistItems)
+        !comparePlaylist(renderedCache, renderedPlaylistIds) ||
+        !apiCache?.items
       ) {
         console.log("YT-playlist-sort: Cache hydration!!!");
-        storeCache("renderedCache", renderedPlaylistItems, message.listId);
+        storeCache("renderedCache", renderedPlaylistIds, message.listId);
         const data = await playlistAPI(message.listId);
-        if (data) {
-          storeCache("apiCache", data, message.listId!);
-        }
+        storeCache("apiCache", data, message.listId!);
       }
-
-      const apiCache = getCache("apiCache", message.listId!);
 
       // Stop if the playlist id has not changed
       if (previousPlaylistId === message.listId || message.listId === "") {

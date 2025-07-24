@@ -32,11 +32,6 @@ export type ApiCache = {
   extVersion: string;
 };
 
-export type countryIs = {
-  ip: string;
-  country: string;
-};
-
 export type YouTubeVideoResponse = {
   kind: "youtube#videoListResponse";
   etag: string;
