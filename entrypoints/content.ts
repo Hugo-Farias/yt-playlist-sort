@@ -16,7 +16,7 @@ let previousPlaylistId: string | null = "";
 export default defineContentScript({
   main() {
     chrome.runtime.onMessage.addListener(async (message: MessageType) => {
-      console.log("content init:", location.href);
+      console.log("content init:");
       if (!message.videoId) return null;
       if (previousURL === message.url) return null; // Prevents duplicate execution
       previousURL = location.href;
@@ -41,13 +41,19 @@ export default defineContentScript({
         getVideoId(el.querySelector("a")?.href),
       );
 
+      // Clause: Stop if the playlist id has not changed
+      if (previousPlaylistId === message.listId || message.listId === "") {
+        console.log("Same Playlist!!! Halting!!! 🔴🔴🔴");
+        previousPlaylistId = message.listId;
+        return null;
+      }
       const renderedCache = getCache("renderedCache", message.listId);
       let apiCache = getCache("apiCache", message.listId!);
 
-      // if the rendered playlist items are different from the cache, hydrate the cache
+      // If the rendered playlist items are different from the cache, hydrate the cache
       if (
         !comparePlaylist(renderedCache, renderedPlaylistIds) ||
-        !apiCache?.items[message.listId]
+        !apiCache?.items
       ) {
         console.log("YT-playlist-sort: Cache hydration!!! 🟡🟡🟡");
         storeCache("renderedCache", renderedPlaylistIds, message.listId);
@@ -56,18 +62,9 @@ export default defineContentScript({
         apiCache = getCache("apiCache", message.listId!);
       }
 
-      // Stop if the playlist id has not changed
-      if (previousPlaylistId === message.listId || message.listId === "") {
-        console.log("Same Playlist!!! Halting!!! 🔴🔴🔴");
-        previousPlaylistId = message.listId;
-        return null;
-      }
-
       previousPlaylistId = message.listId;
 
       console.log("New Playlist!!! Continuing!!! 🟢🟢🟢");
-
-      // debugger;
 
       // Render the date of the video if the API cache is available
 
