@@ -8,7 +8,6 @@ import {
   waitForElements,
 } from "@/helper.ts";
 import { playlistItemSelector } from "@/config.ts";
-// import { API_KEY } from "@/env.ts";
 
 let previousURL = "";
 let previousPlaylistId: string | null = "";
@@ -17,12 +16,10 @@ let previousPlaylistId: string | null = "";
 export default defineContentScript({
   main() {
     chrome.runtime.onMessage.addListener(async (message: MessageType) => {
-      console.log("content init");
+      console.log("content init:", location.href);
       if (!message.videoId) return null;
       if (previousURL === message.url) return null; // Prevents duplicate execution
       previousURL = location.href;
-
-      console.log(message);
 
       // console.log(API_URL + `&playlistId=${message.listId}&key=${API_KEY}`);
 
@@ -37,7 +34,6 @@ export default defineContentScript({
           videoEl.pause();
         }, 1000);
       }
-      // NOTE: development block end
 
       if (!nodePlaylistRender) return null;
 
@@ -46,18 +42,18 @@ export default defineContentScript({
       );
 
       const renderedCache = getCache("renderedCache", message.listId);
-      const apiCache = getCache("apiCache", message.listId!);
+      let apiCache = getCache("apiCache", message.listId!);
 
       // if the rendered playlist items are different from the cache, hydrate the cache
       if (
-        !renderedCache?.length ||
         !comparePlaylist(renderedCache, renderedPlaylistIds) ||
-        !apiCache?.items
+        !apiCache?.items[message.listId]
       ) {
-        console.log("YT-playlist-sort: Cache hydration!!!");
+        console.log("YT-playlist-sort: Cache hydration!!! 🟡🟡🟡");
         storeCache("renderedCache", renderedPlaylistIds, message.listId);
         const data = await playlistAPI(message.listId);
         storeCache("apiCache", data, message.listId!);
+        apiCache = getCache("apiCache", message.listId!);
       }
 
       // Stop if the playlist id has not changed
@@ -71,7 +67,10 @@ export default defineContentScript({
 
       console.log("New Playlist!!! Continuing!!! 🟢🟢🟢");
 
+      // debugger;
+
       // Render the date of the video if the API cache is available
+
       nodePlaylistRender.forEach((value) => {
         const videoId = getVideoId(value.querySelector("a")?.href);
 
