@@ -9,6 +9,7 @@ import pkg from "@/package.json";
 export const waitForElements = async <T extends Element>(
   selector: string,
   timeout: number = 10000,
+  urlCheck: string = "",
 ): Promise<NodeListOf<T> | null> => {
   const browserListId = getListId(location.href);
   return await new Promise((resolve, reject) => {
@@ -24,6 +25,7 @@ export const waitForElements = async <T extends Element>(
       );
 
       if (browserListId !== elementListId) return null;
+      if (location.href === urlCheck) return null;
 
       observer.disconnect();
       clearTimeout(timer);
@@ -145,7 +147,7 @@ export const getPlaylistItemsUrl = (
 };
 
 // Format the date to a human-readable format
-export function formatDate(
+export const formatDate = (
   dateInput: Date | string | number,
   options: Intl.DateTimeFormatOptions = {
     year: "numeric",
@@ -153,31 +155,69 @@ export function formatDate(
     day: "2-digit",
   },
   locale = "en-CA",
-): string {
+): string => {
   const date = new Date(dateInput);
   return date.toLocaleDateString(locale, options);
-}
+};
+
+const isSorted = (
+  nodes: HTMLDivElement[],
+  orderMap: ApiCache,
+  direction: "asc" | "desc" = "asc",
+): boolean => {
+  return nodes.every((curr, i, arr) => {
+    if (i === 0) return true;
+    const prevId = getVideoId(arr[i - 1].querySelector("a")?.href);
+    const currId = getVideoId(curr.querySelector("a")?.href);
+
+    // console.log({ prevId: prevId, currId: currId });
+
+    const prevOrder = orderMap.items[prevId ?? ""].videoPublishedAt ?? -1;
+    const currOrder = orderMap.items[currId ?? ""].videoPublishedAt ?? -1;
+
+    console.log({ prevOrder: prevOrder, currOrder: currOrder });
+
+    console.log(`id:${currId} inOrder:${prevOrder <= currOrder}`);
+
+    return direction === "asc"
+      ? prevOrder <= currOrder
+      : prevOrder >= currOrder;
+  });
+};
 
 // Reorder the playlist items based on the provided id
-export const reorderPlaylistItems = (
+export const reorderPlaylist = (
   items: NodeListOf<HTMLDivElement>,
-  cache: ApiCache,
+  cache: ApiCache | null,
+  selector: string,
+  direction: "asc" | "desc" | "orig" = "asc",
 ) => {
-  if (!cache) return items;
-  if (!items || items.length === 0) return items;
+  if (!items || items.length === 0) return;
+  if (!cache || !cache.items) return;
+  if (direction === "orig") return Array.from(items);
 
-  const itemsArray = Array.from(items);
-  const sortedItems = itemsArray.sort((a, b) => {
-    const aId = getVideoId(a.querySelector("a")?.href);
-    const bId = getVideoId(b.querySelector("a")?.href);
+  if (isSorted([...items], cache, "desc")) {
+    console.log("Playlist already sorted in", direction, "order.");
+    return null;
+  }
 
-    if (!aId || !bId) return 0;
+  const sortedItems = Array.from(items).sort((a, b) => {
+    const aVideoId = getVideoId(a.querySelector("a")?.href);
+    const bVideoId = getVideoId(b.querySelector("a")?.href);
+    // console.log("aVideoId ==> ", aVideoId);
 
-    const aDate = cache.items[aId]?.videoPublishedAt ?? 0;
-    const bDate = cache.items[bId]?.videoPublishedAt ?? 0;
+    if (!aVideoId || !bVideoId) return 0;
+    // if (cache.items[aVideoId]
 
-    return bDate - aDate;
+    const aPublishedAt = cache.items[aVideoId]?.videoPublishedAt || 0;
+    const bPublishedAt = cache.items[bVideoId]?.videoPublishedAt || 0;
+
+    if (direction === "asc") return aPublishedAt - bPublishedAt;
+    return aPublishedAt - bPublishedAt;
   });
 
-  return sortedItems;
+  sortedItems.forEach((item) => {
+    const playlistContainer = document.querySelector(selector);
+    playlistContainer?.appendChild(item);
+  });
 };

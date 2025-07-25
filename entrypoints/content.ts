@@ -6,6 +6,7 @@ import {
   storeCache,
   getCache,
   waitForElements,
+  reorderPlaylist,
 } from "@/helper.ts";
 import { playlistItemSelector } from "@/config.ts";
 
@@ -28,11 +29,12 @@ export default defineContentScript({
         : null;
 
       // NOTE: development block, remove in production
-      const videoEl = document.querySelector("video");
+      const videoEl = document.querySelector("#player-container-outer");
       if (videoEl) {
         setTimeout(() => {
-          videoEl.pause();
-        }, 1000);
+          // videoEl.pause();
+          videoEl.remove(); // Remove the video element to prevent autoplay
+        }, 100);
       }
 
       if (!nodePlaylistRender) return null;
@@ -41,14 +43,21 @@ export default defineContentScript({
         getVideoId(el.querySelector("a")?.href),
       );
 
+      const renderedCache = getCache("renderedCache", message.listId);
+      let apiCache = getCache("apiCache", message.listId!);
+
+      // let playlistContainer = document.querySelector(".playlist-items");
+
+      // if (playlistContainer) playlistContainer.innerHTML = ""; // Clear the playlist items container
+
+      reorderPlaylist(nodePlaylistRender, apiCache, ".playlist-items");
+
       // Clause: Stop if the playlist id has not changed
       if (previousPlaylistId === message.listId || message.listId === "") {
         console.log("Same Playlist!!! Halting!!! 🔴🔴🔴");
         previousPlaylistId = message.listId;
         return null;
       }
-      const renderedCache = getCache("renderedCache", message.listId);
-      let apiCache = getCache("apiCache", message.listId!);
 
       // If the rendered playlist items are different from the cache, hydrate the cache
       if (

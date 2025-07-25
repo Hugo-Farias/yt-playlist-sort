@@ -40,7 +40,7 @@ export type YouTubeVideoResponse = {
     etag: string;
     id: string;
     contentDetails: {
-      duration: string; // ISO 8601 duration
+      duration: string;
       dimension: "2d" | "3d";
       definition: "sd" | "hd";
       caption: "true" | "false";
