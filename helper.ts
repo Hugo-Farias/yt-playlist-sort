@@ -162,7 +162,7 @@ export const formatDate = (
 
 const isSorted = (
   nodes: HTMLDivElement[],
-  orderMap: ApiCache,
+  cache: ApiCache,
   direction: "asc" | "desc" = "asc",
 ): boolean => {
   return nodes.every((curr, i, arr) => {
@@ -170,14 +170,8 @@ const isSorted = (
     const prevId = getVideoId(arr[i - 1].querySelector("a")?.href);
     const currId = getVideoId(curr.querySelector("a")?.href);
 
-    // console.log({ prevId: prevId, currId: currId });
-
-    const prevOrder = orderMap.items[prevId ?? ""].videoPublishedAt ?? -1;
-    const currOrder = orderMap.items[currId ?? ""].videoPublishedAt ?? -1;
-
-    console.log({ prevOrder: prevOrder, currOrder: currOrder });
-
-    console.log(`id:${currId} inOrder:${prevOrder <= currOrder}`);
+    const prevOrder = cache.items[prevId ?? ""].videoPublishedAt ?? -1;
+    const currOrder = cache.items[currId ?? ""].videoPublishedAt ?? -1;
 
     return direction === "asc"
       ? prevOrder <= currOrder
@@ -196,18 +190,20 @@ export const reorderPlaylist = (
   if (!cache || !cache.items) return;
   if (direction === "orig") return Array.from(items);
 
-  if (isSorted([...items], cache, "desc")) {
+  if (isSorted([...items], cache, direction)) {
     console.log("Playlist already sorted in", direction, "order.");
     return null;
   }
 
+  [...document.querySelectorAll(".playlistSort-date")].forEach((v) =>
+    v.remove(),
+  );
+
   const sortedItems = Array.from(items).sort((a, b) => {
     const aVideoId = getVideoId(a.querySelector("a")?.href);
     const bVideoId = getVideoId(b.querySelector("a")?.href);
-    // console.log("aVideoId ==> ", aVideoId);
 
     if (!aVideoId || !bVideoId) return 0;
-    // if (cache.items[aVideoId]
 
     const aPublishedAt = cache.items[aVideoId]?.videoPublishedAt || 0;
     const bPublishedAt = cache.items[bVideoId]?.videoPublishedAt || 0;

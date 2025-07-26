@@ -29,11 +29,11 @@ export default defineContentScript({
         : null;
 
       // NOTE: development block, remove in production
-      const videoEl = document.querySelector("#player-container-outer");
-      if (videoEl) {
+      const videoContainer = document.querySelector("#player-container-outer");
+      if (videoContainer) {
         setTimeout(() => {
-          // videoEl.pause();
-          videoEl.remove(); // Remove the video element to prevent autoplay
+          // document.querySelector("video")?.pause();
+          videoContainer.remove(); // Remove the video element to prevent autoplay
         }, 100);
       }
 
@@ -50,14 +50,16 @@ export default defineContentScript({
 
       // if (playlistContainer) playlistContainer.innerHTML = ""; // Clear the playlist items container
 
-      reorderPlaylist(nodePlaylistRender, apiCache, ".playlist-items");
-
       // Clause: Stop if the playlist id has not changed
       if (previousPlaylistId === message.listId || message.listId === "") {
         console.log("Same Playlist!!! Halting!!! 🔴🔴🔴");
         previousPlaylistId = message.listId;
         return null;
       }
+
+      previousPlaylistId = message.listId;
+
+      reorderPlaylist(nodePlaylistRender, apiCache, ".playlist-items");
 
       // If the rendered playlist items are different from the cache, hydrate the cache
       if (
@@ -71,18 +73,24 @@ export default defineContentScript({
         apiCache = getCache("apiCache", message.listId!);
       }
 
-      previousPlaylistId = message.listId;
+      // previousPlaylistId = message.listId;
 
       console.log("New Playlist!!! Continuing!!! 🟢🟢🟢");
 
       // Render the date of the video if the API cache is available
+      // TODO: find a solution to this rendering multiple times when the page is updated
+      // maybe inject the date into the element
+      const isDateRendered = document.querySelector(".playlistSort-date");
 
-      nodePlaylistRender.forEach((value) => {
-        const videoId = getVideoId(value.querySelector("a")?.href);
+      if (isDateRendered) return null;
+
+      nodePlaylistRender.forEach((element) => {
+        element.setAttribute("lockup", "false");
+        const videoId = getVideoId(element.querySelector("a")?.href);
 
         if (!apiCache?.items[videoId]) return null;
 
-        const itemEl = value.querySelector("#byline-container");
+        const itemEl = element.querySelector("#byline-container");
         if (!itemEl) return null;
 
         const { videoPublishedAt } = apiCache?.items[videoId];
@@ -98,7 +106,11 @@ export default defineContentScript({
 
         const span = document.createElement("span");
         span.textContent = `- ${formattedDate}`;
-        span.classList.add("style-scope", "ytd-playlist-panel-video-renderer");
+        span.classList.add(
+          "style-scope",
+          "ytd-playlist-panel-video-renderer",
+          "playlistSort-date",
+        );
         span.id = "byline";
         span.style.marginLeft = "-5px";
 
