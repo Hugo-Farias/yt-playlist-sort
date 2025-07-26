@@ -1,4 +1,4 @@
-import { getListId, getVideoId } from "@/helper.ts";
+// import { getListId, getVideoId } from "@/helper.ts";
 
 let timeout: NodeJS.Timeout;
 
@@ -26,25 +26,25 @@ const sendMsg = function (tabId: number, message: MessageType) {
 };
 
 // noinspection JSUnusedGlobalSymbols
-chrome.tabs.onUpdated.addListener(function (
-  tabId: number,
-  _: chrome.tabs.TabChangeInfo,
-  tab: chrome.tabs.Tab,
-) {
-  // if (!tab.url?.includes("&list=PL")) return null;
-  if (tab.status !== "complete") return null;
-
-  messagesSent = 0;
-
-  const { url } = tab;
-  console.log("=>(background.ts:39) background init", getListId(url));
-  if (!url) return null;
-
-  sendMsg(tabId, {
-    url: url,
-    listId: getListId(url),
-    videoId: getVideoId(url),
-  });
-});
+// chrome.tabs.onUpdated.addListener(function (
+//   tabId: number,
+//   _: chrome.tabs.TabChangeInfo,
+//   tab: chrome.tabs.Tab,
+// ) {
+//   // if (!tab.url?.includes("&list=PL")) return null;
+//   if (tab.status !== "complete") return null;
+//
+//   messagesSent = 0;
+//
+//   const { url } = tab;
+//   console.log("=>(background.ts:39) background init", getListId(url));
+//   if (!url) return null;
+//
+//   sendMsg(tabId, {
+//     url: url,
+//     listId: getListId(url),
+//     videoId: getVideoId(url),
+//   });
+// });
 
 export default defineBackground(() => {});

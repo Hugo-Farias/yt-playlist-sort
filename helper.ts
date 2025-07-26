@@ -195,9 +195,9 @@ export const reorderPlaylist = (
     return null;
   }
 
-  [...document.querySelectorAll(".playlistSort-date")].forEach((v) =>
-    v.remove(),
-  );
+  // [...document.querySelectorAll(".playlistSort-date")].forEach((v) =>
+  //   v.remove(),
+  // );
 
   const sortedItems = Array.from(items).sort((a, b) => {
     const aVideoId = getVideoId(a.querySelector("a")?.href);

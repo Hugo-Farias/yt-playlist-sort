@@ -1,5 +1,5 @@
 import { playlistAPI } from "@/chromeAPI.ts";
-import { MessageType } from "@/entrypoints/background.ts";
+// import { MessageType } from "@/entrypoints/background.ts";
 import {
   getVideoId,
   comparePlaylist,
@@ -7,24 +7,30 @@ import {
   getCache,
   waitForElements,
   reorderPlaylist,
+  getListId,
 } from "@/helper.ts";
 import { playlistItemSelector } from "@/config.ts";
 
 let previousURL = "";
-let previousPlaylistId: string | null = "";
+// let previousPlaylistId: string | null = "";
 
-// noinspection JSUnusedGlobalSymbols
 export default defineContentScript({
   main() {
-    chrome.runtime.onMessage.addListener(async (message: MessageType) => {
-      console.log("content init:");
-      if (!message.videoId) return null;
-      if (previousURL === message.url) return null; // Prevents duplicate execution
-      previousURL = location.href;
+    // TODO: rewirite, change this event listener to "yt-page-data-updated"
+    document.addEventListener("yt-page-data-updated", async () => {
+      console.log("content init");
+      // return null;
+      const currUrl = location.href;
+      const videoId = getVideoId(currUrl);
+      const playlistId = getListId(currUrl);
+      if (!videoId) return null;
+      if (previousURL === currUrl) return null; // Prevents duplicate execution
 
-      // console.log(API_URL + `&playlistId=${message.listId}&key=${API_KEY}`);
+      previousURL = currUrl;
 
-      const nodePlaylistRender = message.listId
+      // console.log(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
+
+      const nodePlaylistRender = playlistId
         ? await waitForElements<HTMLDivElement>(playlistItemSelector)
         : null;
 
@@ -43,23 +49,23 @@ export default defineContentScript({
         getVideoId(el.querySelector("a")?.href),
       );
 
-      const renderedCache = getCache("renderedCache", message.listId);
-      let apiCache = getCache("apiCache", message.listId!);
+      const renderedCache = getCache("renderedCache", playlistId);
+      let apiCache = getCache("apiCache", playlistId!);
 
       // let playlistContainer = document.querySelector(".playlist-items");
 
       // if (playlistContainer) playlistContainer.innerHTML = ""; // Clear the playlist items container
 
-      // Clause: Stop if the playlist id has not changed
-      if (previousPlaylistId === message.listId || message.listId === "") {
-        console.log("Same Playlist!!! Halting!!! 🔴🔴🔴");
-        previousPlaylistId = message.listId;
-        return null;
-      }
-
-      previousPlaylistId = message.listId;
-
       reorderPlaylist(nodePlaylistRender, apiCache, ".playlist-items");
+
+      // // Clause: Stop if the playlist id has not changed
+      // if (previousPlaylistId === playlistId || playlistId === "") {
+      //   console.log("Same Playlist!!! Halting!!! 🔴🔴🔴");
+      //   previousPlaylistId = playlistId;
+      //   return null;
+      // }
+
+      // previousPlaylistId = playlistId;
 
       // If the rendered playlist items are different from the cache, hydrate the cache
       if (
@@ -67,13 +73,13 @@ export default defineContentScript({
         !apiCache?.items
       ) {
         console.log("YT-playlist-sort: Cache hydration!!! 🟡🟡🟡");
-        storeCache("renderedCache", renderedPlaylistIds, message.listId);
-        const data = await playlistAPI(message.listId);
-        storeCache("apiCache", data, message.listId!);
-        apiCache = getCache("apiCache", message.listId!);
+        storeCache("renderedCache", renderedPlaylistIds, playlistId);
+        const data = await playlistAPI(playlistId);
+        storeCache("apiCache", data, playlistId!);
+        apiCache = getCache("apiCache", playlistId!);
       }
 
-      // previousPlaylistId = message.listId;
+      // previousPlaylistId = playlistId;
 
       console.log("New Playlist!!! Continuing!!! 🟢🟢🟢");
 
