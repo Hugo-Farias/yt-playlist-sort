@@ -147,31 +147,65 @@ export const getPlaylistItemsUrl = (
 };
 
 // Format the date to a human-readable format
-export const formatDate = (
-  dateInput: Date | string | number,
+const formatDate = (
+  dateInput: Date | number,
   options: Intl.DateTimeFormatOptions = {
     year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
+    month: "short",
+    day: "numeric",
   },
-  locale = "en-CA",
+  locale = "en-US",
 ): string => {
   const date = new Date(dateInput);
   return date.toLocaleDateString(locale, options);
 };
 
+const renderDateToElement = (el: HTMLDivElement) => {
+  if (el.querySelector(".playlistSort-date")) return null;
+
+  const itemEl = el.querySelector("#byline-container");
+  if (!itemEl) return null;
+
+  const videoPublishedAt = Number(el.dataset.date);
+
+  const formattedDate = formatDate(videoPublishedAt);
+
+  const span = document.createElement("span");
+  span.textContent = `- ${formattedDate}`;
+  span.classList.add(
+    "style-scope",
+    "ytd-playlist-panel-video-renderer",
+    "playlistSort-date",
+  );
+  span.id = "byline";
+  span.style.marginLeft = "-5px";
+
+  itemEl.appendChild(span);
+
+  return el;
+};
+
+const addInfoToElement = (
+  el: HTMLDivElement,
+  cache: ApiCache,
+): HTMLDivElement => {
+  // if (el.dataset.date) return el;
+  const output = el;
+  const videoId = getVideoId(output.querySelector("a")?.href);
+  const date = cache.items[videoId ?? ""]?.videoPublishedAt ?? Infinity;
+  output.dataset.date = String(date);
+  return output;
+};
+
 const isSorted = (
   nodes: HTMLDivElement[],
-  cache: ApiCache,
   direction: "asc" | "desc" = "asc",
 ): boolean => {
   return nodes.every((curr, i, arr) => {
     if (i === 0) return true;
-    const prevId = getVideoId(arr[i - 1].querySelector("a")?.href);
-    const currId = getVideoId(curr.querySelector("a")?.href);
 
-    const prevOrder = cache.items[prevId ?? ""].videoPublishedAt ?? -1;
-    const currOrder = cache.items[currId ?? ""].videoPublishedAt ?? -1;
+    const prevOrder = Number(arr[i - 1].dataset.date) || 0;
+    const currOrder = Number(curr.dataset.date) || 0;
 
     return direction === "asc"
       ? prevOrder <= currOrder
@@ -179,10 +213,9 @@ const isSorted = (
   });
 };
 
-// Reorder the playlist items based on the provided id
-export const reorderPlaylist = (
-  items: NodeListOf<HTMLDivElement>,
-  cache: ApiCache | null,
+export const sortPlaylist = (
+  items: HTMLDivElement[],
+  cache: ApiCache,
   selector: string,
   direction: "asc" | "desc" | "orig" = "asc",
 ) => {
@@ -190,30 +223,37 @@ export const reorderPlaylist = (
   if (!cache || !cache.items) return;
   if (direction === "orig") return Array.from(items);
 
-  if (isSorted([...items], cache, direction)) {
-    console.log("Playlist already sorted in", direction, "order.");
-    return null;
-  }
+  const newItems = items.map((item) => addInfoToElement(item, cache));
 
-  // [...document.querySelectorAll(".playlistSort-date")].forEach((v) =>
-  //   v.remove(),
-  // );
+  // if (isSorted(newItems, direction)) {
+  //   console.log("Playlist already sorted in", direction, "order.");
+  //   return null;
+  // }
 
-  const sortedItems = Array.from(items).sort((a, b) => {
-    const aVideoId = getVideoId(a.querySelector("a")?.href);
-    const bVideoId = getVideoId(b.querySelector("a")?.href);
-
-    if (!aVideoId || !bVideoId) return 0;
-
-    const aPublishedAt = cache.items[aVideoId]?.videoPublishedAt || 0;
-    const bPublishedAt = cache.items[bVideoId]?.videoPublishedAt || 0;
+  const sortedItems = newItems.sort((a, b) => {
+    const aPublishedAt = Number(a.dataset.date) || 0;
+    const bPublishedAt = Number(b.dataset.date) || 0;
 
     if (direction === "asc") return aPublishedAt - bPublishedAt;
     return aPublishedAt - bPublishedAt;
   });
 
+  const playlistContainer = document.querySelector(selector);
+
+  if (!playlistContainer) return null;
+  console.log("Sorting Playlist");
+
+  playlistContainer.innerHTML = "";
+
+  // playlistContainer.append(...sortedItems);
+
+  // const frag = document.createDocumentFragment();
+  // sortedItems.forEach((el) => frag.appendChild(el));
+  // playlistContainer.appendChild(frag);
+
   sortedItems.forEach((item) => {
     const playlistContainer = document.querySelector(selector);
+    renderDateToElement(item);
     playlistContainer?.appendChild(item);
   });
 };

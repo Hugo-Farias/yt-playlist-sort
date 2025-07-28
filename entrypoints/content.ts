@@ -1,22 +1,20 @@
 import { playlistAPI } from "@/chromeAPI.ts";
-// import { MessageType } from "@/entrypoints/background.ts";
 import {
   getVideoId,
   comparePlaylist,
   storeCache,
   getCache,
   waitForElements,
-  reorderPlaylist,
   getListId,
+  sortPlaylist,
 } from "@/helper.ts";
 import { playlistItemSelector } from "@/config.ts";
 
-let previousURL = "";
+// let previousURL = "";
 // let previousPlaylistId: string | null = "";
 
 export default defineContentScript({
   main() {
-    // TODO: rewirite, change this event listener to "yt-page-data-updated"
     document.addEventListener("yt-page-data-updated", async () => {
       console.log("content init");
       // return null;
@@ -24,9 +22,9 @@ export default defineContentScript({
       const videoId = getVideoId(currUrl);
       const playlistId = getListId(currUrl);
       if (!videoId) return null;
-      if (previousURL === currUrl) return null; // Prevents duplicate execution
+      // if (previousURL === currUrl) return null; // Prevents duplicate execution
 
-      previousURL = currUrl;
+      // previousURL = currUrl;
 
       // console.log(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
 
@@ -52,12 +50,6 @@ export default defineContentScript({
       const renderedCache = getCache("renderedCache", playlistId);
       let apiCache = getCache("apiCache", playlistId!);
 
-      // let playlistContainer = document.querySelector(".playlist-items");
-
-      // if (playlistContainer) playlistContainer.innerHTML = ""; // Clear the playlist items container
-
-      reorderPlaylist(nodePlaylistRender, apiCache, ".playlist-items");
-
       // // Clause: Stop if the playlist id has not changed
       // if (previousPlaylistId === playlistId || playlistId === "") {
       //   console.log("Same Playlist!!! Halting!!! 🔴🔴🔴");
@@ -67,7 +59,8 @@ export default defineContentScript({
 
       // previousPlaylistId = playlistId;
 
-      // If the rendered playlist items are different from the cache, hydrate the cache
+      // If the rendered playlist items are different from the cache
+      // or there is no cache, hydrate it
       if (
         !comparePlaylist(renderedCache, renderedPlaylistIds) ||
         !apiCache?.items
@@ -84,44 +77,9 @@ export default defineContentScript({
       console.log("New Playlist!!! Continuing!!! 🟢🟢🟢");
 
       // Render the date of the video if the API cache is available
-      // TODO: find a solution to this rendering multiple times when the page is updated
-      // maybe inject the date into the element
-      const isDateRendered = document.querySelector(".playlistSort-date");
 
-      if (isDateRendered) return null;
-
-      nodePlaylistRender.forEach((element) => {
-        element.setAttribute("lockup", "false");
-        const videoId = getVideoId(element.querySelector("a")?.href);
-
-        if (!apiCache?.items[videoId]) return null;
-
-        const itemEl = element.querySelector("#byline-container");
-        if (!itemEl) return null;
-
-        const { videoPublishedAt } = apiCache?.items[videoId];
-
-        const formattedDate = new Date(videoPublishedAt).toLocaleDateString(
-          "en-US",
-          {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          },
-        );
-
-        const span = document.createElement("span");
-        span.textContent = `- ${formattedDate}`;
-        span.classList.add(
-          "style-scope",
-          "ytd-playlist-panel-video-renderer",
-          "playlistSort-date",
-        );
-        span.id = "byline";
-        span.style.marginLeft = "-5px";
-
-        itemEl.appendChild(span);
-      });
+      if (!apiCache) return null;
+      sortPlaylist([...nodePlaylistRender], apiCache, ".playlist-items");
     });
   },
   matches: ["*://*.youtube.com/*"],
