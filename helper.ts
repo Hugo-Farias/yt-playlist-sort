@@ -160,13 +160,16 @@ const formatDate = (
   return date.toLocaleDateString(locale, options);
 };
 
-const renderDateToElement = (el: HTMLDivElement) => {
+// TODO: finish this
+export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
   if (el.querySelector(".playlistSort-date")) return null;
 
-  const itemEl = el.querySelector("#byline-container");
+  const output = el;
+
+  const itemEl = output.querySelector("#byline-container");
   if (!itemEl) return null;
 
-  const videoPublishedAt = Number(el.dataset.date);
+  const videoPublishedAt = getDateFromCache(output, cache);
 
   const formattedDate = formatDate(videoPublishedAt);
 
@@ -182,30 +185,25 @@ const renderDateToElement = (el: HTMLDivElement) => {
 
   itemEl.appendChild(span);
 
-  return el;
-};
-
-const addInfoToElement = (
-  el: HTMLDivElement,
-  cache: ApiCache,
-): HTMLDivElement => {
-  // if (el.dataset.date) return el;
-  const output = el;
-  const videoId = getVideoId(output.querySelector("a")?.href);
-  const date = cache.items[videoId ?? ""]?.videoPublishedAt ?? Infinity;
-  output.dataset.date = String(date);
   return output;
 };
 
+const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
+  const videoId = getVideoId(el.querySelector("a")?.href);
+  return cache.items[videoId ?? ""]?.videoPublishedAt ?? Infinity;
+};
+
 const isSorted = (
-  nodes: HTMLDivElement[],
-  direction: "asc" | "desc" = "asc",
+  nodes: NodeListOf<HTMLDivElement>,
+  direction: "asc" | "desc" | "orig" = "asc",
+  cache: ApiCache,
 ): boolean => {
-  return nodes.every((curr, i, arr) => {
+  if (direction === "orig") return true;
+  return [...nodes].every((curr, i, arr) => {
     if (i === 0) return true;
 
-    const prevOrder = Number(arr[i - 1].dataset.date) || 0;
-    const currOrder = Number(curr.dataset.date) || 0;
+    const prevOrder = getDateFromCache(arr[i - 1], cache) || 0;
+    const currOrder = getDateFromCache(curr, cache) || 0;
 
     return direction === "asc"
       ? prevOrder <= currOrder
@@ -213,47 +211,23 @@ const isSorted = (
   });
 };
 
-export const sortPlaylist = (
-  items: HTMLDivElement[],
+export const sortList = (
+  nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,
-  selector: string,
   direction: "asc" | "desc" | "orig" = "asc",
-) => {
-  if (!items || items.length === 0) return;
-  if (!cache || !cache.items) return;
-  if (direction === "orig") return Array.from(items);
+): HTMLDivElement[] => {
+  if (isSorted(nodeList, direction, cache)) {
+    console.log("Already sorted in ", direction, " order");
+    return [...nodeList];
+  }
 
-  const newItems = items.map((item) => addInfoToElement(item, cache));
-
-  // if (isSorted(newItems, direction)) {
-  //   console.log("Playlist already sorted in", direction, "order.");
-  //   return null;
-  // }
-
-  const sortedItems = newItems.sort((a, b) => {
-    const aPublishedAt = Number(a.dataset.date) || 0;
-    const bPublishedAt = Number(b.dataset.date) || 0;
-
-    if (direction === "asc") return aPublishedAt - bPublishedAt;
-    return aPublishedAt - bPublishedAt;
+  const sortedList = [...nodeList].sort((a, b) => {
+    const aDate = getDateFromCache(a, cache);
+    const bDate = getDateFromCache(b, cache);
+    return aDate - bDate;
   });
 
-  const playlistContainer = document.querySelector(selector);
+  if (direction === "asc") return sortedList;
 
-  if (!playlistContainer) return null;
-  console.log("Sorting Playlist");
-
-  playlistContainer.innerHTML = "";
-
-  // playlistContainer.append(...sortedItems);
-
-  // const frag = document.createDocumentFragment();
-  // sortedItems.forEach((el) => frag.appendChild(el));
-  // playlistContainer.appendChild(frag);
-
-  sortedItems.forEach((item) => {
-    const playlistContainer = document.querySelector(selector);
-    renderDateToElement(item);
-    playlistContainer?.appendChild(item);
-  });
+  return sortedList.reverse();
 };

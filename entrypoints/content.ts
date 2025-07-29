@@ -1,14 +1,16 @@
 import { playlistAPI } from "@/chromeAPI.ts";
+import { playlistContainerSelector, playlistItemSelector } from "@/config";
 import {
   getVideoId,
   comparePlaylist,
   storeCache,
   getCache,
-  waitForElements,
+  // waitForElements,
   getListId,
-  sortPlaylist,
+  sortList,
+  renderDateToElement,
 } from "@/helper.ts";
-import { playlistItemSelector } from "@/config.ts";
+// import { playlistItemSelector } from "@/config.ts";
 
 // let previousURL = "";
 // let previousPlaylistId: string | null = "";
@@ -28,9 +30,13 @@ export default defineContentScript({
 
       // console.log(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
 
-      const nodePlaylistRender = playlistId
-        ? await waitForElements<HTMLDivElement>(playlistItemSelector)
-        : null;
+      const playlistContainer = document.querySelector<HTMLDivElement>(
+        playlistContainerSelector,
+      );
+
+      // const nodePlaylistRender = playlistId
+      //   ? await waitForElements<HTMLDivElement>(playlistItemSelector)
+      //   : null;
 
       // NOTE: development block, remove in production
       const videoContainer = document.querySelector("#player-container-outer");
@@ -41,10 +47,13 @@ export default defineContentScript({
         }, 100);
       }
 
-      if (!nodePlaylistRender) return null;
+      if (!playlistContainer) return null;
 
-      const renderedPlaylistIds = [...nodePlaylistRender].map((el): string =>
-        getVideoId(el.querySelector("a")?.href),
+      const playlistItems: NodeListOf<HTMLDivElement> =
+        playlistContainer.querySelectorAll(playlistItemSelector);
+
+      const renderedPlaylistIds = [...playlistContainer.children].map(
+        (el): string => getVideoId(el.querySelector("a")?.href),
       );
 
       const renderedCache = getCache("renderedCache", playlistId);
@@ -79,7 +88,9 @@ export default defineContentScript({
       // Render the date of the video if the API cache is available
 
       if (!apiCache) return null;
-      sortPlaylist([...nodePlaylistRender], apiCache, ".playlist-items");
+      const sortedList = sortList(playlistItems, apiCache);
+      playlistContainer.replaceChildren(...sortedList);
+      sortedList.forEach((el) => renderDateToElement(el, apiCache));
     });
   },
   matches: ["*://*.youtube.com/*"],
