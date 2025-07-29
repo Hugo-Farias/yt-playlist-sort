@@ -90,7 +90,7 @@ export default defineContentScript({
       if (!apiCache) return null;
       const sortedList = sortList(playlistItems, apiCache);
       playlistContainer.replaceChildren(...sortedList);
-      sortedList.forEach((el) => renderDateToElement(el, apiCache));
+      sortedList.map((el) => renderDateToElement(el, apiCache));
     });
   },
   matches: ["*://*.youtube.com/*"],

@@ -160,16 +160,14 @@ const formatDate = (
   return date.toLocaleDateString(locale, options);
 };
 
-// TODO: finish this
 export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
-  if (el.querySelector(".playlistSort-date")) return null;
+  const dateEl = el.querySelector(".playlistSort-date");
+  if (dateEl) dateEl.remove();
 
-  const output = el;
-
-  const itemEl = output.querySelector("#byline-container");
+  const itemEl = el.querySelector("#byline-container");
   if (!itemEl) return null;
 
-  const videoPublishedAt = getDateFromCache(output, cache);
+  const videoPublishedAt = getDateFromCache(el, cache);
 
   const formattedDate = formatDate(videoPublishedAt);
 
@@ -185,7 +183,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 
   itemEl.appendChild(span);
 
-  return output;
+  // return el;
 };
 
 const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
