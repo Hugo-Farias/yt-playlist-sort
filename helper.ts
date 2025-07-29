@@ -75,8 +75,9 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
   } else if (storageKey === "apiCache") {
     const playlistData = data as YoutubePlaylistResponse;
     const newItems = playlistData.items.reduce(
-      (acc, item) => {
+      (acc, item, index) => {
         acc[item.contentDetails.videoId] = {
+          originalIndex: index,
           videoPublishedAt: new Date(
             item.contentDetails.videoPublishedAt,
           ).getTime(),
@@ -182,8 +183,6 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
   span.style.marginLeft = "-5px";
 
   itemEl.appendChild(span);
-
-  // return el;
 };
 
 const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
@@ -215,7 +214,7 @@ export const sortList = (
   direction: "asc" | "desc" | "orig" = "asc",
 ): HTMLDivElement[] => {
   if (isSorted(nodeList, direction, cache)) {
-    console.log("Already sorted in ", direction, " order");
+    console.log("Already sorted in", direction, "order 🟣");
     return [...nodeList];
   }
 
