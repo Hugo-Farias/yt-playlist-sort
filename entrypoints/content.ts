@@ -8,6 +8,7 @@ import {
   getListId,
   sortList,
   renderDateToElement,
+  getInfoFromElement,
 } from "@/helper.ts";
 
 // TODO: update prev and next video buttons
@@ -46,7 +47,7 @@ export default defineContentScript({
         playlistContainer.querySelectorAll(playlistItemSelector);
 
       const renderedPlaylistIds = [...playlistContainer.children].map(
-        (el): string => getVideoId(el.querySelector("a")?.href),
+        (el): string => getVideoId(el),
       );
 
       const renderedCache = getCache("renderedCache", playlistId);
@@ -71,9 +72,30 @@ export default defineContentScript({
 
       const sortedList = sortList(playlistItems, apiCache);
       // playlistContainer.replaceChildren(...sortedList);
-      sortedList.forEach((el) => {
-        playlistContainer.appendChild(el);
+      sortedList.forEach((el, index, arr) => {
         renderDateToElement(el, apiCache);
+        playlistContainer.appendChild(el);
+
+        if (
+          index < arr.length - 1 &&
+          getVideoId(el) === getVideoId(location.href)
+        ) {
+          const nxtVidInfo = getInfoFromElement(arr[index + 1]);
+
+          console.log("nxtVidInfo ==> ", nxtVidInfo);
+
+          const nxtBtnEl =
+            document.querySelector<HTMLAnchorElement>(".ytp-next-button");
+
+          if (!nxtBtnEl) return null;
+          // TODO: this is getting overwritten by the page on load
+          setTimeout(() => {
+            // console.log("nextBtnEl ==> ", nextBtnEl);
+            nxtBtnEl.dataset.tooltipText = nxtVidInfo?.tooltipNext.trim();
+            nxtBtnEl.dataset.preview = nxtVidInfo?.preview;
+            nxtBtnEl.href = nxtVidInfo.href;
+          }, 3000);
+        }
       });
     });
   },

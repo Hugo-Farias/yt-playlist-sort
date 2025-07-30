@@ -50,7 +50,10 @@ export const getListId = (url: string | undefined): string => {
   return new URL(url).searchParams.get("list") ?? "";
 };
 
-export const getVideoId = (url: string | undefined): string => {
+export const getVideoId = (url: string | undefined | Element): string => {
+  if (url instanceof Element) {
+    url = url.querySelector("a")?.href;
+  }
   if (!url || url.length <= 0) return "";
   return new URL(url).searchParams.get("v") ?? "";
 };
@@ -186,7 +189,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 };
 
 const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
-  const videoId = getVideoId(el.querySelector("a")?.href);
+  const videoId = getVideoId(el);
   return cache.items[videoId ?? ""]?.videoPublishedAt ?? Infinity;
 };
 
@@ -227,4 +230,28 @@ export const sortList = (
   if (direction === "asc") return sortedList;
 
   return sortedList.reverse();
+};
+
+type getInfoFromElement = {
+  tooltipNext: string;
+  preview: string;
+  href: string;
+};
+
+export const getInfoFromElement = (
+  el: HTMLDivElement | null,
+): getInfoFromElement => {
+  if (!el)
+    return {
+      tooltipNext: "",
+      preview: "",
+      href: "",
+    };
+
+  const videoId = getVideoId(el);
+  return {
+    tooltipNext: el?.querySelector("#video-title")?.textContent ?? "",
+    preview: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
+    href: el.querySelector("a")?.href ?? "",
+  };
 };
