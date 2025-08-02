@@ -2,6 +2,7 @@ import {
   ApiCache,
   RenderedPlaylistItem,
   YoutubePlaylistResponse,
+  YTNavigateEvent,
 } from "@/types.ts";
 import { API_URL, playlistItemSelector } from "@/config.ts";
 import pkg from "@/package.json";
@@ -233,25 +234,61 @@ export const sortList = (
 };
 
 type getInfoFromElement = {
-  tooltipNext: string;
+  videoTitle: string;
   preview: string;
   href: string;
+  videoId: string;
 };
 
 export const getInfoFromElement = (
   el: HTMLDivElement | null,
-): getInfoFromElement => {
-  if (!el)
-    return {
-      tooltipNext: "",
-      preview: "",
-      href: "",
-    };
+): getInfoFromElement | null => {
+  if (!el) return null;
 
   const videoId = getVideoId(el);
   return {
-    tooltipNext: el?.querySelector("#video-title")?.textContent ?? "",
+    videoTitle: el?.querySelector("#video-title")?.textContent?.trim() ?? "",
     preview: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
     href: el.querySelector("a")?.href ?? "",
+    videoId: videoId,
   };
+};
+
+// type YTNavigateEvent = CustomEvent<{
+//   detail: {
+//     destination?: {
+//       url: string;
+//       searchConainer: Element;
+//     };
+//   };
+//   // endpoint: {
+//   //   watchEndpoint: YTWatchEndpoint;
+//   //   commandMetadata?: {
+//   //     webCommandMetadata?: {
+//   //       url?: string;
+//   //       webPageType?: string;
+//   //       rootVe?: number;
+//   //     };
+//   //   };
+//   // };
+// }>;
+
+export const endpointData = (
+  url: string,
+  searchContainer: Element,
+  // videoId: string,
+  // playlistId?: string,
+  // index: number = 0,
+): YTNavigateEvent => {
+  // const watchEndpoint: YTWatchEndpoint = { videoId };
+  // if (playlistId) watchEndpoint.playlistId = playlistId;
+  // if (index !== undefined) watchEndpoint.index = index;
+
+  return new CustomEvent("yt-navigate", {
+    detail: {
+      destination: { url: url, searchContainer: searchContainer },
+    },
+    bubbles: true,
+    composed: true,
+  });
 };

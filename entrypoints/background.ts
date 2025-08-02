@@ -1,5 +1,7 @@
 // import { getListId, getVideoId } from "@/helper.ts";
 
+// HACK: Remove entire file if not needed
+
 let timeout: NodeJS.Timeout;
 
 let messagesSent = 0;

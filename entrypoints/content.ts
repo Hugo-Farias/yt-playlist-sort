@@ -9,12 +9,40 @@ import {
   sortList,
   renderDateToElement,
   getInfoFromElement,
+  endpointData,
 } from "@/helper.ts";
+import { YTNavigateEvent } from "@/types";
 
-// TODO: update prev and next video buttons
 export default defineContentScript({
   main() {
-    document.addEventListener("yt-page-data-updated", async () => {
+    // TODO: Hijack the event here, replace event detail with custom info
+    window.addEventListener(
+      "yt-navigate",
+      (e: Event) => {
+        const event = e as YTNavigateEvent;
+        // const target = e.target as Element;
+
+        console.log("detail ==> ", event.detail);
+        // console.log("e ==> ", target.tagName);
+
+        // if (target.tagName === "YTD-PLAYLIST-PANEL-VIDEO-RENDERER") {
+        if (event.detail.endpoint?.watchEndpoint) {
+          e.stopImmediatePropagation();
+        } else if (event.detail.destination) {
+          const videoUrl = event.detail.destination.url;
+          const element = event.detail.destination.searchContainer;
+
+          element
+            .querySelector<HTMLAnchorElement>(
+              `a[href="${videoUrl.replace("https://www.youtube.com", "")}"]`,
+            )
+            ?.click();
+        }
+      },
+      true,
+    );
+
+    document.addEventListener("yt-navigate-finish", async () => {
       console.log("content init 🟢");
       // return null;
       const currUrl = location.href;
@@ -31,7 +59,7 @@ export default defineContentScript({
         playlistContainerSelector,
       );
 
-      // TEST: development block, remove in production
+      // TEST: development paragraph, remove in production
       const videoContainer = document.querySelector("#player-container-outer");
       if (videoContainer) {
         setTimeout(() => {
@@ -46,12 +74,12 @@ export default defineContentScript({
       const playlistItems: NodeListOf<HTMLDivElement> =
         playlistContainer.querySelectorAll(playlistItemSelector);
 
-      const renderedPlaylistIds = [...playlistContainer.children].map(
-        (el): string => getVideoId(el),
+      const renderedPlaylistIds = [...playlistItems].map((el): string =>
+        getVideoId(el),
       );
 
-      const renderedCache = getCache("renderedCache", playlistId);
-      let apiCache = getCache("apiCache", playlistId!);
+      const renderedCache = getCache("renderedCache", getListId(location.href));
+      let apiCache = getCache("apiCache", getListId(location.href)!);
 
       // If the rendered playlist items are different from the cache
       // or there is no cache, hydrate it
@@ -73,7 +101,7 @@ export default defineContentScript({
       const sortedList = sortList(playlistItems, apiCache);
       // playlistContainer.replaceChildren(...sortedList);
       sortedList.forEach((el, index, arr) => {
-        renderDateToElement(el, apiCache);
+        renderDateToElement(el, apiCache!);
         playlistContainer.appendChild(el);
 
         if (
@@ -82,19 +110,31 @@ export default defineContentScript({
         ) {
           const nxtVidInfo = getInfoFromElement(arr[index + 1]);
 
-          console.log("nxtVidInfo ==> ", nxtVidInfo);
+          // console.log("nxtVidInfo ==> ", nxtVidInfo);
 
           const nxtBtnEl =
             document.querySelector<HTMLAnchorElement>(".ytp-next-button");
 
-          if (!nxtBtnEl) return null;
-          // TODO: this is getting overwritten by the page on load
+          if (!nxtBtnEl || !nxtVidInfo) return null;
+
           setTimeout(() => {
-            // console.log("nextBtnEl ==> ", nextBtnEl);
-            nxtBtnEl.dataset.tooltipText = nxtVidInfo?.tooltipNext.trim();
-            nxtBtnEl.dataset.preview = nxtVidInfo?.preview;
+            nxtBtnEl.dataset.tooltipText = nxtVidInfo.videoTitle;
+            nxtBtnEl.dataset.preview = nxtVidInfo.preview;
             nxtBtnEl.href = nxtVidInfo.href;
-          }, 3000);
+          }, 1000);
+
+          nxtBtnEl.addEventListener("click", () => {
+            const event = endpointData(nxtVidInfo.href, playlistContainer);
+            // const event = {detail: nxtVidInfo}
+
+            window.dispatchEvent(event);
+
+            // playlistContainer
+            //   .querySelector<HTMLAnchorElement>(
+            //     `a[href="${nxtVidInfo.href.replace("https://www.youtube.com", "")}"]`,
+            //   )
+            //   ?.click();
+          });
         }
       });
     });

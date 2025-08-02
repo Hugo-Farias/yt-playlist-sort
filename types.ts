@@ -26,7 +26,9 @@ export type YoutubePlaylistResponse = {
 };
 
 export type ApiCache = {
-  items: { [videoId: string]: {originalIndex: number, videoPublishedAt: number } };
+  items: {
+    [videoId: string]: { originalIndex: number; videoPublishedAt: number };
+  };
   listId: string;
   storeTime: number;
   extVersion: string;
@@ -65,3 +67,61 @@ export type YouTubeVideoResponse = {
     resultsPerPage: number;
   };
 };
+
+type YTWatchEndpoint = {
+  videoId: string;
+  playlistId?: string;
+  index?: number;
+};
+
+export type YTNavigateEvent = CustomEvent<{
+  destination?: {
+    url: string;
+    searchContainer: Element;
+  };
+  endpoint?: {
+    watchEndpoint: YTWatchEndpoint;
+    commandMetadata?: {
+      webCommandMetadata?: {
+        url?: string;
+        webPageType?: string;
+        rootVe?: number;
+      };
+    };
+  };
+}>;
+
+// export type YTFullEndpointData = CustomEvent<{
+//   ytSort: boolean;
+//   endpoint: {
+//     clickTrackingParams?: string;
+//     commandMetadata?: {
+//       webCommandMetadata?: {
+//         url?: string;
+//         webPageType?: string;
+//         rootVe?: number;
+//       };
+//     };
+//     videoId?: string;
+//     playlistId?: string;
+//     index?: number;
+//     params?: string;
+//     loggingContext?: {
+//       vssLoggingContext?: {
+//         serializedContextData?: string;
+//       };
+//     };
+//     watchEndpointSupportedOnesieConfig?: {
+//       html5PlaybackOnesieConfig?: {
+//         commonConfig?: {
+//           url?: string;
+//         };
+//       };
+//     };
+//     watchEndpointSupportedPrefetchConfig?: {
+//       sabrPrefetchEndpointConfig?: {
+//         disablePrefetch?: boolean;
+//       };
+//     };
+//   };
+// }>;
