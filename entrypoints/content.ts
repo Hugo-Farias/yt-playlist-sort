@@ -10,19 +10,24 @@ import {
   renderDateToElement,
   getInfoFromElement,
   endpointData,
+  replaceTooltipInfo,
 } from "@/helper.ts";
 import { YTNavigateEvent } from "@/types";
 
 export default defineContentScript({
   main() {
-    // TODO: Hijack the event here, replace event detail with custom info
+    let firstRun = true;
+
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
+        // e.stopImmediatePropagation();
+        // return null;
+
         const event = e as YTNavigateEvent;
         // const target = e.target as Element;
 
-        console.log("detail ==> ", event.detail);
+        // console.log("detail ==> ", event.detail);
         // console.log("e ==> ", target.tagName);
 
         // if (target.tagName === "YTD-PLAYLIST-PANEL-VIDEO-RENDERER") {
@@ -104,37 +109,39 @@ export default defineContentScript({
         renderDateToElement(el, apiCache!);
         playlistContainer.appendChild(el);
 
-        if (
-          index < arr.length - 1 &&
-          getVideoId(el) === getVideoId(location.href)
-        ) {
-          const nxtVidInfo = getInfoFromElement(arr[index + 1]);
+        if (index > arr.length - 1) return null;
+        if (getVideoId(el) !== getVideoId(location.href)) return null;
 
-          // console.log("nxtVidInfo ==> ", nxtVidInfo);
+        const nextVidInfo = getInfoFromElement(arr[index + 1]);
+        const prevVidInfo = getInfoFromElement(arr[index - 1]);
 
-          const nxtBtnEl =
-            document.querySelector<HTMLAnchorElement>(".ytp-next-button");
+        if (!nextVidInfo) return null;
 
-          if (!nxtBtnEl || !nxtVidInfo) return null;
+        setTimeout(() => {
+          replaceTooltipInfo("next", nextVidInfo);
+          replaceTooltipInfo("prev", prevVidInfo);
+        }, 1000);
 
-          setTimeout(() => {
-            nxtBtnEl.dataset.tooltipText = nxtVidInfo.videoTitle;
-            nxtBtnEl.dataset.preview = nxtVidInfo.preview;
-            nxtBtnEl.href = nxtVidInfo.href;
-          }, 1000);
+        const videoControlBtns = document.querySelector(".ytp-left-controls");
 
-          nxtBtnEl.addEventListener("click", () => {
-            const event = endpointData(nxtVidInfo.href, playlistContainer);
-            // const event = {detail: nxtVidInfo}
+        if (firstRun) {
+          videoControlBtns?.addEventListener("click", (e) => {
+            const target = e.target as HTMLDivElement;
 
-            window.dispatchEvent(event);
+            // console.log("videoControl event ==> ", e);
 
-            // playlistContainer
-            //   .querySelector<HTMLAnchorElement>(
-            //     `a[href="${nxtVidInfo.href.replace("https://www.youtube.com", "")}"]`,
-            //   )
-            //   ?.click();
+            if (target.classList.contains("ytp-next-button")) {
+              console.log("YT-playlist-sort: Next video");
+              const event = endpointData(nextVidInfo.href, playlistContainer);
+              window.dispatchEvent(event);
+            } else if (target.classList.contains("ytp-prev-button")) {
+              console.log("YT-playlist-sort: Previous video");
+              const event = endpointData(nextVidInfo.href, playlistContainer);
+              window.dispatchEvent(event);
+            }
           });
+
+          firstRun = false;
         }
       });
     });

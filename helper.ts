@@ -233,7 +233,7 @@ export const sortList = (
   return sortedList.reverse();
 };
 
-type getInfoFromElement = {
+type GetInfoFromElementRT = {
   videoTitle: string;
   preview: string;
   href: string;
@@ -242,7 +242,7 @@ type getInfoFromElement = {
 
 export const getInfoFromElement = (
   el: HTMLDivElement | null,
-): getInfoFromElement | null => {
+): GetInfoFromElementRT | null => {
   if (!el) return null;
 
   const videoId = getVideoId(el);
@@ -254,36 +254,10 @@ export const getInfoFromElement = (
   };
 };
 
-// type YTNavigateEvent = CustomEvent<{
-//   detail: {
-//     destination?: {
-//       url: string;
-//       searchConainer: Element;
-//     };
-//   };
-//   // endpoint: {
-//   //   watchEndpoint: YTWatchEndpoint;
-//   //   commandMetadata?: {
-//   //     webCommandMetadata?: {
-//   //       url?: string;
-//   //       webPageType?: string;
-//   //       rootVe?: number;
-//   //     };
-//   //   };
-//   // };
-// }>;
-
 export const endpointData = (
   url: string,
   searchContainer: Element,
-  // videoId: string,
-  // playlistId?: string,
-  // index: number = 0,
 ): YTNavigateEvent => {
-  // const watchEndpoint: YTWatchEndpoint = { videoId };
-  // if (playlistId) watchEndpoint.playlistId = playlistId;
-  // if (index !== undefined) watchEndpoint.index = index;
-
   return new CustomEvent("yt-navigate", {
     detail: {
       destination: { url: url, searchContainer: searchContainer },
@@ -291,4 +265,20 @@ export const endpointData = (
     bubbles: true,
     composed: true,
   });
+};
+
+export const replaceTooltipInfo = (
+  type: "next" | "prev",
+  info: GetInfoFromElementRT | null,
+) => {
+  const element = document.querySelector<HTMLAnchorElement>(
+    `.ytp-${type}-button`,
+  );
+
+  if (!element) return null;
+  if (!info) return null;
+
+  element.dataset.tooltipText = info.videoTitle;
+  element.dataset.preview = info.preview;
+  element.href = info.href;
 };
