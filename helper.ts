@@ -237,7 +237,6 @@ type GetInfoFromElementRT = {
   videoTitle: string;
   preview: string;
   href: string;
-  videoId: string;
 };
 
 export const getInfoFromElement = (
@@ -250,17 +249,15 @@ export const getInfoFromElement = (
     videoTitle: el?.querySelector("#video-title")?.textContent?.trim() ?? "",
     preview: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
     href: el.querySelector("a")?.href ?? "",
-    videoId: videoId,
   };
 };
 
 export const endpointData = (
-  url: string,
-  searchContainer: Element,
+  direction: "next" | "previous",
 ): YTNavigateEvent => {
   return new CustomEvent("yt-navigate", {
     detail: {
-      destination: { url: url, searchContainer: searchContainer },
+      ytSort: direction,
     },
     bubbles: true,
     composed: true,

@@ -75,10 +75,7 @@ type YTWatchEndpoint = {
 };
 
 export type YTNavigateEvent = CustomEvent<{
-  destination?: {
-    url: string;
-    searchContainer: Element;
-  };
+  ytSort: "next" | "previous";
   endpoint?: {
     watchEndpoint: YTWatchEndpoint;
     commandMetadata?: {

@@ -17,6 +17,7 @@ import { YTNavigateEvent } from "@/types";
 export default defineContentScript({
   main() {
     let firstRun = true;
+    let videoControlBtns: HTMLDivElement | null;
 
     window.addEventListener(
       "yt-navigate",
@@ -25,23 +26,32 @@ export default defineContentScript({
         // return null;
 
         const event = e as YTNavigateEvent;
+        console.log("event ==> ", event.detail);
         // const target = e.target as Element;
-
-        // console.log("detail ==> ", event.detail);
-        // console.log("e ==> ", target.tagName);
+        // e.stopImmediatePropagation();
 
         // if (target.tagName === "YTD-PLAYLIST-PANEL-VIDEO-RENDERER") {
-        if (event.detail.endpoint?.watchEndpoint) {
+        if (event.detail?.endpoint) {
           e.stopImmediatePropagation();
-        } else if (event.detail.destination) {
-          const videoUrl = event.detail.destination.url;
-          const element = event.detail.destination.searchContainer;
+        } else if (event.detail?.ytSort) {
+          const { ytSort: direction } = event.detail;
 
-          element
-            .querySelector<HTMLAnchorElement>(
-              `a[href="${videoUrl.replace("https://www.youtube.com", "")}"]`,
-            )
-            ?.click();
+          const currentItem = document.querySelector(
+            "ytd-playlist-panel-video-renderer[selected]",
+          );
+
+          const methodMap = {
+            next: "nextSibling",
+            previous: "previousSibling",
+          } as const;
+
+          const itemMethod = methodMap[direction];
+
+          console.log("itemMethod ==> ", itemMethod);
+
+          const element = currentItem?.[itemMethod];
+          if (!(element instanceof Element)) return null;
+          element.querySelector("a")?.click();
         }
       },
       true,
@@ -115,35 +125,39 @@ export default defineContentScript({
         const nextVidInfo = getInfoFromElement(arr[index + 1]);
         const prevVidInfo = getInfoFromElement(arr[index - 1]);
 
-        if (!nextVidInfo) return null;
-
         setTimeout(() => {
+          if (!prevVidInfo) {
+            const el =
+              document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
+
+            if (el) el.style.display = "none";
+          }
+
           replaceTooltipInfo("next", nextVidInfo);
           replaceTooltipInfo("prev", prevVidInfo);
         }, 1000);
-
-        const videoControlBtns = document.querySelector(".ytp-left-controls");
-
-        if (firstRun) {
-          videoControlBtns?.addEventListener("click", (e) => {
-            const target = e.target as HTMLDivElement;
-
-            // console.log("videoControl event ==> ", e);
-
-            if (target.classList.contains("ytp-next-button")) {
-              console.log("YT-playlist-sort: Next video");
-              const event = endpointData(nextVidInfo.href, playlistContainer);
-              window.dispatchEvent(event);
-            } else if (target.classList.contains("ytp-prev-button")) {
-              console.log("YT-playlist-sort: Previous video");
-              const event = endpointData(nextVidInfo.href, playlistContainer);
-              window.dispatchEvent(event);
-            }
-          });
-
-          firstRun = false;
-        }
       });
+
+      if (firstRun) {
+        const clickEvent = (e: Event) => {
+          const target = e.target as HTMLDivElement;
+          console.log("target ==> ");
+
+          const direction = target
+            .getAttribute("data-title-no-tooltip")
+            ?.toLowerCase();
+
+          if (direction !== "next" && direction !== "previous") return null;
+
+          const endpointEvent = endpointData(direction);
+          window.dispatchEvent(endpointEvent);
+        };
+
+        videoControlBtns = document.querySelector(".ytp-left-controls");
+        videoControlBtns?.addEventListener("click", clickEvent);
+      }
+
+      firstRun = false;
     });
   },
   matches: ["*://*.youtube.com/*"],
