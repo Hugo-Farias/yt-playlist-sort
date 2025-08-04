@@ -28,7 +28,6 @@ export default defineContentScript({
         if (event.detail?.endpoint) {
           e.stopImmediatePropagation();
         } else if (event.detail?.ytSort) {
-          // TODO: handle last item in playlist next button
           const { ytSort: direction } = event.detail;
 
           const currentItem = document.querySelector(
@@ -40,8 +39,9 @@ export default defineContentScript({
             previous: "previousSibling",
           } as const;
 
-          const element = currentItem?.[methodMap[direction]];
-          // console.log("element ==> ", element);
+          let element = currentItem?.[methodMap[direction]];
+          if (element === null)
+            element = document.querySelector("yt-lockup-view-model");
           if (!(element instanceof Element)) return null;
           element.querySelector("a")?.click();
         }
@@ -102,9 +102,6 @@ export default defineContentScript({
       }
 
       if (!apiCache) return null;
-
-      // console.log(apiCache.items[videoId]);
-
       const sortedList = sortList(playlistItems, apiCache);
       // playlistContainer.replaceChildren(...sortedList);
       sortedList.forEach((el, index, arr) => {
@@ -125,9 +122,7 @@ export default defineContentScript({
           }
           if (!nextVidInfo) {
             const el = document.querySelector<Element>("yt-lockup-view-model");
-            console.log("el ==> ", el);
             if (el) nextVidInfo = getInfoFromElement(el);
-            console.log("nextVidInfo ==> ", nextVidInfo);
           }
 
           replaceTooltipInfo("next", nextVidInfo);
