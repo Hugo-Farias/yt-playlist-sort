@@ -22,18 +22,13 @@ export default defineContentScript({
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
-        // e.stopImmediatePropagation();
-        // return null;
-
         const event = e as YTNavigateEvent;
-        console.log("event ==> ", event.detail);
-        // const target = e.target as Element;
-        // e.stopImmediatePropagation();
+        // console.log("event ==> ", event);
 
-        // if (target.tagName === "YTD-PLAYLIST-PANEL-VIDEO-RENDERER") {
         if (event.detail?.endpoint) {
           e.stopImmediatePropagation();
         } else if (event.detail?.ytSort) {
+          // TODO: handle last item in playlist next button
           const { ytSort: direction } = event.detail;
 
           const currentItem = document.querySelector(
@@ -45,11 +40,8 @@ export default defineContentScript({
             previous: "previousSibling",
           } as const;
 
-          const itemMethod = methodMap[direction];
-
-          console.log("itemMethod ==> ", itemMethod);
-
-          const element = currentItem?.[itemMethod];
+          const element = currentItem?.[methodMap[direction]];
+          // console.log("element ==> ", element);
           if (!(element instanceof Element)) return null;
           element.querySelector("a")?.click();
         }
@@ -122,15 +114,20 @@ export default defineContentScript({
         if (index > arr.length - 1) return null;
         if (getVideoId(el) !== getVideoId(location.href)) return null;
 
-        const nextVidInfo = getInfoFromElement(arr[index + 1]);
+        let nextVidInfo = getInfoFromElement(arr[index + 1]);
         const prevVidInfo = getInfoFromElement(arr[index - 1]);
 
         setTimeout(() => {
           if (!prevVidInfo) {
             const el =
               document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
-
             if (el) el.style.display = "none";
+          }
+          if (!nextVidInfo) {
+            const el = document.querySelector<Element>("yt-lockup-view-model");
+            console.log("el ==> ", el);
+            if (el) nextVidInfo = getInfoFromElement(el);
+            console.log("nextVidInfo ==> ", nextVidInfo);
           }
 
           replaceTooltipInfo("next", nextVidInfo);
@@ -141,7 +138,6 @@ export default defineContentScript({
       if (firstRun) {
         const clickEvent = (e: Event) => {
           const target = e.target as HTMLDivElement;
-          console.log("target ==> ");
 
           const direction = target
             .getAttribute("data-title-no-tooltip")
@@ -153,6 +149,7 @@ export default defineContentScript({
           window.dispatchEvent(endpointEvent);
         };
 
+        // TODO: add event for keyboard shortcut
         videoControlBtns = document.querySelector(".ytp-left-controls");
         videoControlBtns?.addEventListener("click", clickEvent);
       }

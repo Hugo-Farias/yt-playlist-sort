@@ -240,13 +240,16 @@ type GetInfoFromElementRT = {
 };
 
 export const getInfoFromElement = (
-  el: HTMLDivElement | null,
+  el: Element | null,
 ): GetInfoFromElementRT | null => {
   if (!el) return null;
 
   const videoId = getVideoId(el);
   return {
-    videoTitle: el?.querySelector("#video-title")?.textContent?.trim() ?? "",
+    videoTitle:
+      el?.querySelector("#video-title")?.textContent?.trim() ??
+      el?.querySelector("span[role=text]")?.textContent?.trim() ??
+      "",
     preview: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
     href: el.querySelector("a")?.href ?? "",
   };
