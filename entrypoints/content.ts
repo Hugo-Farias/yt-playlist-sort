@@ -23,7 +23,7 @@ export default defineContentScript({
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
-        console.log(!getListId(currUrl));
+        console.log(getListId(currUrl));
         if (!getListId(currUrl)) return null;
 
         const event = e as YTNavigateEvent;
@@ -168,7 +168,13 @@ export default defineContentScript({
       });
 
       if (firstRun) {
-        const clickEvent = (e: Event) => {
+        const navigateEvent = (direction: "next" | "previous") => {
+          const endpointEvent = endpointData(direction);
+          window.dispatchEvent(endpointEvent);
+        };
+
+        videoControlBtns = document.querySelector(".ytp-left-controls");
+        videoControlBtns?.addEventListener("click", (e) => {
           const target = e.target as HTMLDivElement;
 
           const direction = target
@@ -177,13 +183,12 @@ export default defineContentScript({
 
           if (direction !== "next" && direction !== "previous") return null;
 
-          const endpointEvent = endpointData(direction);
-          window.dispatchEvent(endpointEvent);
-        };
-
-        // TODO: add event for keyboard shortcut
-        videoControlBtns = document.querySelector(".ytp-left-controls");
-        videoControlBtns?.addEventListener("click", clickEvent);
+          navigateEvent(direction);
+        });
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "N") navigateEvent("next");
+          else if (e.key === "P") navigateEvent("previous");
+        });
       }
 
       firstRun = false;
