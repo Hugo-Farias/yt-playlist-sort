@@ -66,13 +66,31 @@ export default defineContentScript({
         playlistContainerSelector,
       );
 
-      // TEST: development paragraph, remove in production
+      // TEST: development block, remove in production
       const videoContainer = document.querySelector("#player-container-outer");
       if (videoContainer) {
         setTimeout(() => {
           console.log("YT-playlist-sort: Pausing video...");
           document.querySelector("video")?.pause();
           // videoContainer.remove(); // Remove the video element to prevent autoplay
+
+          // TEST: remove this before production
+          // this closes the playlist container
+          const isCollapsed = document
+            .querySelector<HTMLDivElement>(
+              "ytd-playlist-panel-renderer#playlist",
+            )
+            ?.hasAttribute("collapsed");
+
+          console.log("isCollapsed ==> ", isCollapsed);
+
+          if (!isCollapsed) {
+            const containerElement = document.querySelector<HTMLDivElement>(
+              "#container.ytd-playlist-panel-renderer",
+            )?.firstChild as HTMLDivElement;
+
+            containerElement.click();
+          }
         }, 1000);
       }
 
@@ -111,8 +129,24 @@ export default defineContentScript({
         if (index > arr.length - 1) return null;
         if (getVideoId(el) !== getVideoId(location.href)) return null;
 
-        let nextVidInfo = getInfoFromElement(arr[index + 1]);
         const prevVidInfo = getInfoFromElement(arr[index - 1]);
+        console.log("prevVidInfo ==> ", prevVidInfo);
+        let nextVidInfo = getInfoFromElement(arr[index + 1]);
+        console.log("nextVidInfo ==> ", nextVidInfo);
+
+        const nextLabel = document.querySelector(
+          "#next-video-title > #next-label",
+        );
+        const sibling = nextLabel?.nextSibling as HTMLDivElement;
+
+        if (!nextVidInfo && nextLabel && nextLabel.nextSibling) {
+          nextLabel.textContent = "End of playlist";
+          sibling.textContent = "";
+        } else if (nextLabel && nextLabel.nextSibling) {
+          nextLabel.textContent = "Next:";
+          sibling.textContent = nextVidInfo?.videoTitle ?? "";
+          sibling.removeAttribute("is-empty");
+        }
 
         setTimeout(() => {
           if (!prevVidInfo) {
