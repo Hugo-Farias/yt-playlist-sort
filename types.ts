@@ -76,7 +76,6 @@ type YTWatchEndpoint = {
 
 export type YTNavigateEvent = CustomEvent<{
   ytSort?: "next" | "previous";
-  bypass?: boolean;
   tempData?: {};
   endpoint?: {
     watchEndpoint?: YTWatchEndpoint;

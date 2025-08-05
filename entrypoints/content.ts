@@ -18,12 +18,15 @@ export default defineContentScript({
   main() {
     let firstRun = true;
     let videoControlBtns: HTMLDivElement | null;
+    let currUrl = location.href;
 
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
+        console.log(!getListId(currUrl));
+        if (!getListId(currUrl)) return null;
+
         const event = e as YTNavigateEvent;
-        // console.log("event ==> ", event);
 
         if (event.detail?.endpoint) {
           e.stopImmediatePropagation();
@@ -52,7 +55,7 @@ export default defineContentScript({
     document.addEventListener("yt-navigate-finish", async () => {
       console.log("content init 🟢");
       // return null;
-      const currUrl = location.href;
+      currUrl = location.href;
       const videoId = getVideoId(currUrl);
       const playlistId = getListId(currUrl);
       if (!videoId) return null;
