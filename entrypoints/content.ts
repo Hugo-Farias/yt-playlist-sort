@@ -43,8 +43,9 @@ export default defineContentScript({
           } as const;
 
           let element = currentItem?.[methodMap[direction]];
-          if (element === null)
+          if (element === null) {
             element = document.querySelector("yt-lockup-view-model");
+          }
           if (!(element instanceof Element)) return null;
           element.querySelector("a")?.click();
         }
@@ -76,24 +77,6 @@ export default defineContentScript({
           console.log("YT-playlist-sort: Pausing video...");
           document.querySelector("video")?.pause();
           // videoContainer.remove(); // Remove the video element to prevent autoplay
-
-          // TEST: remove this before production
-          // this closes the playlist container
-          const isCollapsed = document
-            .querySelector<HTMLDivElement>(
-              "ytd-playlist-panel-renderer#playlist",
-            )
-            ?.hasAttribute("collapsed");
-
-          console.log("isCollapsed ==> ", isCollapsed);
-
-          if (!isCollapsed) {
-            const containerElement = document.querySelector<HTMLDivElement>(
-              "#container.ytd-playlist-panel-renderer",
-            )?.firstChild as HTMLDivElement;
-
-            containerElement.click();
-          }
         }, 1000);
       }
 
@@ -124,22 +107,35 @@ export default defineContentScript({
 
       if (!apiCache) return null;
       const sortedList = sortList(playlistItems, apiCache);
-      // playlistContainer.replaceChildren(...sortedList);
+
       sortedList.forEach((el, index, arr) => {
         renderDateToElement(el, apiCache!);
         playlistContainer.appendChild(el);
 
-        if (index > arr.length - 1) return null;
-        if (getVideoId(el) !== getVideoId(location.href)) return null;
+        // if (index > arr.length - 1) return null;
+        if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
+        const currentLocation = `${index + 1}/${arr.length}`;
+
+        const indexMessage = document.querySelector<HTMLSpanElement>(
+          "span.index-message.ytd-playlist-panel-renderer",
+        );
+
+        console.log("indexMessage ==> ", indexMessage);
+
+        if (indexMessage) {
+          indexMessage.textContent = currentLocation;
+          indexMessage.removeAttribute("hidden");
+          // indexMessage.style.marginRight = "1rem";
+          indexMessage.nextElementSibling?.setAttribute("hidden", "");
+        }
 
         const prevVidInfo = getInfoFromElement(arr[index - 1]);
-        console.log("prevVidInfo ==> ", prevVidInfo);
         let nextVidInfo = getInfoFromElement(arr[index + 1]);
-        console.log("nextVidInfo ==> ", nextVidInfo);
 
         const nextLabel = document.querySelector(
           "#next-video-title > #next-label",
         );
+
         const sibling = nextLabel?.nextSibling as HTMLDivElement;
 
         if (!nextVidInfo && nextLabel && nextLabel.nextSibling) {
@@ -185,6 +181,7 @@ export default defineContentScript({
 
           navigateEvent(direction);
         });
+
         window.addEventListener("keydown", (e) => {
           if (e.key === "N") navigateEvent("next");
           else if (e.key === "P") navigateEvent("previous");

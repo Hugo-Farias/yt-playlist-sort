@@ -217,6 +217,8 @@ export const sortList = (
   cache: ApiCache,
   direction: "asc" | "desc" | "orig" = "asc",
 ): HTMLDivElement[] => {
+  if (direction === "orig") return [...nodeList];
+
   if (isSorted(nodeList, direction, cache)) {
     console.log("Already sorted in", direction, "order 🟣");
     return [...nodeList];
