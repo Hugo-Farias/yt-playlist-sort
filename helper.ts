@@ -257,18 +257,6 @@ export const getInfoFromElement = (
   };
 };
 
-export const endpointData = (
-  direction: "next" | "previous",
-): YTNavigateEvent => {
-  return new CustomEvent("yt-navigate", {
-    detail: {
-      ytSort: direction,
-    },
-    bubbles: true,
-    composed: true,
-  });
-};
-
 export const replaceTooltipInfo = (
   type: "next" | "prev",
   info: GetInfoFromElementRT | null,
@@ -283,4 +271,19 @@ export const replaceTooltipInfo = (
   element.dataset.tooltipText = info.videoTitle;
   element.dataset.preview = info.preview;
   element.href = info.href;
+};
+
+const endpointData = (direction: "next" | "previous"): YTNavigateEvent => {
+  return new CustomEvent("yt-navigate", {
+    detail: {
+      ytSort: direction,
+    },
+    bubbles: true,
+    composed: true,
+  });
+};
+
+export const navigateEvent = (direction: "next" | "previous") => {
+  const endpointEvent = endpointData(direction);
+  window.dispatchEvent(endpointEvent);
 };

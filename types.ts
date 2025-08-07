@@ -76,7 +76,10 @@ type YTWatchEndpoint = {
 
 export type YTNavigateEvent = CustomEvent<{
   ytSort?: "next" | "previous";
-  tempData?: {};
+  tempData?: {
+    autonav?: "1";
+    lact?: number;
+  };
   endpoint?: {
     watchEndpoint?: YTWatchEndpoint;
     commandMetadata?: {
@@ -90,7 +93,8 @@ export type YTNavigateEvent = CustomEvent<{
 }>;
 
 // export type YTFullEndpointData = CustomEvent<{
-//   ytSort: boolean;
+//  ytSort?: "next" | "previous";
+//  tempData?: {};
 //   endpoint: {
 //     clickTrackingParams?: string;
 //     commandMetadata?: {

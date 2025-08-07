@@ -9,26 +9,29 @@ import {
   sortList,
   renderDateToElement,
   getInfoFromElement,
-  endpointData,
   replaceTooltipInfo,
+  navigateEvent,
 } from "@/helper.ts";
 import { YTNavigateEvent } from "@/types";
 
 export default defineContentScript({
   main() {
     let firstRun = true;
-    let videoControlBtns: HTMLDivElement | null;
     let currUrl = location.href;
 
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
-        console.log(getListId(currUrl));
         if (!getListId(currUrl)) return null;
 
         const event = e as YTNavigateEvent;
+        console.log("event ==> ", event.detail);
 
-        if (event.detail?.endpoint) {
+        if (event.detail?.endpoint?.commandMetadata) {
+          if (event.detail.tempData?.autonav) {
+            console.log("autonav");
+            navigateEvent("next");
+          }
           e.stopImmediatePropagation();
         } else if (event.detail?.ytSort) {
           const { ytSort: direction } = event.detail;
@@ -60,6 +63,11 @@ export default defineContentScript({
       const videoId = getVideoId(currUrl);
       const playlistId = getListId(currUrl);
       if (!videoId) return null;
+      const video = document.querySelector("video");
+      // @ts-ignore
+      // video.currentTime = video?.duration - 3;
+      video?.pause();
+
       // if (previousURL === currUrl) return null; // Prevents duplicate execution
 
       // previousURL = currUrl;
@@ -71,14 +79,14 @@ export default defineContentScript({
       );
 
       // TEST: development block, remove in production
-      const videoContainer = document.querySelector("#player-container-outer");
-      if (videoContainer) {
-        setTimeout(() => {
-          console.log("YT-playlist-sort: Pausing video...");
-          document.querySelector("video")?.pause();
-          // videoContainer.remove(); // Remove the video element to prevent autoplay
-        }, 1000);
-      }
+      // const videoContainer = document.querySelector("#player-container-outer");
+      // if (videoContainer) {
+      //   setTimeout(() => {
+      //     console.log("YT-playlist-sort: Pausing video...");
+      //     video?.pause();
+      //     // videoContainer.remove(); // Remove the video element to prevent autoplay
+      //   }, 1000);
+      // }
 
       if (!playlistContainer) return null;
 
@@ -120,8 +128,6 @@ export default defineContentScript({
           "span.index-message.ytd-playlist-panel-renderer",
         );
 
-        console.log("indexMessage ==> ", indexMessage);
-
         if (indexMessage) {
           indexMessage.textContent = currentLocation;
           indexMessage.removeAttribute("hidden");
@@ -162,15 +168,21 @@ export default defineContentScript({
           replaceTooltipInfo("prev", prevVidInfo);
         }, 1000);
       });
-
+      // TODO: add a listener for when the video ends
       if (firstRun) {
-        const navigateEvent = (direction: "next" | "previous") => {
-          const endpointEvent = endpointData(direction);
-          window.dispatchEvent(endpointEvent);
-        };
+        // video?.addEventListener("seeked", () => {
+        //   console.log("video.currentTime ==> ", video.currentTime);
+        //   console.log("video.duration ==> ", video.duration);
+        //
+        //   console.log(video.currentTime >= video.duration - 5);
+        //
+        //   // console.log("video ended ==> ", video);
+        //   if (video.currentTime >= video.duration - 3) navigateEvent("next");
+        // });
 
-        videoControlBtns = document.querySelector(".ytp-left-controls");
+        const videoControlBtns = document.querySelector(".ytp-left-controls");
         videoControlBtns?.addEventListener("click", (e) => {
+          return null;
           const target = e.target as HTMLDivElement;
 
           const direction = target
