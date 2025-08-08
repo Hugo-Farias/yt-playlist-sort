@@ -25,16 +25,17 @@ export default defineContentScript({
         if (!getListId(currUrl)) return null;
 
         const event = e as YTNavigateEvent;
-        console.log("event ==> ", event.detail);
+        const { detail } = event;
 
-        if (event.detail?.endpoint?.commandMetadata) {
-          if (event.detail.tempData?.autonav) {
+        // TODO: find a way to trigger on video end
+        if (detail?.endpoint?.commandMetadata) {
+          if (detail.tempData?.autonav) {
             console.log("autonav");
-            navigateEvent("next");
+            // navigateEvent("next");
           }
           e.stopImmediatePropagation();
-        } else if (event.detail?.ytSort) {
-          const { ytSort: direction } = event.detail;
+        } else if (detail?.ytSort) {
+          const { ytSort } = detail;
 
           const currentItem = document.querySelector(
             "ytd-playlist-panel-video-renderer[selected]",
@@ -45,7 +46,7 @@ export default defineContentScript({
             previous: "previousSibling",
           } as const;
 
-          let element = currentItem?.[methodMap[direction]];
+          let element = currentItem?.[methodMap[ytSort]];
           if (element === null) {
             element = document.querySelector("yt-lockup-view-model");
           }
@@ -65,7 +66,7 @@ export default defineContentScript({
       if (!videoId) return null;
       const video = document.querySelector("video");
       // @ts-ignore
-      // video.currentTime = video?.duration - 3;
+      video.currentTime = video?.duration - 10;
       video?.pause();
 
       // if (previousURL === currUrl) return null; // Prevents duplicate execution
@@ -168,21 +169,21 @@ export default defineContentScript({
           replaceTooltipInfo("prev", prevVidInfo);
         }, 1000);
       });
-      // TODO: add a listener for when the video ends
+
       if (firstRun) {
-        // video?.addEventListener("seeked", () => {
-        //   console.log("video.currentTime ==> ", video.currentTime);
-        //   console.log("video.duration ==> ", video.duration);
-        //
-        //   console.log(video.currentTime >= video.duration - 5);
-        //
-        //   // console.log("video ended ==> ", video);
-        //   if (video.currentTime >= video.duration - 3) navigateEvent("next");
-        // });
+        video?.addEventListener("pause", () => {
+          const playBtn =
+            document.querySelector<HTMLButtonElement>(".ytp-play-button");
+
+          console.log(playBtn?.dataset.tooltipTitle);
+
+          if (playBtn?.dataset.tooltipTitle === "Replay") {
+            navigateEvent("next");
+          }
+        });
 
         const videoControlBtns = document.querySelector(".ytp-left-controls");
         videoControlBtns?.addEventListener("click", (e) => {
-          return null;
           const target = e.target as HTMLDivElement;
 
           const direction = target
