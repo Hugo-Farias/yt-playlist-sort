@@ -6,13 +6,11 @@ import {
   storeCache,
   getCache,
   getListId,
-  sortList,
-  renderDateToElement,
-  getInfoFromElement,
-  replaceTooltipInfo,
   navigateEvent,
+  sortRenderedPlaylist,
 } from "@/helper.ts";
 import { YTNavigateEvent } from "@/types";
+import { createDropdownMenu } from "./components/createDropdownMenu";
 
 export default defineContentScript({
   main() {
@@ -22,6 +20,7 @@ export default defineContentScript({
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
+        console.log("e ==> ", e);
         if (!getListId(currUrl)) return null;
 
         const event = e as YTNavigateEvent;
@@ -57,7 +56,10 @@ export default defineContentScript({
       true,
     );
 
-    document.addEventListener("yt-navigate-finish", async () => {
+    // TODO: trigger this event after the settings have changed for refresh
+    document.addEventListener("yt-navigate-finish", async (b) => {
+      console.log("b ==> ", b);
+
       console.log("content init 🟢");
       // return null;
       currUrl = location.href;
@@ -65,9 +67,9 @@ export default defineContentScript({
       const playlistId = getListId(currUrl);
       if (!videoId) return null;
       const video = document.querySelector("video");
-      // @ts-ignore
-      video.currentTime = video?.duration - 10;
-      video?.pause();
+
+      // video.currentTime = video?.duration - 10;
+      // video?.pause();
 
       // if (previousURL === currUrl) return null; // Prevents duplicate execution
 
@@ -80,16 +82,29 @@ export default defineContentScript({
       );
 
       // TEST: development block, remove in production
-      // const videoContainer = document.querySelector("#player-container-outer");
-      // if (videoContainer) {
-      //   setTimeout(() => {
-      //     console.log("YT-playlist-sort: Pausing video...");
-      //     video?.pause();
-      //     // videoContainer.remove(); // Remove the video element to prevent autoplay
-      //   }, 1000);
-      // }
+      const videoContainer = document.querySelector("#player-container-outer");
+      if (videoContainer) {
+        setTimeout(() => {
+          console.log("YT-playlist-sort: Pausing video...");
+          video?.pause();
+          videoContainer.remove();
+        }, 1000);
+      }
 
       if (!playlistContainer) return null;
+
+      const renderedCache = getCache("renderedCache", getListId(location.href));
+      let apiCache = getCache("apiCache", getListId(location.href)!);
+
+      if (apiCache) {
+        const dropdown = createDropdownMenu(playlistContainer, apiCache);
+
+        const playlistMenuBtns = document.querySelector(
+          "div#playlist-actions > div > div > ytd-menu-renderer > #top-level-buttons-computed",
+        );
+
+        playlistMenuBtns?.appendChild(dropdown);
+      }
 
       const playlistItems: NodeListOf<HTMLDivElement> =
         playlistContainer.querySelectorAll(playlistItemSelector);
@@ -97,9 +112,6 @@ export default defineContentScript({
       const renderedPlaylistIds = [...playlistItems].map((el): string =>
         getVideoId(el),
       );
-
-      const renderedCache = getCache("renderedCache", getListId(location.href));
-      let apiCache = getCache("apiCache", getListId(location.href)!);
 
       // If the rendered playlist items are different from the cache
       // or there is no cache, hydrate it
@@ -115,70 +127,16 @@ export default defineContentScript({
       }
 
       if (!apiCache) return null;
-      const sortedList = sortList(playlistItems, apiCache);
 
-      sortedList.forEach((el, index, arr) => {
-        renderDateToElement(el, apiCache!);
-        playlistContainer.appendChild(el);
-
-        // if (index > arr.length - 1) return null;
-        if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
-        const currentLocation = `${index + 1}/${arr.length}`;
-
-        const indexMessage = document.querySelector<HTMLSpanElement>(
-          "span.index-message.ytd-playlist-panel-renderer",
-        );
-
-        if (indexMessage) {
-          indexMessage.textContent = currentLocation;
-          indexMessage.removeAttribute("hidden");
-          // indexMessage.style.marginRight = "1rem";
-          indexMessage.nextElementSibling?.setAttribute("hidden", "");
-        }
-
-        const prevVidInfo = getInfoFromElement(arr[index - 1]);
-        let nextVidInfo = getInfoFromElement(arr[index + 1]);
-
-        const nextLabel = document.querySelector(
-          "#next-video-title > #next-label",
-        );
-
-        const sibling = nextLabel?.nextSibling as HTMLDivElement;
-
-        if (!nextVidInfo && nextLabel && nextLabel.nextSibling) {
-          nextLabel.textContent = "End of playlist";
-          sibling.textContent = "";
-        } else if (nextLabel && nextLabel.nextSibling) {
-          nextLabel.textContent = "Next:";
-          sibling.textContent = nextVidInfo?.videoTitle ?? "";
-          sibling.removeAttribute("is-empty");
-        }
-
-        setTimeout(() => {
-          if (!prevVidInfo) {
-            const el =
-              document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
-            if (el) el.style.display = "none";
-          }
-          if (!nextVidInfo) {
-            const el = document.querySelector<Element>("yt-lockup-view-model");
-            if (el) nextVidInfo = getInfoFromElement(el);
-          }
-
-          replaceTooltipInfo("next", nextVidInfo);
-          replaceTooltipInfo("prev", prevVidInfo);
-        }, 1000);
-      });
+      sortRenderedPlaylist(playlistContainer, apiCache, "asc");
 
       if (firstRun) {
         video?.addEventListener("pause", () => {
           const playBtn =
             document.querySelector<HTMLButtonElement>(".ytp-play-button");
 
-          console.log(playBtn?.dataset.tooltipTitle);
-
           if (playBtn?.dataset.tooltipTitle === "Replay") {
-            navigateEvent("next");
+            navigateEvent("yt-navigate", { ytSort: "next" });
           }
         });
 
@@ -192,12 +150,13 @@ export default defineContentScript({
 
           if (direction !== "next" && direction !== "previous") return null;
 
-          navigateEvent(direction);
+          navigateEvent("yt-navigate", { ytSort: direction });
         });
 
         window.addEventListener("keydown", (e) => {
-          if (e.key === "N") navigateEvent("next");
-          else if (e.key === "P") navigateEvent("previous");
+          if (e.key === "N") navigateEvent("yt-navigate", { ytSort: "next" });
+          else if (e.key === "P")
+            navigateEvent("yt-navigate", { ytSort: "previous" });
         });
       }
 

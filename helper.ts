@@ -2,7 +2,6 @@ import {
   ApiCache,
   RenderedPlaylistItem,
   YoutubePlaylistResponse,
-  YTNavigateEvent,
 } from "@/types.ts";
 import { API_URL, playlistItemSelector } from "@/config.ts";
 import pkg from "@/package.json";
@@ -212,7 +211,7 @@ const isSorted = (
   });
 };
 
-export const sortList = (
+const sortList = (
   nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,
   direction: "asc" | "desc" | "orig" = "asc",
@@ -273,17 +272,80 @@ export const replaceTooltipInfo = (
   element.href = info.href;
 };
 
-const endpointData = (direction: "next" | "previous"): YTNavigateEvent => {
-  return new CustomEvent("yt-navigate", {
+export const navigateEvent = (
+  eventType: "yt-navigate" | "yt-navigate-finish",
+  payload: {},
+) => {
+  console.log("navigate event triggered");
+
+  const event = new CustomEvent(eventType, {
     detail: {
-      ytSort: direction,
+      ...payload,
     },
     bubbles: true,
     composed: true,
   });
+  window.dispatchEvent(event);
 };
 
-export const navigateEvent = (direction: "next" | "previous") => {
-  const endpointEvent = endpointData(direction);
-  window.dispatchEvent(endpointEvent);
+export const sortRenderedPlaylist = (
+  playlistContainer: HTMLDivElement,
+  apiCache: ApiCache,
+  direction: "asc" | "desc" | "orig" = "orig",
+) => {
+  const playlistItems: NodeListOf<HTMLDivElement> =
+    playlistContainer.querySelectorAll(playlistItemSelector);
+
+  const sortedList = sortList(playlistItems, apiCache, direction);
+
+  sortedList.forEach((el, index, arr) => {
+    renderDateToElement(el, apiCache!);
+    playlistContainer.appendChild(el);
+
+    // if (index > arr.length - 1) return null;
+    if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
+    const currentLocation = `${index + 1}/${arr.length}`;
+
+    const indexMessage = document.querySelector<HTMLSpanElement>(
+      "span.index-message.ytd-playlist-panel-renderer",
+    );
+
+    if (indexMessage) {
+      indexMessage.textContent = currentLocation;
+      indexMessage.removeAttribute("hidden");
+      // indexMessage.style.marginRight = "1rem";
+      indexMessage.nextElementSibling?.setAttribute("hidden", "");
+    }
+
+    const prevVidInfo = getInfoFromElement(arr[index - 1]);
+    let nextVidInfo = getInfoFromElement(arr[index + 1]);
+
+    const nextLabel = document.querySelector("#next-video-title > #next-label");
+
+    const sibling = nextLabel?.nextSibling as HTMLDivElement;
+
+    if (!nextVidInfo && nextLabel && nextLabel.nextSibling) {
+      nextLabel.textContent = "End of playlist";
+      sibling.textContent = "";
+    } else if (nextLabel && nextLabel.nextSibling) {
+      nextLabel.textContent = "Next:";
+      sibling.textContent = nextVidInfo?.videoTitle ?? "";
+      sibling.removeAttribute("is-empty");
+    }
+
+    setTimeout(() => {
+      if (!prevVidInfo) {
+        const el =
+          document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
+        if (el) el.style.display = "none";
+      }
+      if (!nextVidInfo) {
+        const el = document.querySelector<Element>("yt-lockup-view-model");
+        if (el) nextVidInfo = getInfoFromElement(el);
+      }
+
+      replaceTooltipInfo("next", nextVidInfo);
+      replaceTooltipInfo("prev", prevVidInfo);
+    }, 1000);
+  });
 };
