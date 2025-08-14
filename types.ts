@@ -25,6 +25,8 @@ export type YoutubePlaylistResponse = {
   };
 };
 
+export type YtSortOrder = "asc" | "desc" | "orig";
+
 export type ApiCache = {
   items: {
     [videoId: string]: { originalIndex: number; videoPublishedAt: number };

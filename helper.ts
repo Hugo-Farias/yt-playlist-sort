@@ -193,6 +193,11 @@ const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
   return cache.items[videoId ?? ""]?.videoPublishedAt ?? Infinity;
 };
 
+const getIndexFromCache = (el: HTMLDivElement, cache: ApiCache) => {
+  const videoId = getVideoId(el);
+  return cache.items[videoId ?? ""]?.originalIndex ?? Infinity;
+};
+
 const isSorted = (
   nodes: NodeListOf<HTMLDivElement>,
   direction: "asc" | "desc" | "orig" = "asc",
@@ -216,7 +221,13 @@ const sortList = (
   cache: ApiCache,
   direction: "asc" | "desc" | "orig" = "asc",
 ): HTMLDivElement[] => {
-  if (direction === "orig") return [...nodeList];
+  if (direction === "orig") {
+    return [...nodeList].sort((a, b) => {
+      const aIndex = getIndexFromCache(a, cache);
+      const bIndex = getIndexFromCache(b, cache);
+      return aIndex - bIndex;
+    });
+  }
 
   if (isSorted(nodeList, direction, cache)) {
     console.log("Already sorted in", direction, "order 🟣");

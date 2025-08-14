@@ -10,7 +10,7 @@ import {
   sortRenderedPlaylist,
 } from "@/helper.ts";
 import { YTNavigateEvent } from "@/types";
-import { createDropdownMenu } from "./components/createDropdownMenu";
+import createDropdownMenu from "./createDropdownMenu";
 
 export default defineContentScript({
   main() {
@@ -20,7 +20,6 @@ export default defineContentScript({
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
-        console.log("e ==> ", e);
         if (!getListId(currUrl)) return null;
 
         const event = e as YTNavigateEvent;
@@ -58,8 +57,6 @@ export default defineContentScript({
 
     // TODO: trigger this event after the settings have changed for refresh
     document.addEventListener("yt-navigate-finish", async (b) => {
-      console.log("b ==> ", b);
-
       console.log("content init 🟢");
       // return null;
       currUrl = location.href;

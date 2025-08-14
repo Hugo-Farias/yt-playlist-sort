@@ -1,17 +1,25 @@
 import { sortRenderedPlaylist } from "@/helper";
-import { ApiCache } from "@/types";
+import { ApiCache, YtSortOrder } from "@/types";
 
-type SortOrder = "asc" | "desc" | "orig";
-
-export function createDropdownMenu(
+function createDropdownMenu(
   playlistContainer: HTMLDivElement,
   cache: ApiCache,
 ): HTMLSelectElement {
-  let sortOrder: SortOrder = "orig";
+  let sortOrder: YtSortOrder =
+    (localStorage.getItem("ytSortOrder") as YtSortOrder) ?? "orig";
 
   const select = document.createElement("select");
+  select.className = "header ytd-playlist-panel-renderer";
+  select.style.color = "var(--yt-spec-text-primary)";
+  select.style.height = "25px";
+  // select.style.paddingBottom = "1px";
+  select.style.paddingBlock = "0px";
+  select.style.borderRadius = "10px";
+  // select.style.display = "flex";
+  // select.style.justifyContent = "space-between";
+  // select.style.alignItems = "center";
 
-  const options: { value: SortOrder; label: string }[] = [
+  const options: { value: YtSortOrder; label: string }[] = [
     { value: "asc", label: "Ascending" },
     { value: "desc", label: "Descending" },
     { value: "orig", label: "Original" },
@@ -26,10 +34,13 @@ export function createDropdownMenu(
   }
 
   select.addEventListener("change", () => {
-    sortOrder = select.value as SortOrder;
+    sortOrder = select.value as YtSortOrder;
     console.log("Sort order changed to:", sortOrder);
     sortRenderedPlaylist(playlistContainer, cache, sortOrder);
+    localStorage.setItem("ytSortOrder", sortOrder);
   });
 
   return select;
 }
+
+export default createDropdownMenu;
