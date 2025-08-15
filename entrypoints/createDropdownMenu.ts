@@ -4,25 +4,25 @@ import { ApiCache, YtSortOrder } from "@/types";
 function createDropdownMenu(
   playlistContainer: HTMLDivElement,
   cache: ApiCache,
-): HTMLSelectElement {
+) {
+  document.querySelector(".ytSortDropdown")?.remove();
+
   let sortOrder: YtSortOrder =
     (localStorage.getItem("ytSortOrder") as YtSortOrder) ?? "orig";
 
   const select = document.createElement("select");
-  select.className = "header ytd-playlist-panel-renderer";
+  select.className = "header ytd-playlist-panel-renderer ytSortDropdown";
   select.style.color = "var(--yt-spec-text-primary)";
   select.style.height = "25px";
-  // select.style.paddingBottom = "1px";
   select.style.paddingBlock = "0px";
-  select.style.borderRadius = "10px";
-  // select.style.display = "flex";
-  // select.style.justifyContent = "space-between";
-  // select.style.alignItems = "center";
+  // select.style.paddingInline = "5px";
+  select.style.borderRadius = "5px";
 
   const options: { value: YtSortOrder; label: string }[] = [
-    { value: "asc", label: "Ascending" },
-    { value: "desc", label: "Descending" },
-    { value: "orig", label: "Original" },
+    { value: "orig", label: "Default Order" },
+    { value: "origRev", label: "Default: Reverse Order" },
+    { value: "asc", label: "By Date: Ascending" },
+    { value: "desc", label: "By Date: Descending" },
   ];
 
   for (const { value, label } of options) {
@@ -40,7 +40,11 @@ function createDropdownMenu(
     localStorage.setItem("ytSortOrder", sortOrder);
   });
 
-  return select;
+  const playlistMenuBtns = document.querySelector(
+    "div#playlist-actions > div > div > ytd-menu-renderer > #top-level-buttons-computed",
+  );
+
+  playlistMenuBtns?.appendChild(select);
 }
 
 export default createDropdownMenu;

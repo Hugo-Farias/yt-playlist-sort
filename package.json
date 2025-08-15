@@ -1,8 +1,8 @@
 {
-  "name": "wxt-react-starter",
-  "description": "manifest.json description",
+  "name": "Youtube playlist sort",
+  "description": "Sorts playlist items in youtube",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "git": "git add -A && tsc -noEmit && git commit -m",

@@ -25,7 +25,7 @@ export type YoutubePlaylistResponse = {
   };
 };
 
-export type YtSortOrder = "asc" | "desc" | "orig";
+export type YtSortOrder = "asc" | "desc" | "orig" | "origRev";
 
 export type ApiCache = {
   items: {

@@ -9,7 +9,7 @@ import {
   navigateEvent,
   sortRenderedPlaylist,
 } from "@/helper.ts";
-import { YTNavigateEvent } from "@/types";
+import { YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
 
 export default defineContentScript({
@@ -25,12 +25,7 @@ export default defineContentScript({
         const event = e as YTNavigateEvent;
         const { detail } = event;
 
-        // TODO: find a way to trigger on video end
         if (detail?.endpoint?.commandMetadata) {
-          if (detail.tempData?.autonav) {
-            console.log("autonav");
-            // navigateEvent("next");
-          }
           e.stopImmediatePropagation();
         } else if (detail?.ytSort) {
           const { ytSort } = detail;
@@ -55,8 +50,7 @@ export default defineContentScript({
       true,
     );
 
-    // TODO: trigger this event after the settings have changed for refresh
-    document.addEventListener("yt-navigate-finish", async (b) => {
+    const init = async () => {
       console.log("content init 🟢");
       // return null;
       currUrl = location.href;
@@ -65,8 +59,9 @@ export default defineContentScript({
       if (!videoId) return null;
       const video = document.querySelector("video");
 
-      // video.currentTime = video?.duration - 10;
-      // video?.pause();
+      // if (video) {
+      //   video.currentTime = 100;
+      // }
 
       // if (previousURL === currUrl) return null; // Prevents duplicate execution
 
@@ -78,15 +73,15 @@ export default defineContentScript({
         playlistContainerSelector,
       );
 
-      // TEST: development block, remove in production
-      const videoContainer = document.querySelector("#player-container-outer");
-      if (videoContainer) {
-        setTimeout(() => {
-          console.log("YT-playlist-sort: Pausing video...");
-          video?.pause();
-          videoContainer.remove();
-        }, 1000);
-      }
+      // // TEST: development block, remove in production
+      // const videoContainer = document.querySelector("#player-container-outer");
+      // if (videoContainer) {
+      //   setTimeout(() => {
+      //     console.log("YT-playlist-sort: Pausing video...");
+      //     video?.pause();
+      //     // videoContainer.remove();
+      //   }, 1000);
+      // }
 
       if (!playlistContainer) return null;
 
@@ -94,13 +89,7 @@ export default defineContentScript({
       let apiCache = getCache("apiCache", getListId(location.href)!);
 
       if (apiCache) {
-        const dropdown = createDropdownMenu(playlistContainer, apiCache);
-
-        const playlistMenuBtns = document.querySelector(
-          "div#playlist-actions > div > div > ytd-menu-renderer > #top-level-buttons-computed",
-        );
-
-        playlistMenuBtns?.appendChild(dropdown);
+        createDropdownMenu(playlistContainer, apiCache);
       }
 
       const playlistItems: NodeListOf<HTMLDivElement> =
@@ -123,9 +112,14 @@ export default defineContentScript({
         apiCache = getCache("apiCache", playlistId!);
       }
 
-      if (!apiCache) return null;
+      // if (!apiCache) return null;
 
-      sortRenderedPlaylist(playlistContainer, apiCache, "asc");
+      sortRenderedPlaylist(
+        playlistContainer,
+        apiCache ?? getCache("apiCache", playlistId!),
+        localStorage.getItem("ytSortOrder") as YtSortOrder,
+        firstRun,
+      );
 
       if (firstRun) {
         video?.addEventListener("pause", () => {
@@ -155,10 +149,13 @@ export default defineContentScript({
           else if (e.key === "P")
             navigateEvent("yt-navigate", { ytSort: "previous" });
         });
+        firstRun = false;
       }
+    };
 
-      firstRun = false;
-    });
+    document.addEventListener("yt-navigate-finish", () => init());
+
+    init();
   },
   matches: ["*://*.youtube.com/*"],
 });

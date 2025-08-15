@@ -2,48 +2,10 @@ import {
   ApiCache,
   RenderedPlaylistItem,
   YoutubePlaylistResponse,
+  YtSortOrder,
 } from "@/types.ts";
 import { API_URL, playlistItemSelector } from "@/config.ts";
 import pkg from "@/package.json";
-
-export const waitForElements = async <T extends Element>(
-  selector: string,
-  timeout: number = 10000,
-  urlCheck: string = "",
-): Promise<NodeListOf<T> | null> => {
-  const browserListId = getListId(location.href);
-  return await new Promise((resolve, reject) => {
-    const observer = new MutationObserver(() => {
-      const elementList = document.querySelectorAll(selector);
-
-      if (elementList.length === 0) return null;
-
-      const elementListId = getListId(
-        document
-          .querySelectorAll(playlistItemSelector)
-          [elementList.length - 1]?.querySelector("a")?.href,
-      );
-
-      if (browserListId !== elementListId) return null;
-      if (location.href === urlCheck) return null;
-
-      observer.disconnect();
-      clearTimeout(timer);
-      resolve(elementList as NodeListOf<T>);
-    });
-
-    const timer = setTimeout(() => {
-      observer.disconnect();
-      reject(
-        new Error(
-          `Element with selector '${selector}' not found within ${timeout}ms`,
-        ),
-      );
-    }, timeout);
-
-    observer.observe(document.body, { childList: true, subtree: true });
-  });
-};
 
 export const getListId = (url: string | undefined): string => {
   if (!url || url.length <= 0) return "";
@@ -142,14 +104,6 @@ export const getFullCache = <T extends "apiCache" | "renderedCache">(
   return JSON.parse(data) as getFullCacheRT<T>;
 };
 
-export const getPlaylistItemsUrl = (
-  playlistId: string,
-  apiKey: string,
-  nextPageToken: string | null = null,
-): string => {
-  return `${API_URL}&playlistId=${playlistId}&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ""}`;
-};
-
 // Format the date to a human-readable format
 const formatDate = (
   dateInput: Date | number,
@@ -198,41 +152,45 @@ const getIndexFromCache = (el: HTMLDivElement, cache: ApiCache) => {
   return cache.items[videoId ?? ""]?.originalIndex ?? Infinity;
 };
 
-const isSorted = (
-  nodes: NodeListOf<HTMLDivElement>,
-  direction: "asc" | "desc" | "orig" = "asc",
-  cache: ApiCache,
-): boolean => {
-  if (direction === "orig") return true;
-  return [...nodes].every((curr, i, arr) => {
-    if (i === 0) return true;
-
-    const prevOrder = getDateFromCache(arr[i - 1], cache) || 0;
-    const currOrder = getDateFromCache(curr, cache) || 0;
-
-    return direction === "asc"
-      ? prevOrder <= currOrder
-      : prevOrder >= currOrder;
-  });
-};
+// const isSorted = (
+//   nodes: NodeListOf<HTMLDivElement>,
+//   direction: "asc" | "desc" | "orig" = "asc",
+//   cache: ApiCache,
+// ): boolean => {
+//   if (direction === "orig") return true;
+//   return [...nodes].every((curr, i, arr) => {
+//     if (i === 0) return true;
+//
+//     const prevOrder = getDateFromCache(arr[i - 1], cache) || 0;
+//     const currOrder = getDateFromCache(curr, cache) || 0;
+//
+//     return direction === "asc"
+//       ? prevOrder <= currOrder
+//       : prevOrder >= currOrder;
+//   });
+// };
 
 const sortList = (
   nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,
-  direction: "asc" | "desc" | "orig" = "asc",
+  direction: YtSortOrder = "asc",
 ): HTMLDivElement[] => {
-  if (direction === "orig") {
-    return [...nodeList].sort((a, b) => {
+  if (direction === "orig" || direction === "origRev") {
+    const originalOrder = [...nodeList].sort((a, b) => {
       const aIndex = getIndexFromCache(a, cache);
       const bIndex = getIndexFromCache(b, cache);
       return aIndex - bIndex;
     });
+
+    if (direction === "origRev") return originalOrder.reverse();
+
+    return originalOrder;
   }
 
-  if (isSorted(nodeList, direction, cache)) {
-    console.log("Already sorted in", direction, "order 🟣");
-    return [...nodeList];
-  }
+  // if (isSorted(nodeList, direction, cache)) {
+  //   console.log("Already sorted in", direction, "order 🟣");
+  //   return [...nodeList];
+  // }
 
   const sortedList = [...nodeList].sort((a, b) => {
     const aDate = getDateFromCache(a, cache);
@@ -268,13 +226,9 @@ export const getInfoFromElement = (
 };
 
 export const replaceTooltipInfo = (
-  type: "next" | "prev",
+  element: HTMLAnchorElement | null,
   info: GetInfoFromElementRT | null,
 ) => {
-  const element = document.querySelector<HTMLAnchorElement>(
-    `.ytp-${type}-button`,
-  );
-
   if (!element) return null;
   if (!info) return null;
 
@@ -287,8 +241,6 @@ export const navigateEvent = (
   eventType: "yt-navigate" | "yt-navigate-finish",
   payload: {},
 ) => {
-  console.log("navigate event triggered");
-
   const event = new CustomEvent(eventType, {
     detail: {
       ...payload,
@@ -299,15 +251,27 @@ export const navigateEvent = (
   window.dispatchEvent(event);
 };
 
+// TODO: make this work!!
+function refreshHover(el: HTMLElement) {
+  el.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+  el.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+}
+
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement,
-  apiCache: ApiCache,
-  direction: "asc" | "desc" | "orig" = "orig",
+  apiCache: ApiCache | null,
+  direction: YtSortOrder,
+  firstRun: boolean = false,
 ) => {
+  const order = direction ?? "orig";
+
+  if (!playlistContainer) return null;
+  if (!apiCache) return null;
+
   const playlistItems: NodeListOf<HTMLDivElement> =
     playlistContainer.querySelectorAll(playlistItemSelector);
 
-  const sortedList = sortList(playlistItems, apiCache, direction);
+  const sortedList = sortList(playlistItems, apiCache, order);
 
   sortedList.forEach((el, index, arr) => {
     renderDateToElement(el, apiCache!);
@@ -345,18 +309,39 @@ export const sortRenderedPlaylist = (
     }
 
     setTimeout(() => {
+      const prevBtnEl =
+        document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
+
+      const nextBtnEl =
+        document.querySelector<HTMLAnchorElement>(".ytp-next-button");
+
       if (!prevVidInfo) {
-        const el =
-          document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
-        if (el) el.style.display = "none";
-      }
-      if (!nextVidInfo) {
-        const el = document.querySelector<Element>("yt-lockup-view-model");
-        if (el) nextVidInfo = getInfoFromElement(el);
+        if (prevBtnEl) prevBtnEl.setAttribute("hidden", "");
+      } else {
+        if (prevBtnEl) prevBtnEl.removeAttribute("hidden");
       }
 
-      replaceTooltipInfo("next", nextVidInfo);
-      replaceTooltipInfo("prev", prevVidInfo);
+      if (!nextVidInfo) {
+        const nextRecomendedVidEl = document.querySelector<Element>(
+          "yt-lockup-view-model",
+        );
+        if (nextRecomendedVidEl) {
+          nextVidInfo = getInfoFromElement(nextRecomendedVidEl);
+        }
+      }
+
+      replaceTooltipInfo(nextBtnEl, nextVidInfo);
+      replaceTooltipInfo(prevBtnEl, prevVidInfo);
+
+      if (firstRun) {
+        prevBtnEl?.addEventListener("click", () => {
+          console.log("Prev button clicked");
+          setTimeout(() => {
+            replaceTooltipInfo(prevBtnEl, prevVidInfo);
+            refreshHover(prevBtnEl!);
+          }, 500);
+        });
+      }
     }, 1000);
   });
 };
