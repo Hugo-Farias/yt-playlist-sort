@@ -216,6 +216,8 @@ export const replaceTooltipInfo = (
   element.dataset.tooltipText = info.videoTitle;
   element.dataset.preview = info.preview;
   element.href = info.href;
+
+  refreshHover(element);
 };
 
 export const navigateEvent = (
@@ -233,6 +235,7 @@ export const navigateEvent = (
 };
 
 function refreshHover(el: HTMLElement) {
+  if (!el.matches(":hover")) return null;
   el.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
   el.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 }
@@ -243,6 +246,7 @@ export const sortRenderedPlaylist = (
   direction: YtSortOrder,
   firstRun: boolean = false,
 ) => {
+  console.log("direction ==> ", direction);
   const order = direction ?? "orig";
 
   if (!playlistContainer) return null;
@@ -316,10 +320,11 @@ export const sortRenderedPlaylist = (
       if (firstRun) {
         prevBtnEl?.addEventListener("click", () => {
           clog("Prev button hover");
-          setTimeout(() => {
-            replaceTooltipInfo(prevBtnEl, prevVidInfo);
-            refreshHover(prevBtnEl!);
-          }, 50);
+          sortRenderedPlaylist(
+            playlistContainer,
+            apiCache,
+            localStorage.getItem("ytSortOrder") as YtSortOrder,
+          );
         });
       }
     }, 1000);
