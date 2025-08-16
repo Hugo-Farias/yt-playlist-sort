@@ -1,6 +1,7 @@
 import { YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
 import { API_KEY } from "@/env.ts";
+import { clog } from "@/helper.ts";
 
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
@@ -22,7 +23,7 @@ export const playlistAPI = async function (
 ): Promise<YoutubePlaylistResponse | null> {
   if (!playlistId) return null;
 
-  console.log("chromeAPI.playlist triggered");
+  clog("chromeAPI.playlist triggered");
 
   const data = await fetchJson<YoutubePlaylistResponse>(
     `${API_URL}&playlistId=${playlistId}&key=${API_KEY}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,

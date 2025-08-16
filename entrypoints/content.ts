@@ -8,6 +8,7 @@ import {
   getListId,
   navigateEvent,
   sortRenderedPlaylist,
+  clog,
 } from "@/helper.ts";
 import { YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
@@ -51,23 +52,24 @@ export default defineContentScript({
     );
 
     const init = async () => {
-      console.log("content init 🟢");
-      // return null;
+      clog("init 🟢");
       currUrl = location.href;
       const videoId = getVideoId(currUrl);
       const playlistId = getListId(currUrl);
       if (!videoId) return null;
+      if (!playlistId) return null;
       const video = document.querySelector("video");
 
-      // if (video) {
-      //   video.currentTime = 100;
-      // }
+      if (video) {
+        video.currentTime = 100;
+        video.pause();
+      }
 
       // if (previousURL === currUrl) return null; // Prevents duplicate execution
 
       // previousURL = currUrl;
 
-      // console.log(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
+      // clog(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
 
       const playlistContainer = document.querySelector<HTMLDivElement>(
         playlistContainerSelector,
@@ -77,20 +79,16 @@ export default defineContentScript({
       // const videoContainer = document.querySelector("#player-container-outer");
       // if (videoContainer) {
       //   setTimeout(() => {
-      //     console.log("YT-playlist-sort: Pausing video...");
+      //     clog("Pausing video...");
       //     video?.pause();
       //     // videoContainer.remove();
       //   }, 1000);
       // }
-
+      //
       if (!playlistContainer) return null;
 
       const renderedCache = getCache("renderedCache", getListId(location.href));
       let apiCache = getCache("apiCache", getListId(location.href)!);
-
-      if (apiCache) {
-        createDropdownMenu(playlistContainer, apiCache);
-      }
 
       const playlistItems: NodeListOf<HTMLDivElement> =
         playlistContainer.querySelectorAll(playlistItemSelector);
@@ -105,21 +103,23 @@ export default defineContentScript({
         !comparePlaylist(renderedCache, renderedPlaylistIds) ||
         !apiCache?.items
       ) {
-        console.log("YT-playlist-sort: Cache hydration!!! 🟡");
+        clog("Playlist Changed, Hydrating Cache!!! 🟡");
         storeCache("renderedCache", renderedPlaylistIds, playlistId);
         const data = await playlistAPI(playlistId);
         storeCache("apiCache", data, playlistId!);
         apiCache = getCache("apiCache", playlistId!);
       }
 
-      // if (!apiCache) return null;
+      if (!apiCache) return null;
 
       sortRenderedPlaylist(
         playlistContainer,
-        apiCache ?? getCache("apiCache", playlistId!),
+        apiCache,
         localStorage.getItem("ytSortOrder") as YtSortOrder,
         firstRun,
       );
+
+      createDropdownMenu(playlistContainer, apiCache);
 
       if (firstRun) {
         video?.addEventListener("pause", () => {

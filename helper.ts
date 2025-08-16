@@ -4,8 +4,12 @@ import {
   YoutubePlaylistResponse,
   YtSortOrder,
 } from "@/types.ts";
-import { API_URL, playlistItemSelector } from "@/config.ts";
+import { playlistItemSelector } from "@/config.ts";
 import pkg from "@/package.json";
+
+export const clog = (...content: string[]) => {
+  console.log("YT-Playlist-Sort: ", ...content);
+};
 
 export const getListId = (url: string | undefined): string => {
   if (!url || url.length <= 0) return "";
@@ -30,7 +34,7 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
   playlistId: string,
 ) => {
   if (!data || !playlistId) return null;
-  console.log("storeCache =>", playlistId);
+  clog("storeCache =>", playlistId);
 
   if (storageKey === "renderedCache") {
     localStorage.setItem(
@@ -152,24 +156,6 @@ const getIndexFromCache = (el: HTMLDivElement, cache: ApiCache) => {
   return cache.items[videoId ?? ""]?.originalIndex ?? Infinity;
 };
 
-// const isSorted = (
-//   nodes: NodeListOf<HTMLDivElement>,
-//   direction: "asc" | "desc" | "orig" = "asc",
-//   cache: ApiCache,
-// ): boolean => {
-//   if (direction === "orig") return true;
-//   return [...nodes].every((curr, i, arr) => {
-//     if (i === 0) return true;
-//
-//     const prevOrder = getDateFromCache(arr[i - 1], cache) || 0;
-//     const currOrder = getDateFromCache(curr, cache) || 0;
-//
-//     return direction === "asc"
-//       ? prevOrder <= currOrder
-//       : prevOrder >= currOrder;
-//   });
-// };
-
 const sortList = (
   nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,
@@ -186,11 +172,6 @@ const sortList = (
 
     return originalOrder;
   }
-
-  // if (isSorted(nodeList, direction, cache)) {
-  //   console.log("Already sorted in", direction, "order 🟣");
-  //   return [...nodeList];
-  // }
 
   const sortedList = [...nodeList].sort((a, b) => {
     const aDate = getDateFromCache(a, cache);
@@ -251,10 +232,9 @@ export const navigateEvent = (
   window.dispatchEvent(event);
 };
 
-// TODO: make this work!!
 function refreshHover(el: HTMLElement) {
-  el.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
-  el.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+  el.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
+  el.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 }
 
 export const sortRenderedPlaylist = (
@@ -335,11 +315,11 @@ export const sortRenderedPlaylist = (
 
       if (firstRun) {
         prevBtnEl?.addEventListener("click", () => {
-          console.log("Prev button clicked");
+          clog("Prev button hover");
           setTimeout(() => {
             replaceTooltipInfo(prevBtnEl, prevVidInfo);
             refreshHover(prevBtnEl!);
-          }, 500);
+          }, 50);
         });
       }
     }, 1000);
