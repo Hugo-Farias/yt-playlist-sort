@@ -9,19 +9,28 @@ import {
   navigateEvent,
   sortRenderedPlaylist,
   clog,
+  replaceTooltipInfo,
+  getInfoFromElement,
+  isShuffleOn,
+  isLoopOn,
 } from "@/helper.ts";
 import { YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
 
 export default defineContentScript({
   main() {
+    // TODO: Maybe add a setting to disable this script
+    // if (localStorage.getItme("ytSortOrder") === "orig") return null;
+
     let firstRun = true;
     let currUrl = location.href;
 
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
-        if (!getListId(currUrl)) return null;
+        console.log("e ==> ", e);
+        if (isShuffleOn()) return null;
+        if (!getListId(currUrl)) return null; // No playlist ID, do nothing
 
         const event = e as YTNavigateEvent;
         const { detail } = event;
@@ -38,12 +47,21 @@ export default defineContentScript({
           const methodMap = {
             next: "nextSibling",
             previous: "previousSibling",
+            videoEnd: "nextSibling",
           } as const;
 
           let element = currentItem?.[methodMap[ytSort]];
-          if (element === null) {
+
+          // FIX: Shuffle button turns off no matter what
+          if (!element && isLoopOn() && ytSort === "videoEnd") {
+            clog("Looping to the first item in the playlist");
+            element = document.querySelector(
+              "ytd-playlist-panel-video-renderer",
+            );
+          } else if (!element) {
             element = document.querySelector("yt-lockup-view-model");
           }
+
           if (!(element instanceof Element)) return null;
           element.querySelector("a")?.click();
         }
@@ -60,11 +78,6 @@ export default defineContentScript({
       if (!playlistId) return null;
       const video = document.querySelector("video");
 
-      if (video) {
-        video.currentTime = 100;
-        video.pause();
-      }
-
       // if (previousURL === currUrl) return null; // Prevents duplicate execution
 
       // previousURL = currUrl;
@@ -75,16 +88,18 @@ export default defineContentScript({
         playlistContainerSelector,
       );
 
-      // // TEST: development block, remove in production
-      // const videoContainer = document.querySelector("#player-container-outer");
-      // if (videoContainer) {
-      //   setTimeout(() => {
-      //     clog("Pausing video...");
-      //     video?.pause();
-      //     // videoContainer.remove();
-      //   }, 1000);
-      // }
-      //
+      // TEST: development block, remove in production
+      const videoContainer = document.querySelector("#player-container-outer");
+      if (videoContainer) {
+        setTimeout(() => {
+          clog("Pausing video...");
+          if (!video) return null;
+          video.currentTime = video.duration - 2;
+          video.pause();
+          // videoContainer.remove();
+        }, 1000);
+      }
+
       if (!playlistContainer) return null;
 
       const renderedCache = getCache("renderedCache", getListId(location.href));
@@ -116,18 +131,40 @@ export default defineContentScript({
         playlistContainer,
         apiCache,
         localStorage.getItem("ytSortOrder") as YtSortOrder,
-        firstRun,
       );
 
       createDropdownMenu(playlistContainer, apiCache);
 
       if (firstRun) {
+        const prevBtnEl =
+          document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
+
+        ["click", "mouseenter"].forEach((eventType) => {
+          prevBtnEl?.addEventListener(eventType, () => {
+            const video = document.querySelector("video");
+            if (!video) return null;
+            setTimeout(() => {
+              if (video.currentTime > 3) return null;
+              const currentVidEl = document.querySelector<HTMLDivElement>(
+                "ytd-playlist-panel-video-renderer[selected]",
+              );
+
+              if (!currentVidEl) return null;
+
+              const prevVidInfo = getInfoFromElement(
+                currentVidEl.previousElementSibling,
+              );
+              replaceTooltipInfo(prevBtnEl, prevVidInfo);
+            }, 80);
+          });
+        });
+
         video?.addEventListener("pause", () => {
           const playBtn =
             document.querySelector<HTMLButtonElement>(".ytp-play-button");
 
           if (playBtn?.dataset.tooltipTitle === "Replay") {
-            navigateEvent("yt-navigate", { ytSort: "next" });
+            navigateEvent("yt-navigate", { ytSort: "videoEnd" });
           }
         });
 

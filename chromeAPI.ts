@@ -23,7 +23,7 @@ export const playlistAPI = async function (
 ): Promise<YoutubePlaylistResponse | null> {
   if (!playlistId) return null;
 
-  clog("chromeAPI.playlist triggered");
+  clog("chromeAPI called");
 
   const data = await fetchJson<YoutubePlaylistResponse>(
     `${API_URL}&playlistId=${playlistId}&key=${API_KEY}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,

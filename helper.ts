@@ -240,13 +240,25 @@ function refreshHover(el: HTMLElement) {
   el.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 }
 
+export const isShuffleOn = (): boolean => {
+  const shuffleBtn = document.querySelector<HTMLButtonElement>(
+    'button[aria-label="Shuffle playlist"]',
+  );
+
+  return shuffleBtn?.getAttribute("aria-pressed") === "true";
+};
+
+export const isLoopOn = () => {
+  return !!document.querySelector<HTMLButtonElement>(
+    'button[aria-label="Loop video"]',
+  );
+};
+
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement,
   apiCache: ApiCache | null,
   direction: YtSortOrder,
-  firstRun: boolean = false,
 ) => {
-  console.log("direction ==> ", direction);
   const order = direction ?? "orig";
 
   if (!playlistContainer) return null;
@@ -261,7 +273,6 @@ export const sortRenderedPlaylist = (
     renderDateToElement(el, apiCache!);
     playlistContainer.appendChild(el);
 
-    // if (index > arr.length - 1) return null;
     if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
     const currentLocation = `${index + 1}/${arr.length}`;
 
@@ -316,17 +327,6 @@ export const sortRenderedPlaylist = (
 
       replaceTooltipInfo(nextBtnEl, nextVidInfo);
       replaceTooltipInfo(prevBtnEl, prevVidInfo);
-
-      if (firstRun) {
-        prevBtnEl?.addEventListener("click", () => {
-          clog("Prev button hover");
-          sortRenderedPlaylist(
-            playlistContainer,
-            apiCache,
-            localStorage.getItem("ytSortOrder") as YtSortOrder,
-          );
-        });
-      }
     }, 1000);
   });
 };

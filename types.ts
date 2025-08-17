@@ -77,7 +77,7 @@ type YTWatchEndpoint = {
 };
 
 export type YTNavigateEvent = CustomEvent<{
-  ytSort?: "next" | "previous";
+  ytSort?: "next" | "previous" | "videoEnd";
   tempData?: {
     autonav?: "1";
     lact?: number;
