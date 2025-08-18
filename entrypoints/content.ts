@@ -13,13 +13,16 @@ import {
   getInfoFromElement,
   isShuffleOn,
   isLoopOn,
+  localSet,
+  localRemove,
+  localGet,
 } from "@/helper.ts";
 import { YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
 
 export default defineContentScript({
   main() {
-    // TODO: Maybe add a setting to disable this script
+    // TODO: add a setting to disable this script
     // if (localStorage.getItme("ytSortOrder") === "orig") return null;
 
     let firstRun = true;
@@ -28,7 +31,6 @@ export default defineContentScript({
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
-        console.log("e ==> ", e);
         if (isShuffleOn()) return null;
         if (!getListId(currUrl)) return null; // No playlist ID, do nothing
 
@@ -52,9 +54,11 @@ export default defineContentScript({
 
           let element = currentItem?.[methodMap[ytSort]];
 
-          // FIX: Shuffle button turns off no matter what
+          if (ytSort !== "videoEnd") localRemove("ytSortisLoopOn", true);
+          else if (isLoopOn()) localSet("ytSortisLoopOn", "true", true);
+
           if (!element && isLoopOn() && ytSort === "videoEnd") {
-            clog("Looping to the first item in the playlist");
+            localSet("ytSortisLoopOn", "true", true);
             element = document.querySelector(
               "ytd-playlist-panel-video-renderer",
             );
@@ -130,10 +134,22 @@ export default defineContentScript({
       sortRenderedPlaylist(
         playlistContainer,
         apiCache,
-        localStorage.getItem("ytSortOrder") as YtSortOrder,
+        localGet("ytSortOrder") as YtSortOrder,
       );
 
       createDropdownMenu(playlistContainer, apiCache);
+
+      const wasLoop = localGet("ytSortisLoopOn", true) === "true";
+
+      console.log("wasLoop ==> ", wasLoop);
+
+      if (wasLoop) {
+        const loopBtn = document.querySelector<HTMLButtonElement>(
+          'button[aria-label="Loop playlist"]',
+        );
+
+        loopBtn?.click();
+      }
 
       if (firstRun) {
         const prevBtnEl =

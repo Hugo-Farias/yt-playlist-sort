@@ -11,6 +11,44 @@ export const clog = (...content: string[]) => {
   console.log("YT-Playlist-Sort: ", ...content);
 };
 
+type localSorageKeys = "ytSortOrder" | "ytSortisLoopOn";
+
+export const localSet = (
+  keyname: localSorageKeys,
+  data: string,
+  session: boolean = false,
+) => {
+  if (session) {
+    sessionStorage.setItem(keyname, data);
+    return null;
+  }
+
+  localStorage.setItem(keyname, data);
+};
+
+export const localGet = (
+  keyname: localSorageKeys,
+  session: boolean = false,
+): string | null => {
+  if (session) {
+    return sessionStorage.getItem(keyname);
+  }
+
+  return localStorage.getItem(keyname);
+};
+
+export const localRemove = (
+  keyname: localSorageKeys,
+  session: boolean = false,
+) => {
+  if (session) {
+    sessionStorage.removeItem(keyname);
+    return null;
+  }
+
+  localStorage.removeItem(keyname);
+};
+
 export const getListId = (url: string | undefined): string => {
   if (!url || url.length <= 0) return "";
   return new URL(url).searchParams.get("list") ?? "";
