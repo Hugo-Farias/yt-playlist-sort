@@ -63,6 +63,7 @@ export default defineContentScript({
               "ytd-playlist-panel-video-renderer",
             );
           } else if (!element) {
+            if (ytSort === "previous") return null;
             element = document.querySelector("yt-lockup-view-model");
           }
 
@@ -96,9 +97,9 @@ export default defineContentScript({
       const videoContainer = document.querySelector("#player-container-outer");
       if (videoContainer) {
         setTimeout(() => {
-          clog("Pausing video...");
+          clog("Pausing video... 🟢🟢🟢");
           if (!video) return null;
-          video.currentTime = video.duration - 2;
+          // video.currentTime = video.duration - 2;
           video.pause();
           // videoContainer.remove();
         }, 1000);
@@ -140,8 +141,6 @@ export default defineContentScript({
       createDropdownMenu(playlistContainer, apiCache);
 
       const wasLoop = localGet("ytSortisLoopOn", true) === "true";
-
-      console.log("wasLoop ==> ", wasLoop);
 
       if (wasLoop) {
         const loopBtn = document.querySelector<HTMLButtonElement>(
