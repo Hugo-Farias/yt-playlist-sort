@@ -1,4 +1,4 @@
-import { sortRenderedPlaylist } from "@/helper";
+import { clog, localGet, localSet, sortRenderedPlaylist } from "@/helper";
 import { ApiCache, YtSortOrder } from "@/types";
 
 function createDropdownMenu(
@@ -8,7 +8,7 @@ function createDropdownMenu(
   document.querySelector(".ytSortDropdown")?.remove();
 
   let sortOrder: YtSortOrder =
-    (localStorage.getItem("ytSortOrder") as YtSortOrder) ?? "orig";
+    (localGet("ytSortOrder") as YtSortOrder) ?? "orig";
 
   const select = document.createElement("select");
   select.className = "header ytd-playlist-panel-renderer ytSortDropdown";
@@ -35,9 +35,9 @@ function createDropdownMenu(
 
   select.addEventListener("change", () => {
     sortOrder = select.value as YtSortOrder;
-    console.log("Sort order changed to:", sortOrder);
+    clog("Sort order changed to:", sortOrder);
     sortRenderedPlaylist(playlistContainer, cache, sortOrder);
-    localStorage.setItem("ytSortOrder", sortOrder);
+    localSet("ytSortOrder", sortOrder);
   });
 
   const playlistMenuBtns = document.querySelector(

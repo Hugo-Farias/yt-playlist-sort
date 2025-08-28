@@ -1,5 +1,9 @@
 import { playlistAPI } from "@/chromeAPI.ts";
-import { playlistContainerSelector, playlistItemSelector } from "@/config";
+import {
+  API_URL,
+  playlistContainerSelector,
+  playlistItemSelector,
+} from "@/config";
 import {
   getVideoId,
   comparePlaylist,
@@ -19,11 +23,12 @@ import {
 } from "@/helper.ts";
 import { YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
+import { API_KEY } from "@/env";
 
 export default defineContentScript({
   main() {
     // TODO: add a setting to disable this script
-    // if (localStorage.getItme("ytSortOrder") === "orig") return null;
+    // if (localGet("ytSortOrder") === "orig") return null;
 
     let firstRun = true;
     let currUrl = location.href;
@@ -87,7 +92,7 @@ export default defineContentScript({
 
       // previousURL = currUrl;
 
-      // clog(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
+      clog(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
 
       const playlistContainer = document.querySelector<HTMLDivElement>(
         playlistContainerSelector,

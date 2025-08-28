@@ -3,6 +3,7 @@ import { API_URL } from "./config";
 import { API_KEY } from "@/env.ts";
 import { clog } from "@/helper.ts";
 
+// TODO: add backup API keys
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
   init?: RequestInit,

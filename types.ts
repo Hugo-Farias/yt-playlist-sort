@@ -93,39 +93,3 @@ export type YTNavigateEvent = CustomEvent<{
     };
   };
 }>;
-
-// export type YTFullEndpointData = CustomEvent<{
-//  ytSort?: "next" | "previous";
-//  tempData?: {};
-//   endpoint: {
-//     clickTrackingParams?: string;
-//     commandMetadata?: {
-//       webCommandMetadata?: {
-//         url?: string;
-//         webPageType?: string;
-//         rootVe?: number;
-//       };
-//     };
-//     videoId?: string;
-//     playlistId?: string;
-//     index?: number;
-//     params?: string;
-//     loggingContext?: {
-//       vssLoggingContext?: {
-//         serializedContextData?: string;
-//       };
-//     };
-//     watchEndpointSupportedOnesieConfig?: {
-//       html5PlaybackOnesieConfig?: {
-//         commonConfig?: {
-//           url?: string;
-//         };
-//       };
-//     };
-//     watchEndpointSupportedPrefetchConfig?: {
-//       sabrPrefetchEndpointConfig?: {
-//         disablePrefetch?: boolean;
-//       };
-//     };
-//   };
-// }>;
