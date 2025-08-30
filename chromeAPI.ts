@@ -7,10 +7,14 @@ import { clog } from "@/helper.ts";
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
   init?: RequestInit,
-): Promise<T> => {
+): Promise<T | "quota execeed"> => {
   const res = await fetch(input, init);
 
   if (!res.ok) {
+    if (res.status === 403) {
+      // throw new Error("API key has reached its quota limit.");
+      return {} as T;
+    }
     const errorText = await res.text();
     throw new Error(`Fetch error ${res.status}: ${errorText}`);
   }
@@ -29,6 +33,12 @@ export const playlistAPI = async function (
   const data = await fetchJson<YoutubePlaylistResponse>(
     `${API_URL}&playlistId=${playlistId}&key=${API_KEY}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
+
+  if (data === "quota execeed") {
+    clog("API quota exceeded rotating key");
+    // TODO: recur with backup API key
+    return null;
+  }
 
   if (data.nextPageToken) {
     const recurData = await playlistAPI(playlistId, data.nextPageToken);
