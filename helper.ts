@@ -365,6 +365,6 @@ export const sortRenderedPlaylist = (
 
       replaceTooltipInfo(nextBtnEl, nextVidInfo);
       replaceTooltipInfo(prevBtnEl, prevVidInfo);
-    }, 1000);
+    }, 1200);
   });
 };

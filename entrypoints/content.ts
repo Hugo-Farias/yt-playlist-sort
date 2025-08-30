@@ -78,11 +78,6 @@ export default defineContentScript({
       const playlistId = getListId(currUrl);
       if (!videoId) return null;
       if (!playlistId) return null;
-      // const video = document.querySelector("video");
-
-      // if (previousURL === currUrl) return null; // Prevents duplicate execution
-
-      // previousURL = currUrl;
 
       // clog(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
 
@@ -154,8 +149,6 @@ export default defineContentScript({
       const prevBtnEl =
         document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
 
-      // if (!prevBtnEl) return null;
-
       ["click", "mouseenter"].forEach((eventType) => {
         prevBtnEl?.addEventListener(eventType, () => {
           const video = document.querySelector("video");
@@ -205,7 +198,7 @@ export default defineContentScript({
       });
     };
 
-    document.addEventListener("yt-page-data-updated", () => init());
+    document.addEventListener("yt-navigate-finish", () => init());
 
     if (firstRun) {
       new MutationObserver((_, obs) => {
