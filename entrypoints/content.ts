@@ -1,5 +1,5 @@
 import { playlistAPI } from "@/chromeAPI.ts";
-import { playlistContainerSelector, playlistItemSelector } from "@/config";
+import { playlistItemSelector } from "@/config";
 import {
   getVideoId,
   comparePlaylist,
@@ -25,6 +25,23 @@ export default defineContentScript({
   main() {
     let firstRun = true;
     let currUrl = location.href;
+
+    const testFunction = () => {
+      setTimeout(() => {
+        const videoContainer = document.querySelector(
+          "#player-container-outer",
+        );
+        if (videoContainer) {
+          const video = document.querySelector("video");
+          clog("Pausing video... 🟢🟢🟢");
+          console.log("video ==> ", video);
+          if (!video) return null;
+          // video.currentTime = video.duration - 2;
+          video.pause();
+          // videoContainer.remove();
+        }
+      }, 2000);
+    };
 
     window.addEventListener(
       "yt-navigate",
@@ -75,54 +92,8 @@ export default defineContentScript({
     const renderedCache = getCache("renderedCache", getListId(location.href));
     let apiCache = getCache("apiCache", getListId(location.href)!);
 
-    const init = async () => {
-      clog("init 🟢");
-      currUrl = location.href;
-      const videoId = getVideoId(currUrl);
-      const playlistId = getListId(currUrl);
-      if (!videoId) return null;
-      if (!playlistId) return null;
-
+    const init = async (playlistContainer: HTMLDivElement) => {
       // clog(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
-
-      const playlistContainer = document.querySelector<HTMLDivElement>(
-        playlistContainerSelector,
-      );
-
-      // TEST: development block, remove in production
-      const videoContainer = document.querySelector("#player-container-outer");
-      if (videoContainer) {
-        const video = videoContainer.querySelector("video");
-        setTimeout(() => {
-          clog("Pausing video... 🟢🟢🟢");
-          if (!video) return null;
-          // video.currentTime = video.duration - 2;
-          video.pause();
-          // videoContainer.remove();
-        }, 2000);
-      }
-
-      if (!playlistContainer) return null;
-
-      const playlistItems: NodeListOf<HTMLDivElement> =
-        playlistContainer.querySelectorAll(playlistItemSelector);
-
-      const renderedPlaylistIds = [...playlistItems].map((el): string =>
-        getVideoId(el),
-      );
-
-      // If the rendered playlist items are different from the cache
-      // or there is no cache, hydrate it
-      if (
-        !comparePlaylist(renderedCache, renderedPlaylistIds) ||
-        !apiCache?.items
-      ) {
-        clog("Playlist Changed, Hydrating Cache!!! 🟡");
-        storeCache("renderedCache", renderedPlaylistIds, playlistId);
-        const data = await playlistAPI(playlistId);
-        storeCache("apiCache", data, playlistId!);
-        apiCache = getCache("apiCache", playlistId!);
-      }
 
       if (!apiCache) return null;
 
@@ -198,21 +169,67 @@ export default defineContentScript({
       });
     };
 
-    document.addEventListener("yt-navigate-finish", () => {
-      init();
+    const hydrateCache = async (
+      playlistContainer: HTMLDivElement,
+      playlistId: string,
+    ) => {
+      if (!playlistContainer) return null;
 
-      createDropdownMenu(apiCache);
+      const playlistItems: NodeListOf<HTMLDivElement> =
+        playlistContainer.querySelectorAll(playlistItemSelector);
 
-      if (firstRun) {
-        new MutationObserver((_, obs) => {
-          if (document.querySelector("video")) {
-            clog("✅ Video player ready");
-            firstRunEvent();
-            firstRun = false;
-            obs.disconnect();
-          }
-        }).observe(document, { childList: true, subtree: true });
+      const renderedPlaylistIds = [...playlistItems].map((el): string =>
+        getVideoId(el),
+      );
+
+      // If the rendered playlist items are different from the cache
+      // or there is no cache, hydrate it
+      if (
+        !comparePlaylist(renderedCache, renderedPlaylistIds) ||
+        !apiCache?.items
+      ) {
+        clog("Playlist Changed, Hydrating Cache!!! 🟡");
+        storeCache("renderedCache", renderedPlaylistIds, playlistId);
+        const data = await playlistAPI(playlistId);
+        storeCache("apiCache", data, playlistId!);
+        apiCache = getCache("apiCache", playlistId!);
       }
+    };
+
+    document.addEventListener("yt-navigate-finish", () => {
+      clog("init 🟢");
+
+      currUrl = location.href;
+
+      // const videoId = getVideoId(currUrl);
+      // if (!videoId) return null;
+
+      const playlistId = getListId(currUrl);
+      if (!playlistId) return null;
+
+      const playlistContainer = document.querySelector<HTMLDivElement>(
+        "ytd-playlist-panel-renderer #items",
+      );
+
+      if (!playlistContainer) return null;
+
+      hydrateCache(playlistContainer, playlistId);
+
+      init(playlistContainer);
+
+      createDropdownMenu(apiCache, playlistContainer);
+
+      testFunction(); // TEST: development function, remove/comment in production
+
+      if (!firstRun) return;
+      new MutationObserver((_, obs) => {
+        if (document.querySelector("video")) {
+          clog("✅ Video player ready");
+          firstRunEvent();
+          firstRun = false;
+          obs.disconnect();
+        }
+      }).observe(document, { childList: true, subtree: true });
     });
   },
   matches: ["*://*.youtube.com/*"],
