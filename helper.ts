@@ -293,7 +293,7 @@ export const isLoopOn = () => {
 };
 
 export const sortRenderedPlaylist = (
-  playlistContainer: HTMLDivElement,
+  playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
   direction: YtSortOrder,
 ) => {

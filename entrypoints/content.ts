@@ -20,6 +20,7 @@ import {
 import { YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
 
+// TODO: don't run if order is default
 export default defineContentScript({
   main() {
     let firstRun = true;
@@ -71,6 +72,9 @@ export default defineContentScript({
       true,
     );
 
+    const renderedCache = getCache("renderedCache", getListId(location.href));
+    let apiCache = getCache("apiCache", getListId(location.href)!);
+
     const init = async () => {
       clog("init 🟢");
       currUrl = location.href;
@@ -85,22 +89,20 @@ export default defineContentScript({
         playlistContainerSelector,
       );
 
-      // // TEST: development block, remove in production
-      // const videoContainer = document.querySelector("#player-container-outer");
-      // if (videoContainer) {
-      //   setTimeout(() => {
-      //     clog("Pausing video... 🟢🟢🟢");
-      //     if (!video) return null;
-      //     // video.currentTime = video.duration - 2;
-      //     video.pause();
-      //     // videoContainer.remove();
-      //   }, 2000);
-      // }
-      //
-      if (!playlistContainer) return null;
+      // TEST: development block, remove in production
+      const videoContainer = document.querySelector("#player-container-outer");
+      if (videoContainer) {
+        const video = videoContainer.querySelector("video");
+        setTimeout(() => {
+          clog("Pausing video... 🟢🟢🟢");
+          if (!video) return null;
+          // video.currentTime = video.duration - 2;
+          video.pause();
+          // videoContainer.remove();
+        }, 2000);
+      }
 
-      const renderedCache = getCache("renderedCache", getListId(location.href));
-      let apiCache = getCache("apiCache", getListId(location.href)!);
+      if (!playlistContainer) return null;
 
       const playlistItems: NodeListOf<HTMLDivElement> =
         playlistContainer.querySelectorAll(playlistItemSelector);
@@ -129,8 +131,6 @@ export default defineContentScript({
         apiCache,
         localGet("ytSortOrder") as YtSortOrder,
       );
-
-      createDropdownMenu(playlistContainer, apiCache);
 
       const wasLoop = localGet("ytSortisLoopOn", true) === "true";
 
@@ -198,18 +198,22 @@ export default defineContentScript({
       });
     };
 
-    document.addEventListener("yt-navigate-finish", () => init());
+    document.addEventListener("yt-navigate-finish", () => {
+      init();
 
-    if (firstRun) {
-      new MutationObserver((_, obs) => {
-        if (document.querySelector("video")) {
-          clog("✅ Video player ready");
-          firstRunEvent();
-          firstRun = false;
-          obs.disconnect();
-        }
-      }).observe(document, { childList: true, subtree: true });
-    }
+      createDropdownMenu(apiCache);
+
+      if (firstRun) {
+        new MutationObserver((_, obs) => {
+          if (document.querySelector("video")) {
+            clog("✅ Video player ready");
+            firstRunEvent();
+            firstRun = false;
+            obs.disconnect();
+          }
+        }).observe(document, { childList: true, subtree: true });
+      }
+    });
   },
   matches: ["*://*.youtube.com/*"],
 });

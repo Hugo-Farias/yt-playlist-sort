@@ -1,11 +1,13 @@
+import { playlistContainerSelector } from "@/config";
 import { clog, localGet, localSet, sortRenderedPlaylist } from "@/helper";
 import { ApiCache, YtSortOrder } from "@/types";
 
-function createDropdownMenu(
-  playlistContainer: HTMLDivElement,
-  cache: ApiCache,
-) {
+function createDropdownMenu(cache: ApiCache | null) {
   document.querySelector(".ytSortDropdown")?.remove();
+
+  const playlistContainer = document.querySelector<HTMLDivElement>(
+    playlistContainerSelector,
+  );
 
   let sortOrder: YtSortOrder =
     (localGet("ytSortOrder") as YtSortOrder) ?? "orig";
