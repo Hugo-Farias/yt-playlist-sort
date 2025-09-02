@@ -25,11 +25,13 @@ export type YoutubePlaylistResponse = {
   };
 };
 
-export type YtSortOrder = "asc" | "desc" | "orig" | "origRev";
+export type YtSortOrder = "orig" | "date";
+
+export type ApiCacheItems = { originalIndex: number; videoPublishedAt: number };
 
 export type ApiCache = {
   items: {
-    [videoId: string]: { originalIndex: number; videoPublishedAt: number };
+    [videoId: string]: ApiCacheItems;
   };
   listId: string;
   storeTime: number;

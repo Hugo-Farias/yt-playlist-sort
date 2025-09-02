@@ -1,5 +1,6 @@
 import {
   ApiCache,
+  ApiCacheItems,
   RenderedPlaylistItem,
   YoutubePlaylistResponse,
   YtSortOrder,
@@ -189,37 +190,35 @@ const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
   return cache.items[videoId ?? ""]?.videoPublishedAt ?? Infinity;
 };
 
-const getIndexFromCache = (el: HTMLDivElement, cache: ApiCache) => {
+const getFromCache = (
+  el: HTMLDivElement,
+  cache: ApiCache,
+  type: keyof ApiCacheItems,
+) => {
   const videoId = getVideoId(el);
-  return cache.items[videoId ?? ""]?.originalIndex ?? Infinity;
+  return cache.items[videoId ?? ""]?.[type] ?? Infinity;
 };
 
 const sortList = (
   nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,
-  direction: YtSortOrder = "asc",
+  direction: YtSortOrder = "orig",
+  reverse: boolean,
 ): HTMLDivElement[] => {
-  if (direction === "orig" || direction === "origRev") {
-    const originalOrder = [...nodeList].sort((a, b) => {
-      const aIndex = getIndexFromCache(a, cache);
-      const bIndex = getIndexFromCache(b, cache);
-      return aIndex - bIndex;
-    });
+  let order: keyof ApiCacheItems;
 
-    if (direction === "origRev") return originalOrder.reverse();
-
-    return originalOrder;
-  }
+  if (direction === "date") order = "videoPublishedAt";
+  if (direction === "orig") order = "originalIndex";
 
   const sortedList = [...nodeList].sort((a, b) => {
-    const aDate = getDateFromCache(a, cache);
-    const bDate = getDateFromCache(b, cache);
-    return aDate - bDate;
+    const aInfo = getFromCache(a, cache, order);
+    const bInfo = getFromCache(b, cache, order);
+    return aInfo - bInfo;
   });
 
-  if (direction === "asc") return sortedList;
+  if (reverse) return sortedList.reverse();
 
-  return sortedList.reverse();
+  return sortedList;
 };
 
 type GetInfoFromElementRT = {
@@ -295,17 +294,16 @@ export const isLoopOn = () => {
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
-  direction: YtSortOrder,
+  order: YtSortOrder = "orig",
+  reverse: boolean,
 ) => {
-  const order = direction ?? "orig";
-
   if (!playlistContainer) return null;
   if (!apiCache) return null;
 
   const playlistItems: NodeListOf<HTMLDivElement> =
     playlistContainer.querySelectorAll(playlistItemSelector);
 
-  const sortedList = sortList(playlistItems, apiCache, order);
+  const sortedList = sortList(playlistItems, apiCache, order, reverse);
 
   sortedList.forEach((el, index, arr) => {
     renderDateToElement(el, apiCache!);

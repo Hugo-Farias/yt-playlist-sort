@@ -26,15 +26,14 @@ export default defineContentScript({
     let firstRun = true;
     let currUrl = location.href;
 
-    const testFunction = () => {
+    const devFunction = () => {
       setTimeout(() => {
         const videoContainer = document.querySelector(
           "#player-container-outer",
         );
         if (videoContainer) {
           const video = document.querySelector("video");
-          clog("Pausing video... 🟢🟢🟢");
-          console.log("video ==> ", video);
+          clog("Pausing video... 🔴🔴🔴");
           if (!video) return null;
           // video.currentTime = video.duration - 2;
           video.pause();
@@ -91,28 +90,6 @@ export default defineContentScript({
 
     const renderedCache = getCache("renderedCache", getListId(location.href));
     let apiCache = getCache("apiCache", getListId(location.href)!);
-
-    const init = async (playlistContainer: HTMLDivElement) => {
-      // clog(API_URL + `&playlistId=${playlistId}&key=${API_KEY}`);
-
-      if (!apiCache) return null;
-
-      sortRenderedPlaylist(
-        playlistContainer,
-        apiCache,
-        localGet("ytSortOrder") as YtSortOrder,
-      );
-
-      const wasLoop = localGet("ytSortisLoopOn", true) === "true";
-
-      if (wasLoop) {
-        const loopBtn = document.querySelector<HTMLButtonElement>(
-          'button[aria-label="Loop playlist"]',
-        );
-
-        loopBtn?.click();
-      }
-    };
 
     const firstRunEvent = () => {
       const video = document.querySelector("video");
@@ -201,9 +178,6 @@ export default defineContentScript({
 
       currUrl = location.href;
 
-      // const videoId = getVideoId(currUrl);
-      // if (!videoId) return null;
-
       const playlistId = getListId(currUrl);
       if (!playlistId) return null;
 
@@ -213,18 +187,34 @@ export default defineContentScript({
 
       if (!playlistContainer) return null;
 
-      hydrateCache(playlistContainer, playlistId);
-
-      init(playlistContainer);
-
       createDropdownMenu(apiCache, playlistContainer);
 
-      testFunction(); // TEST: development function, remove/comment in production
+      hydrateCache(playlistContainer, playlistId);
+
+      sortRenderedPlaylist(
+        playlistContainer,
+        apiCache,
+        localGet("ytSortOrder") as YtSortOrder,
+        false,
+      );
+
+      const wasLoop = localGet("ytSortisLoopOn", true) === "true";
+
+      if (wasLoop) {
+        const loopBtn = document.querySelector<HTMLButtonElement>(
+          'button[aria-label="Loop playlist"]',
+        );
+
+        loopBtn?.click();
+      }
+
+      if (import.meta.env.DEV) {
+        devFunction(); // TEST: development function, remove/comment in production
+      }
 
       if (!firstRun) return;
       new MutationObserver((_, obs) => {
         if (document.querySelector("video")) {
-          clog("✅ Video player ready");
           firstRunEvent();
           firstRun = false;
           obs.disconnect();

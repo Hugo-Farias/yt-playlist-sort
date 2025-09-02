@@ -10,19 +10,17 @@ function createDropdownMenu(
   let sortOrder: YtSortOrder =
     (localGet("ytSortOrder") as YtSortOrder) ?? "orig";
 
+  // TODO: add reverse order button
   const select = document.createElement("select");
   select.className = "header ytd-playlist-panel-renderer ytSortDropdown";
   select.style.color = "var(--yt-spec-text-primary)";
   select.style.height = "25px";
   select.style.paddingBlock = "0px";
-  // select.style.paddingInline = "5px";
   select.style.borderRadius = "5px";
 
   const options: { value: YtSortOrder; label: string }[] = [
     { value: "orig", label: "Default Order" },
-    { value: "origRev", label: "Default: Reverse Order" },
-    { value: "asc", label: "By Date: Ascending" },
-    { value: "desc", label: "By Date: Descending" },
+    { value: "date", label: "Sort By Date" },
   ];
 
   for (const { value, label } of options) {
@@ -36,7 +34,7 @@ function createDropdownMenu(
   select.addEventListener("change", () => {
     sortOrder = select.value as YtSortOrder;
     clog("Sort order changed to:", sortOrder);
-    sortRenderedPlaylist(playlistContainer, cache, sortOrder);
+    sortRenderedPlaylist(playlistContainer, cache, sortOrder, false);
     localSet("ytSortOrder", sortOrder);
   });
 
