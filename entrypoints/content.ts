@@ -88,7 +88,7 @@ export default defineContentScript({
       true,
     );
 
-    const renderedCache = getCache("renderedCache", getListId(location.href));
+    let renderedCache = getCache("renderedCache", getListId(location.href));
     let apiCache = getCache("apiCache", getListId(location.href)!);
 
     const firstRunEvent = () => {
@@ -170,6 +170,7 @@ export default defineContentScript({
         const data = await playlistAPI(playlistId);
         storeCache("apiCache", data, playlistId!);
         apiCache = getCache("apiCache", playlistId!);
+        renderedCache = getCache("renderedCache", playlistId);
       }
     };
 
