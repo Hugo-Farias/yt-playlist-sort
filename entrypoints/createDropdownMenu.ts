@@ -1,5 +1,6 @@
 import { clog, localGet, localSet, sortRenderedPlaylist } from "@/helper";
 import { ApiCache, YtSortOrder } from "@/types";
+import { reverseBtn } from "./ui/reverseBtn";
 
 function createDropdownMenu(
   cache: ApiCache | null,
@@ -10,13 +11,13 @@ function createDropdownMenu(
   let sortOrder: YtSortOrder =
     (localGet("ytSortOrder") as YtSortOrder) ?? "orig";
 
-  // TODO: add reverse order button
   const select = document.createElement("select");
   select.className = "header ytd-playlist-panel-renderer ytSortDropdown";
   select.style.color = "var(--yt-spec-text-primary)";
   select.style.height = "25px";
   select.style.paddingBlock = "0px";
   select.style.borderRadius = "5px";
+  select.style.marginInline = "5px";
 
   const options: { value: YtSortOrder; label: string }[] = [
     { value: "orig", label: "Default Order" },
@@ -43,6 +44,7 @@ function createDropdownMenu(
   );
 
   playlistMenuBtns?.appendChild(select);
+  playlistMenuBtns?.appendChild(reverseBtn);
 }
 
 export default createDropdownMenu;
