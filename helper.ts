@@ -12,7 +12,7 @@ export const clog = (...content: string[]) => {
   console.log("YT-Playlist-Sort: ", ...content);
 };
 
-type localSorageKeys = "ytSortOrder" | "ytSortisLoopOn";
+type localSorageKeys = "ytSortOrder" | "ytSortisLoopOn" | "ytSortisReversed";
 
 export const localSet = (
   keyname: localSorageKeys,
