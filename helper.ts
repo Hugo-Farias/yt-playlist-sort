@@ -312,6 +312,7 @@ export const sortRenderedPlaylist = (
     playlistContainer.appendChild(el);
 
     if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
+
     const currentLocation = `${index + 1}/${arr.length}`;
 
     const indexMessage = document.querySelector<HTMLSpanElement>(

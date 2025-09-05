@@ -191,15 +191,15 @@ export default defineContentScript({
 
       if (!playlistContainer) return null;
 
-      createDropdownMenu(apiCache, playlistContainer);
-
       await hydrateCache(playlistContainer, playlistId);
+
+      createDropdownMenu(apiCache, playlistContainer);
 
       sortRenderedPlaylist(
         playlistContainer,
         apiCache,
         localGet("ytSortOrder") as YtSortOrder,
-        localGet("ytSortisReversed") === "true",
+        localGet("ytSortisReversed") === "false",
       );
 
       const wasLoop = localGet("ytSortisLoopOn", true) === "true";
