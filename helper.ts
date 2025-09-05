@@ -357,6 +357,7 @@ export const sortRenderedPlaylist = (
         }
       }
 
+      // FIX: this doesn't always work, find motive
       replaceTooltipInfo(nextBtnEl, nextVidInfo);
       replaceTooltipInfo(prevBtnEl, prevVidInfo);
     }, 1200);

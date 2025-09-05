@@ -6,7 +6,8 @@ function createDropdownMenu(
   cache: ApiCache | null,
   playlistContainer: HTMLDivElement,
 ) {
-  document.querySelector(".ytSortDropdown")?.remove();
+  const dropdownElList = document.querySelectorAll(".ytSortDropdown");
+  dropdownElList.forEach((el) => el.remove());
 
   let isReversed: boolean = localGet("ytSortisReversed") === "true";
 
@@ -24,21 +25,32 @@ function createDropdownMenu(
   const reverseBtn = document.createElement("button");
   reverseBtn.className = "ytSortReverseBtn ytSortDropdown";
   reverseBtn.innerHTML = reversePlaylistSVG;
-  reverseBtn.style.color = "var(--yt-spec-text-primary)";
   reverseBtn.style.backgroundColor = "transparent";
   reverseBtn.style.border = "transparent";
   reverseBtn.style.cursor = "pointer";
   reverseBtn.style.height = "40px";
   reverseBtn.style.aspectRatio = "1/1";
+  reverseBtn.style.color = "var(--yt-spec-text-primary)";
   // reverseBtn.style.paddingBlock = "5px";
   // reverseBtn.style.paddingInline = "10px";
   reverseBtn.style.padding = "5px";
   reverseBtn.style.borderRadius = "50%";
   reverseBtn.style.fontSize = "16px";
   reverseBtn.style.fontWeight = "200";
-  if (isReversed) reverseBtn.style.transform = "scaleY(-1)";
-  else reverseBtn.style.transform = "scaleY(1)";
-  // reverseBtn.style.backgroundColor = "rgba(255,26,26,0.2)";
+  reverseBtn.ariaLabel = "Reverse playlist order";
+
+  const runOnClick = () => {
+    if (isReversed) {
+      reverseBtn.style.transform = "scaleY(-1)";
+      reverseBtn.ariaPressed = "true";
+      reverseBtn.children[0].setAttribute("stroke-width", "2");
+    } else {
+      reverseBtn.style.transform = "scaleY(1)";
+      reverseBtn.ariaPressed = "false";
+      reverseBtn.children[0].setAttribute("stroke-width", "1");
+    }
+  };
+  runOnClick();
 
   const options: { value: YtSortOrder; label: string }[] = [
     { value: "orig", label: "Default Order" },
@@ -69,6 +81,8 @@ function createDropdownMenu(
     localSet("ytSortisReversed", isReversed ? "true" : "false");
 
     sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);
+
+    runOnClick();
   };
 
   const playlistMenuBtns = document.querySelector(
@@ -79,10 +93,8 @@ function createDropdownMenu(
     reverseBtn.style.backgroundColor = "var(--yt-spec-outline)";
   });
 
-  ["click", "mouseleave"].forEach((v) => {
-    reverseBtn.addEventListener(v, () => {
-      reverseBtn.style.backgroundColor = "transparent";
-    });
+  reverseBtn.addEventListener("mouseleave", () => {
+    reverseBtn.style.backgroundColor = "transparent";
   });
 
   reverseBtn.addEventListener("click", () => {

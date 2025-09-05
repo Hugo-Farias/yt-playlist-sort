@@ -17,7 +17,7 @@ import {
   localRemove,
   localGet,
 } from "@/helper.ts";
-import { YTNavigateEvent, YtSortOrder } from "@/types";
+import { ApiCache, YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
 import { API_KEY } from "@/env";
 
@@ -92,9 +92,6 @@ export default defineContentScript({
       true,
     );
 
-    let renderedCache = getCache("renderedCache", getListId(location.href));
-    let apiCache = getCache("apiCache", getListId(location.href)!);
-
     const firstRunEvent = () => {
       const video = document.querySelector("video");
 
@@ -151,6 +148,8 @@ export default defineContentScript({
 
     const hydrateCache = async (
       playlistContainer: HTMLDivElement,
+      cache: ApiCache | null,
+      renderedCache: string[] | null,
       playlistId: string,
     ) => {
       if (!playlistContainer) return null;
@@ -158,23 +157,28 @@ export default defineContentScript({
       const playlistItems: NodeListOf<HTMLDivElement> =
         playlistContainer.querySelectorAll(playlistItemSelector);
 
-      const renderedPlaylistIds = [...playlistItems].map((el): string =>
-        getVideoId(el),
-      );
+      const renderedPlaylistIds = [...playlistItems]
+        .filter((el: HTMLDivElement) => {
+          const anchor = el.querySelector("a");
+          return getListId(anchor?.href) === playlistId;
+        })
+        .map((v) => getVideoId(v));
 
       // If the rendered playlist items are different from the cache
       // or there is no cache, hydrate it
+
       if (
         !comparePlaylist(renderedCache, renderedPlaylistIds) ||
-        !apiCache?.items
+        !cache?.items
       ) {
         clog("Playlist Changed, Hydrating Cache!!! 🟡");
         storeCache("renderedCache", renderedPlaylistIds, playlistId);
         const data = await playlistAPI(playlistId);
         storeCache("apiCache", data, playlistId!);
-        apiCache = getCache("apiCache", playlistId!);
         renderedCache = getCache("renderedCache", playlistId);
       }
+
+      return getCache("apiCache", playlistId!);
     };
 
     document.addEventListener("yt-navigate-finish", async () => {
@@ -185,19 +189,27 @@ export default defineContentScript({
       const playlistId = getListId(currUrl);
       if (!playlistId) return null;
 
+      let renderedCache = getCache("renderedCache", getListId(location.href));
+      let apiCache = getCache("apiCache", getListId(location.href)!);
+
       const playlistContainer = document.querySelector<HTMLDivElement>(
         "ytd-playlist-panel-renderer #items",
       );
 
       if (!playlistContainer) return null;
 
-      await hydrateCache(playlistContainer, playlistId);
+      const refreshedCache = await hydrateCache(
+        playlistContainer,
+        apiCache,
+        renderedCache,
+        playlistId,
+      );
 
-      createDropdownMenu(apiCache, playlistContainer);
+      createDropdownMenu(refreshedCache, playlistContainer);
 
       sortRenderedPlaylist(
         playlistContainer,
-        apiCache,
+        refreshedCache,
         localGet("ytSortOrder") as YtSortOrder,
         localGet("ytSortisReversed") === "true",
       );
