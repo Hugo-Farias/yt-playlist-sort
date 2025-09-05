@@ -1,5 +1,5 @@
 import { playlistAPI } from "@/chromeAPI.ts";
-import { playlistItemSelector } from "@/config";
+import { API_URL, playlistItemSelector } from "@/config";
 import {
   getVideoId,
   comparePlaylist,
@@ -19,14 +19,16 @@ import {
 } from "@/helper.ts";
 import { YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
+import { API_KEY } from "@/env";
 
-// TODO: don't run if order is default
 export default defineContentScript({
   main() {
     let firstRun = true;
     let currUrl = location.href;
 
     const devFunction = () => {
+      clog(`${API_URL}&playlistId=${getListId(currUrl)}&key=${API_KEY}`);
+
       setTimeout(() => {
         const videoContainer = document.querySelector(
           "#player-container-outer",
@@ -46,7 +48,7 @@ export default defineContentScript({
       "yt-navigate",
       (e: Event) => {
         if (isShuffleOn()) return null;
-        if (!getListId(currUrl)) return null; // No playlist ID, do nothing
+        if (!getListId(currUrl)) return null;
 
         const event = e as YTNavigateEvent;
         const { detail } = event;
@@ -192,6 +194,7 @@ export default defineContentScript({
 
       hydrateCache(playlistContainer, playlistId);
 
+      // TODO: separate render date from sort function
       sortRenderedPlaylist(
         playlistContainer,
         apiCache,

@@ -36,6 +36,8 @@ function createDropdownMenu(
   reverseBtn.style.borderRadius = "50%";
   reverseBtn.style.fontSize = "16px";
   reverseBtn.style.fontWeight = "200";
+  if (isReversed) reverseBtn.style.transform = "scaleY(-1)";
+  else reverseBtn.style.transform = "scaleY(1)";
   // reverseBtn.style.backgroundColor = "rgba(255,26,26,0.2)";
 
   const options: { value: YtSortOrder; label: string }[] = [
@@ -59,8 +61,6 @@ function createDropdownMenu(
   });
 
   const reverseBtnFunc = (element: HTMLButtonElement) => {
-    console.log("Reverse button clicked");
-
     isReversed = !isReversed;
 
     if (isReversed) element.style.transform = "scaleY(-1)";
@@ -76,15 +76,16 @@ function createDropdownMenu(
   );
 
   reverseBtn.addEventListener("mouseenter", () => {
-    reverseBtn.style.backgroundColor = "rgba(255,255,255,0.2)";
+    reverseBtn.style.backgroundColor = "var(--yt-spec-outline)";
   });
 
-  reverseBtn.addEventListener("mouseleave", () => {
-    reverseBtn.style.backgroundColor = "transparent";
+  ["click", "mouseleave"].forEach((v) => {
+    reverseBtn.addEventListener(v, () => {
+      reverseBtn.style.backgroundColor = "transparent";
+    });
   });
 
-  reverseBtn.addEventListener("click", (e) => {
-    e.preventDefault();
+  reverseBtn.addEventListener("click", () => {
     reverseBtnFunc(reverseBtn);
   });
 

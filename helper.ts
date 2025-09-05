@@ -52,7 +52,9 @@ export const localRemove = (
 
 export const getListId = (url: string | undefined): string => {
   if (!url || url.length <= 0) return "";
-  return new URL(url).searchParams.get("list") ?? "";
+  const listId = new URL(url).searchParams.get("list") ?? "";
+  if (listId.startsWith("PL")) return listId;
+  return "";
 };
 
 export const getVideoId = (url: string | undefined | Element): string => {
