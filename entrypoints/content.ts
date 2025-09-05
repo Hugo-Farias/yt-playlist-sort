@@ -27,7 +27,9 @@ export default defineContentScript({
     let currUrl = location.href;
 
     const devFunction = () => {
-      clog(`${API_URL}&playlistId=${getListId(currUrl)}&key=${API_KEY}`);
+      if (firstRun) {
+        clog(`${API_URL}&playlistId=${getListId(currUrl)}&key=${API_KEY}`);
+      }
 
       setTimeout(() => {
         const videoContainer = document.querySelector(
@@ -101,10 +103,9 @@ export default defineContentScript({
 
       ["click", "mouseenter"].forEach((eventType) => {
         prevBtnEl?.addEventListener(eventType, () => {
-          const video = document.querySelector("video");
           if (!video) return null;
+          if (video.currentTime > 3) return null;
           setTimeout(() => {
-            if (video.currentTime > 3) return null;
             const currentVidEl = document.querySelector<HTMLDivElement>(
               "ytd-playlist-panel-video-renderer[selected]",
             );
@@ -176,7 +177,7 @@ export default defineContentScript({
       }
     };
 
-    document.addEventListener("yt-navigate-finish", () => {
+    document.addEventListener("yt-navigate-finish", async () => {
       clog("init 🟢");
 
       currUrl = location.href;
@@ -192,9 +193,8 @@ export default defineContentScript({
 
       createDropdownMenu(apiCache, playlistContainer);
 
-      hydrateCache(playlistContainer, playlistId);
+      await hydrateCache(playlistContainer, playlistId);
 
-      // TODO: separate render date from sort function
       sortRenderedPlaylist(
         playlistContainer,
         apiCache,
