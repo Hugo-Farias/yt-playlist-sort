@@ -166,7 +166,6 @@ export default defineContentScript({
 
       // If the rendered playlist items are different from the cache
       // or there is no cache, hydrate it
-
       if (
         !comparePlaylist(renderedCache, renderedPlaylistIds) ||
         !cache?.items
@@ -182,12 +181,12 @@ export default defineContentScript({
     };
 
     document.addEventListener("yt-navigate-finish", async () => {
-      clog("init 🟢");
-
       currUrl = location.href;
 
       const playlistId = getListId(currUrl);
       if (!playlistId) return null;
+
+      clog("init 🟢");
 
       let renderedCache = getCache("renderedCache", getListId(location.href));
       let apiCache = getCache("apiCache", getListId(location.href)!);

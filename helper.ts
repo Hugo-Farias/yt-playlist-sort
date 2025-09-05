@@ -305,6 +305,8 @@ export const sortRenderedPlaylist = (
   const playlistItems: NodeListOf<HTMLDivElement> =
     playlistContainer.querySelectorAll(playlistItemSelector);
 
+  console.log("playlistItems ==> ", playlistItems);
+
   const sortedList = sortList(playlistItems, apiCache, order, reverse);
 
   sortedList.forEach((el, index, arr) => {
@@ -357,9 +359,11 @@ export const sortRenderedPlaylist = (
         }
       }
 
-      // FIX: this doesn't always work, find motive
       replaceTooltipInfo(nextBtnEl, nextVidInfo);
       replaceTooltipInfo(prevBtnEl, prevVidInfo);
     }, 1200);
   });
+  const messageRender = playlistContainer.querySelector("ytd-message-renderer");
+  if (!messageRender) return null;
+  playlistContainer.appendChild(messageRender);
 };
