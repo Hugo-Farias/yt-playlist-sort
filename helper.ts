@@ -313,18 +313,11 @@ export const sortRenderedPlaylist = (
 
     if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
 
-    const currentLocation = `${index + 1}/${arr.length}`;
+    const indexMessage = document.querySelector(
+      "yt-formatted-string.index-message",
+    )?.firstChild;
 
-    const indexMessage = document.querySelector<HTMLSpanElement>(
-      "span.index-message.ytd-playlist-panel-renderer",
-    );
-
-    if (indexMessage) {
-      indexMessage.textContent = currentLocation;
-      indexMessage.removeAttribute("hidden");
-      // indexMessage.style.marginRight = "1rem";
-      indexMessage.nextElementSibling?.setAttribute("hidden", "");
-    }
+    if (indexMessage) indexMessage.textContent = index + 1 + "";
 
     const prevVidInfo = getInfoFromElement(arr[index - 1]);
     let nextVidInfo = getInfoFromElement(arr[index + 1]);

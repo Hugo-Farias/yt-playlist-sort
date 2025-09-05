@@ -199,7 +199,7 @@ export default defineContentScript({
         playlistContainer,
         apiCache,
         localGet("ytSortOrder") as YtSortOrder,
-        localGet("ytSortisReversed") === "false",
+        localGet("ytSortisReversed") === "true",
       );
 
       const wasLoop = localGet("ytSortisLoopOn", true) === "true";
