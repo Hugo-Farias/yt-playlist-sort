@@ -40,6 +40,7 @@ export default defineContentScript({
           clog("Pausing video... 🔴🔴🔴");
           if (!video) return null;
           // video.currentTime = video.duration - 2;
+          video.currentTime = 4;
           video.pause();
           // videoContainer.remove();
         }
@@ -98,10 +99,10 @@ export default defineContentScript({
       const prevBtnEl =
         document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
 
-      ["click", "mouseenter"].forEach((eventType) => {
+      (["click", "mouseenter"] as const).forEach((eventType) => {
         prevBtnEl?.addEventListener(eventType, () => {
           if (!video) return null;
-          if (video.currentTime > 3) return null;
+          if (eventType === "mouseenter" && video.currentTime > 3) return null;
           setTimeout(() => {
             const currentVidEl = document.querySelector<HTMLDivElement>(
               "ytd-playlist-panel-video-renderer[selected]",

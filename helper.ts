@@ -256,7 +256,9 @@ export const replaceTooltipInfo = (
   element.dataset.preview = info.preview;
   element.href = info.href;
 
-  refreshHover(element);
+  if (!element.matches(":hover")) return null;
+  element.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
+  element.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 };
 
 export const navigateEvent = (
@@ -272,12 +274,6 @@ export const navigateEvent = (
   });
   window.dispatchEvent(event);
 };
-
-function refreshHover(el: HTMLElement) {
-  if (!el.matches(":hover")) return null;
-  el.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
-  el.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
-}
 
 export const isShuffleOn = (): boolean => {
   const shuffleBtn = document.querySelector<HTMLButtonElement>(
@@ -304,8 +300,6 @@ export const sortRenderedPlaylist = (
 
   const playlistItems: NodeListOf<HTMLDivElement> =
     playlistContainer.querySelectorAll(playlistItemSelector);
-
-  console.log("playlistItems ==> ", playlistItems);
 
   const sortedList = sortList(playlistItems, apiCache, order, reverse);
 
@@ -363,6 +357,8 @@ export const sortRenderedPlaylist = (
       replaceTooltipInfo(prevBtnEl, prevVidInfo);
     }, 1200);
   });
+
+  // moves "unavailable videos are hidden" message back to bottom of playlist
   const messageRender = playlistContainer.querySelector("ytd-message-renderer");
   if (!messageRender) return null;
   playlistContainer.appendChild(messageRender);
