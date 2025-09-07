@@ -289,6 +289,24 @@ export const isLoopOn = () => {
   );
 };
 
+function scrollInContainer(
+  container: HTMLElement,
+  target: HTMLElement,
+  positionPercent: number = 50,
+): void {
+  const containerRect: DOMRect = container.getBoundingClientRect();
+  const targetRect: DOMRect = target.getBoundingClientRect();
+
+  const offset: number = targetRect.top - containerRect.top;
+
+  const clampedPercent: number = Math.min(100, Math.max(0, positionPercent));
+
+  const positionOffset: number =
+    (container.clientHeight - targetRect.height) * (clampedPercent / 100);
+
+  container.scrollTop += offset - positionOffset;
+}
+
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
@@ -298,65 +316,73 @@ export const sortRenderedPlaylist = (
   if (!playlistContainer) return null;
   if (!apiCache) return null;
 
+  let currentVideoElement: HTMLDivElement | null = null;
+
   const playlistItems: NodeListOf<HTMLDivElement> =
     playlistContainer.querySelectorAll(playlistItemSelector);
 
   const sortedList = sortList(playlistItems, apiCache, order, reverse);
 
-  sortedList.forEach((el, index, arr) => {
-    renderDateToElement(el, apiCache!);
-    playlistContainer.appendChild(el);
+  sortedList.forEach(
+    (el: HTMLDivElement, index: number, arr: HTMLDivElement[]) => {
+      renderDateToElement(el, apiCache!);
+      playlistContainer.appendChild(el);
 
-    if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
+      if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
 
-    const indexMessage = document.querySelector(
-      "yt-formatted-string.index-message",
-    )?.firstChild;
+      currentVideoElement = el;
 
-    if (indexMessage) indexMessage.textContent = index + 1 + "";
+      const indexMessage = document.querySelector(
+        "yt-formatted-string.index-message",
+      )?.firstChild;
 
-    const prevVidInfo = getInfoFromElement(arr[index - 1]);
-    let nextVidInfo = getInfoFromElement(arr[index + 1]);
+      if (indexMessage) indexMessage.textContent = index + 1 + "";
 
-    const nextLabel = document.querySelector("#next-video-title > #next-label");
+      const prevVidInfo = getInfoFromElement(arr[index - 1]);
+      let nextVidInfo = getInfoFromElement(arr[index + 1]);
 
-    const sibling = nextLabel?.nextSibling as HTMLDivElement;
+      const nextLabel = document.querySelector(
+        "#next-video-title > #next-label",
+      );
 
-    if (!nextVidInfo && nextLabel && nextLabel.nextSibling) {
-      nextLabel.textContent = "End of playlist";
-      sibling.textContent = "";
-    } else if (nextLabel && nextLabel.nextSibling) {
-      nextLabel.textContent = "Next:";
-      sibling.textContent = nextVidInfo?.videoTitle ?? "";
-      sibling.removeAttribute("is-empty");
-    }
+      const sibling = nextLabel?.nextSibling as HTMLDivElement;
 
-    setTimeout(() => {
-      const prevBtnEl =
-        document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
-
-      const nextBtnEl =
-        document.querySelector<HTMLAnchorElement>(".ytp-next-button");
-
-      if (!prevVidInfo) {
-        if (prevBtnEl) prevBtnEl.setAttribute("hidden", "");
-      } else {
-        if (prevBtnEl) prevBtnEl.removeAttribute("hidden");
+      if (!nextVidInfo && nextLabel && nextLabel.nextSibling) {
+        nextLabel.textContent = "End of playlist";
+        sibling.textContent = "";
+      } else if (nextLabel && nextLabel.nextSibling) {
+        nextLabel.textContent = "Next:";
+        sibling.textContent = nextVidInfo?.videoTitle ?? "";
+        sibling.removeAttribute("is-empty");
       }
 
-      if (!nextVidInfo) {
-        const nextRecomendedVidEl = document.querySelector<Element>(
-          "yt-lockup-view-model",
-        );
-        if (nextRecomendedVidEl) {
-          nextVidInfo = getInfoFromElement(nextRecomendedVidEl);
-        }
-      }
-
-      replaceTooltipInfo(nextBtnEl, nextVidInfo);
-      replaceTooltipInfo(prevBtnEl, prevVidInfo);
-    }, 1200);
-  });
+      // setTimeout(() => {
+      //   const prevBtnEl =
+      //     document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
+      //
+      //   const nextBtnEl =
+      //     document.querySelector<HTMLAnchorElement>(".ytp-next-button");
+      //
+      //   if (!prevVidInfo) {
+      //     if (prevBtnEl) prevBtnEl.setAttribute("hidden", "");
+      //   } else {
+      //     if (prevBtnEl) prevBtnEl.removeAttribute("hidden");
+      //   }
+      //
+      //   if (!nextVidInfo) {
+      //     const nextRecomendedVidEl = document.querySelector<Element>(
+      //       "yt-lockup-view-model",
+      //     );
+      //     if (nextRecomendedVidEl) {
+      //       nextVidInfo = getInfoFromElement(nextRecomendedVidEl);
+      //     }
+      //   }
+      //
+      //   replaceTooltipInfo(nextBtnEl, nextVidInfo);
+      //   replaceTooltipInfo(prevBtnEl, prevVidInfo);
+      // }, 1200);
+    },
+  );
 
   // moves "unavailable videos are hidden" message back to bottom of playlist
   const messageRender = playlistContainer.querySelector("ytd-message-renderer");

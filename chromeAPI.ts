@@ -3,11 +3,10 @@ import { API_URL } from "./config";
 import { API_KEY } from "@/env.ts";
 import { clog } from "@/helper.ts";
 
-// TODO: add backup API keys
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
   init?: RequestInit,
-): Promise<T | "quota execeed"> => {
+): Promise<T> => {
   const res = await fetch(input, init);
 
   if (!res.ok) {
@@ -34,7 +33,7 @@ export const playlistAPI = async function (
     `${API_URL}&playlistId=${playlistId}&key=${API_KEY}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
-  if (data === "quota execeed") {
+  if (Object.keys(data).length === 0) {
     clog("API quota exceeded rotating key");
     // TODO: recur with backup API key
     return null;

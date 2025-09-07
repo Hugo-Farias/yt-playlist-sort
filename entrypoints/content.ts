@@ -44,7 +44,7 @@ export default defineContentScript({
           video.pause();
           // videoContainer.remove();
         }
-      }, 2000);
+      }, 1000);
     };
 
     window.addEventListener(
@@ -96,26 +96,38 @@ export default defineContentScript({
     const firstRunEvent = () => {
       const video = document.querySelector("video");
 
-      const prevBtnEl =
-        document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
-
       (["click", "mouseenter"] as const).forEach((eventType) => {
-        prevBtnEl?.addEventListener(eventType, () => {
-          if (!video) return null;
-          if (eventType === "mouseenter" && video.currentTime > 3) return null;
-          setTimeout(() => {
-            const currentVidEl = document.querySelector<HTMLDivElement>(
-              "ytd-playlist-panel-video-renderer[selected]",
-            );
+        ([".ytp-prev-button", ".ytp-next-button"] as const).forEach(
+          (btnSelector) => {
+            const btnElement =
+              document.querySelector<HTMLAnchorElement>(btnSelector);
+            btnElement?.addEventListener(eventType, () => {
+              if (!video) return null;
+              if (
+                btnSelector === ".ytp-prev-button" &&
+                eventType === "mouseenter" &&
+                video.currentTime > 3
+              ) {
+                return null;
+              }
+              setTimeout(() => {
+                const currentVidEl = document.querySelector<HTMLDivElement>(
+                  "ytd-playlist-panel-video-renderer[selected]",
+                );
 
-            if (!currentVidEl) return null;
+                if (!currentVidEl) return null;
 
-            const prevVidInfo = getInfoFromElement(
-              currentVidEl.previousElementSibling,
-            );
-            replaceTooltipInfo(prevBtnEl, prevVidInfo);
-          }, 80);
-        });
+                const vidInfo = getInfoFromElement(
+                  btnSelector === ".ytp-prev-button"
+                    ? currentVidEl.previousElementSibling
+                    : currentVidEl.nextElementSibling,
+                );
+
+                replaceTooltipInfo(btnElement, vidInfo);
+              }, 80);
+            });
+          },
+        );
       });
 
       video?.addEventListener("pause", () => {
