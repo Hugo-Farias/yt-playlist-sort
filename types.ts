@@ -27,7 +27,10 @@ export type YoutubePlaylistResponse = {
 
 export type YtSortOrder = "orig" | "date";
 
-export type ApiCacheItems = { originalIndex: number; videoPublishedAt: number };
+export type ApiCacheItems = {
+  originalIndex: number;
+  videoPublishedAt: number;
+};
 
 export type ApiCache = {
   items: {
@@ -35,6 +38,7 @@ export type ApiCache = {
   };
   listId: string;
   storeTime: number;
+  totalResults: number;
   extVersion: string;
 };
 

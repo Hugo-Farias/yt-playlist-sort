@@ -21,6 +21,7 @@ import { ApiCache, YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
 import { API_KEY } from "@/env";
 
+// TODO: solution for huge playlists (1000+ videos)
 export default defineContentScript({
   main() {
     let firstRun = true;
@@ -32,18 +33,18 @@ export default defineContentScript({
       }
 
       setTimeout(() => {
-        const videoContainer = document.querySelector(
-          "#player-container-outer",
-        );
-        if (videoContainer) {
-          const video = document.querySelector("video");
-          clog("Pausing video... 🔴🔴🔴");
-          if (!video) return null;
-          // video.currentTime = video.duration - 2;
-          video.currentTime = 4;
-          video.pause();
-          // videoContainer.remove();
-        }
+        // const videoContainer = document.querySelector(
+        //   "#player-container-outer",
+        // );
+        // if (videoContainer) {
+        const video = document.querySelector("video");
+        clog("Pausing video... 🔴🔴🔴");
+        if (!video) return null;
+        // video.currentTime = video.duration - 2;
+        video.pause();
+        video.currentTime = video.duration / 2;
+        // videoContainer.remove();
+        // }
       }, 1000);
     };
 
@@ -110,21 +111,24 @@ export default defineContentScript({
               ) {
                 return null;
               }
-              setTimeout(() => {
-                const currentVidEl = document.querySelector<HTMLDivElement>(
-                  "ytd-playlist-panel-video-renderer[selected]",
-                );
+              setTimeout(
+                () => {
+                  const currentVidEl = document.querySelector<HTMLDivElement>(
+                    "ytd-playlist-panel-video-renderer[selected]",
+                  );
 
-                if (!currentVidEl) return null;
+                  if (!currentVidEl) return null;
 
-                const vidInfo = getInfoFromElement(
-                  btnSelector === ".ytp-prev-button"
-                    ? currentVidEl.previousElementSibling
-                    : currentVidEl.nextElementSibling,
-                );
+                  const vidInfo = getInfoFromElement(
+                    btnSelector === ".ytp-prev-button"
+                      ? currentVidEl.previousElementSibling
+                      : currentVidEl.nextElementSibling,
+                  );
 
-                replaceTooltipInfo(btnElement, vidInfo);
-              }, 80);
+                  replaceTooltipInfo(btnElement, vidInfo);
+                },
+                eventType === "click" ? 50 : 0,
+              );
             });
           },
         );
@@ -217,8 +221,20 @@ export default defineContentScript({
         playlistId,
       );
 
+      // TODO: item limit check
+      // if (refreshedCache?.items[getListId(location.href)!]) return null;
+
+      if (!refreshedCache) return null;
+
+      const { totalResults } = refreshedCache;
+
+      console.log("totalResults ==> ", totalResults);
+
+      if (totalResults > 500) return null;
+
       createDropdownMenu(refreshedCache, playlistContainer);
 
+      // TODO: separate function for reverse
       sortRenderedPlaylist(
         playlistContainer,
         refreshedCache,
@@ -232,7 +248,6 @@ export default defineContentScript({
         const loopBtn = document.querySelector<HTMLButtonElement>(
           'button[aria-label="Loop playlist"]',
         );
-
         loopBtn?.click();
       }
 

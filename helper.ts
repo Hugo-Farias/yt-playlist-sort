@@ -8,7 +8,7 @@ import {
 import { playlistItemSelector } from "@/config.ts";
 import pkg from "@/package.json";
 
-export const clog = (...content: string[]) => {
+export const clog = (...content: any[]) => {
   console.log("YT-Playlist-Sort: ", ...content);
 };
 
@@ -69,6 +69,7 @@ type storeCacheDataParam<T extends string> = T extends "apiCache"
   ? YoutubePlaylistResponse
   : string[];
 
+// TODO: add video title and more
 export const storeCache = <T extends "apiCache" | "renderedCache">(
   storageKey: T,
   data: storeCacheDataParam<T> | null,
@@ -107,6 +108,7 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
           listId: playlistId,
           storeTime: Date.now(),
           extVersion: pkg.version,
+          totalResults: playlistData.pageInfo.totalResults,
         },
       }),
     );
@@ -289,24 +291,6 @@ export const isLoopOn = () => {
   );
 };
 
-function scrollInContainer(
-  container: HTMLElement,
-  target: HTMLElement,
-  positionPercent: number = 50,
-): void {
-  const containerRect: DOMRect = container.getBoundingClientRect();
-  const targetRect: DOMRect = target.getBoundingClientRect();
-
-  const offset: number = targetRect.top - containerRect.top;
-
-  const clampedPercent: number = Math.min(100, Math.max(0, positionPercent));
-
-  const positionOffset: number =
-    (container.clientHeight - targetRect.height) * (clampedPercent / 100);
-
-  container.scrollTop += offset - positionOffset;
-}
-
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
@@ -338,7 +322,7 @@ export const sortRenderedPlaylist = (
 
       if (indexMessage) indexMessage.textContent = index + 1 + "";
 
-      const prevVidInfo = getInfoFromElement(arr[index - 1]);
+      // const prevVidInfo = getInfoFromElement(arr[index - 1]);
       let nextVidInfo = getInfoFromElement(arr[index + 1]);
 
       const nextLabel = document.querySelector(

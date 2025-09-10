@@ -33,7 +33,10 @@ export const playlistAPI = async function (
     `${API_URL}&playlistId=${playlistId}&key=${API_KEY}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
-  if (Object.keys(data).length === 0) {
+  if (data.pageInfo.totalResults === 0) return null;
+  // if (Number(data.pageInfo.totalResults) > 500) return data;
+
+  if (Object.keys(data).length === 0 || !data?.etag) {
     clog("API quota exceeded rotating key");
     // TODO: recur with backup API key
     return null;
