@@ -237,12 +237,7 @@ export default defineContentScript({
 
       createDropdownMenu(refreshedCache, playlistContainer, playlistMenuBtns);
 
-      createReverseBtn(
-        refreshedCache,
-        playlistContainer,
-        playlistMenuBtns,
-        localGet("ytSortisReversed") === "true",
-      );
+      createReverseBtn(refreshedCache, playlistContainer, playlistMenuBtns);
 
       // TODO: separate function for reverse
       sortRenderedPlaylist(

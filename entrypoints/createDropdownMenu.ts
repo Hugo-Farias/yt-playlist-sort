@@ -9,8 +9,6 @@ function createDropdownMenu(
   const dropdownElList = document.querySelectorAll(".ytSortDropdown");
   dropdownElList.forEach((el) => el.remove());
 
-  let isReversed: boolean = localGet("ytSortisReversed") === "true";
-
   let sortOrder: YtSortOrder =
     (localGet("ytSortOrder") as YtSortOrder) ?? "orig";
 
@@ -37,6 +35,8 @@ function createDropdownMenu(
 
   select.addEventListener("change", () => {
     sortOrder = select.value as YtSortOrder;
+    const isReversed = localGet("ytSortisReversed") === "true";
+
     clog("Sort order changed to:", sortOrder);
     sortRenderedPlaylist(playlistContainer, cache, isReversed, sortOrder);
     localSet("ytSortOrder", sortOrder);

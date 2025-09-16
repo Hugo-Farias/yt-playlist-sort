@@ -6,9 +6,10 @@ const createReverseBtn = (
   cache: ApiCache,
   playlistContainer: HTMLDivElement,
   playlistMenuBtns: HTMLDivElement | null,
-  isReversed: boolean,
 ) => {
   // const sortOrder = (localGet("ytSortOrder") as YtSortOrder) || "keep";
+  let isReversed = localGet("ytSortisReversed") === "true";
+  console.log("isReversed ==> ", isReversed);
 
   const reverseBtn = document.createElement("button");
   reverseBtn.className = "ytSortReverseBtn ytSortDropdown";
@@ -28,14 +29,16 @@ const createReverseBtn = (
   reverseBtn.ariaLabel = "Reverse playlist order";
 
   const changeBtnEffect = () => {
-    reverseBtn.style.transform = `scaleY(${isReversed ? "1" : "-1"})`;
+    reverseBtn.style.transform = `scaleY(${isReversed ? "-1" : "1"})`;
     reverseBtn.ariaPressed = String(isReversed);
-    reverseBtn.children[0].setAttribute("stroke-width", isReversed ? "1" : "2");
+    reverseBtn.children[0].setAttribute("stroke-width", isReversed ? "2" : "1");
   };
   changeBtnEffect();
 
   const reverseBtnFunc = () => {
     isReversed = !isReversed;
+    changeBtnEffect();
+    console.log("isReversed ==> ", isReversed);
 
     localSet("ytSortisReversed", isReversed ? "true" : "false");
 
@@ -45,8 +48,6 @@ const createReverseBtn = (
       isReversed,
       localGet("ytSortOrder") as YtSortOrder,
     );
-
-    changeBtnEffect();
   };
 
   reverseBtn.addEventListener("click", () => {
