@@ -20,6 +20,7 @@ import {
 import { ApiCache, YTNavigateEvent, YtSortOrder } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
 import { API_KEY } from "@/env";
+import createReverseBtn from "./createReverseBtn";
 
 // TODO: solution for huge playlists (1000+ videos)
 export default defineContentScript({
@@ -32,20 +33,16 @@ export default defineContentScript({
         clog(`${API_URL}&playlistId=${getListId(currUrl)}&key=${API_KEY}`);
       }
 
-      setTimeout(() => {
-        // const videoContainer = document.querySelector(
-        //   "#player-container-outer",
-        // );
-        // if (videoContainer) {
+      const videoContainer = document.querySelector("#full-bleed-container");
+      if (videoContainer) {
         const video = document.querySelector("video");
         clog("Pausing video... 🔴🔴🔴");
         if (!video) return null;
         // video.currentTime = video.duration - 2;
         video.pause();
         video.currentTime = video.duration / 2;
-        // videoContainer.remove();
-        // }
-      }, 1000);
+        videoContainer.remove();
+      }
     };
 
     window.addEventListener(
@@ -232,14 +229,27 @@ export default defineContentScript({
 
       if (totalResults > 500) return null;
 
-      createDropdownMenu(refreshedCache, playlistContainer);
+      const playlistMenuBtns = document.querySelector<HTMLDivElement>(
+        "div#playlist-actions > div > div > ytd-menu-renderer > #top-level-buttons-computed",
+      );
+
+      if (!playlistMenuBtns) return null;
+
+      createDropdownMenu(refreshedCache, playlistContainer, playlistMenuBtns);
+
+      createReverseBtn(
+        refreshedCache,
+        playlistContainer,
+        playlistMenuBtns,
+        localGet("ytSortisReversed") === "true",
+      );
 
       // TODO: separate function for reverse
       sortRenderedPlaylist(
         playlistContainer,
         refreshedCache,
-        localGet("ytSortOrder") as YtSortOrder,
         localGet("ytSortisReversed") === "true",
+        localGet("ytSortOrder") as YtSortOrder,
       );
 
       const wasLoop = localGet("ytSortisLoopOn", true) === "true";

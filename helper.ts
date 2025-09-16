@@ -207,10 +207,8 @@ const sortList = (
   nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,
   direction: YtSortOrder = "orig",
-  reverse: boolean,
 ): HTMLDivElement[] => {
   let order: keyof ApiCacheItems;
-
   if (direction === "date") order = "videoPublishedAt";
   if (direction === "orig") order = "originalIndex";
 
@@ -220,7 +218,7 @@ const sortList = (
     return aInfo - bInfo;
   });
 
-  if (reverse) return sortedList.reverse();
+  // if (reverse) return sortedList.reverse();
 
   return sortedList;
 };
@@ -294,8 +292,8 @@ export const isLoopOn = () => {
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
-  order: YtSortOrder = "orig",
   reverse: boolean,
+  order: YtSortOrder = "orig",
 ) => {
   if (!playlistContainer) return null;
   if (!apiCache) return null;
@@ -305,7 +303,9 @@ export const sortRenderedPlaylist = (
   const playlistItems: NodeListOf<HTMLDivElement> =
     playlistContainer.querySelectorAll(playlistItemSelector);
 
-  const sortedList = sortList(playlistItems, apiCache, order, reverse);
+  const sortedList = sortList(playlistItems, apiCache, order);
+
+  if (reverse) sortedList.reverse();
 
   sortedList.forEach(
     (el: HTMLDivElement, index: number, arr: HTMLDivElement[]) => {
@@ -339,32 +339,6 @@ export const sortRenderedPlaylist = (
         sibling.textContent = nextVidInfo?.videoTitle ?? "";
         sibling.removeAttribute("is-empty");
       }
-
-      // setTimeout(() => {
-      //   const prevBtnEl =
-      //     document.querySelector<HTMLAnchorElement>(".ytp-prev-button");
-      //
-      //   const nextBtnEl =
-      //     document.querySelector<HTMLAnchorElement>(".ytp-next-button");
-      //
-      //   if (!prevVidInfo) {
-      //     if (prevBtnEl) prevBtnEl.setAttribute("hidden", "");
-      //   } else {
-      //     if (prevBtnEl) prevBtnEl.removeAttribute("hidden");
-      //   }
-      //
-      //   if (!nextVidInfo) {
-      //     const nextRecomendedVidEl = document.querySelector<Element>(
-      //       "yt-lockup-view-model",
-      //     );
-      //     if (nextRecomendedVidEl) {
-      //       nextVidInfo = getInfoFromElement(nextRecomendedVidEl);
-      //     }
-      //   }
-      //
-      //   replaceTooltipInfo(nextBtnEl, nextVidInfo);
-      //   replaceTooltipInfo(prevBtnEl, prevVidInfo);
-      // }, 1200);
     },
   );
 
