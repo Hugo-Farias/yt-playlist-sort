@@ -18,9 +18,8 @@ import {
   localGet,
 } from "@/helper.ts";
 import { ApiCache, YTNavigateEvent } from "@/types";
-import createDropdownMenu from "./createDropdownMenu";
+import { createDropdownMenu, createReverseBtn } from "@/buttons";
 import { API_KEY } from "@/env";
-import createReverseBtn from "./createReverseBtn";
 
 // TODO: solution for huge playlists (1000+ videos)
 export default defineContentScript({
