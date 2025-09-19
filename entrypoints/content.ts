@@ -17,7 +17,7 @@ import {
   localRemove,
   localGet,
 } from "@/helper.ts";
-import { ApiCache, YTNavigateEvent, YtSortOrder } from "@/types";
+import { ApiCache, YTNavigateEvent } from "@/types";
 import createDropdownMenu from "./createDropdownMenu";
 import { API_KEY } from "@/env";
 import createReverseBtn from "./createReverseBtn";
@@ -234,6 +234,7 @@ export default defineContentScript({
       );
 
       if (!playlistMenuBtns) return null;
+      console.log(refreshedCache.isReversed);
 
       createDropdownMenu(refreshedCache, playlistContainer, playlistMenuBtns);
 
@@ -243,11 +244,11 @@ export default defineContentScript({
       sortRenderedPlaylist(
         playlistContainer,
         refreshedCache,
-        localGet("ytSortisReversed") === "true",
-        localGet("ytSortOrder") as YtSortOrder,
+        refreshedCache.sortOrder,
+        refreshedCache.isReversed,
       );
 
-      const wasLoop = localGet("ytSortisLoopOn", true) === "true";
+      const wasLoop = localGet("ytSortisLoopOn", true);
 
       if (wasLoop) {
         const loopBtn = document.querySelector<HTMLButtonElement>(

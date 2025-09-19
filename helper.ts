@@ -12,13 +12,14 @@ export const clog = (...content: any[]) => {
   console.log("YT-Playlist-Sort: ", ...content);
 };
 
-type localSorageKeys = "ytSortOrder" | "ytSortisLoopOn" | "ytSortisReversed";
+type localSorageKeys = "ytSortisLoopOn" | "apiCache";
 
 export const localSet = (
   keyname: localSorageKeys,
-  data: string,
+  obj: Object,
   session: boolean = false,
 ) => {
+  const data = JSON.stringify(obj);
   if (session) {
     sessionStorage.setItem(keyname, data);
     return null;
@@ -30,12 +31,18 @@ export const localSet = (
 export const localGet = (
   keyname: localSorageKeys,
   session: boolean = false,
-): string | null => {
+) => {
+  let data: string | null;
   if (session) {
-    return sessionStorage.getItem(keyname);
+    data = sessionStorage.getItem(keyname);
+  } else {
+    data = localStorage.getItem(keyname);
   }
 
-  return localStorage.getItem(keyname);
+  if (!data) return null;
+  if (typeof data === "string") return data;
+
+  return JSON.parse(data);
 };
 
 export const localRemove = (
@@ -48,6 +55,23 @@ export const localRemove = (
   }
 
   localStorage.removeItem(keyname);
+};
+
+export const localAdd = (keyname: localSorageKeys, add: Object) => {
+  const data = localGet(keyname);
+
+  if (!data) return null;
+
+  const parsedData: { [key: string]: ApiCache } = JSON.parse(data);
+  const listId = getListId(location.href);
+
+  localStorage.setItem(
+    keyname,
+    JSON.stringify({
+      ...parsedData,
+      [listId]: { ...parsedData[listId], ...add },
+    }),
+  );
 };
 
 export const getListId = (url: string | undefined): string => {
@@ -109,6 +133,7 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
           storeTime: Date.now(),
           extVersion: pkg.version,
           totalResults: playlistData.pageInfo.totalResults,
+          isReversed: false,
         },
       }),
     );
@@ -289,11 +314,12 @@ export const isLoopOn = () => {
   );
 };
 
+// FIX: playlist not reversing if user clicks too early after switching list order
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
+  order: YtSortOrder,
   reverse: boolean,
-  order: YtSortOrder = "orig",
 ) => {
   if (!playlistContainer) return null;
   if (!apiCache) return null;

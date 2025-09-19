@@ -1,4 +1,4 @@
-import { clog, localGet, localSet, sortRenderedPlaylist } from "@/helper";
+import { clog, localAdd, sortRenderedPlaylist } from "@/helper";
 import { ApiCache, YtSortOrder } from "@/types";
 
 function createDropdownMenu(
@@ -9,8 +9,7 @@ function createDropdownMenu(
   const dropdownElList = document.querySelectorAll(".ytSortDropdown");
   dropdownElList.forEach((el) => el.remove());
 
-  let sortOrder: YtSortOrder =
-    (localGet("ytSortOrder") as YtSortOrder) ?? "orig";
+  let sortOrder: YtSortOrder = cache?.sortOrder ?? "orig";
 
   const select = document.createElement("select");
   select.className = "header ytd-playlist-panel-renderer ytSortDropdown";
@@ -35,11 +34,17 @@ function createDropdownMenu(
 
   select.addEventListener("change", () => {
     sortOrder = select.value as YtSortOrder;
-    const isReversed = localGet("ytSortisReversed") === "true";
 
     clog("Sort order changed to:", sortOrder);
-    sortRenderedPlaylist(playlistContainer, cache, isReversed, sortOrder);
-    localSet("ytSortOrder", sortOrder);
+
+    localAdd("apiCache", { sortOrder: sortOrder });
+
+    sortRenderedPlaylist(
+      playlistContainer,
+      cache,
+      sortOrder,
+      cache?.isReversed ?? false,
+    );
   });
 
   playlistMenuBtns?.appendChild(select);

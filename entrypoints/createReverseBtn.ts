@@ -1,5 +1,5 @@
-import { localGet, localSet, sortRenderedPlaylist } from "@/helper";
-import { ApiCache, YtSortOrder } from "@/types";
+import { clog, localAdd, sortRenderedPlaylist } from "@/helper";
+import { ApiCache } from "@/types";
 import { reversePlaylistSVG } from "./ui/reverseBtn";
 
 const createReverseBtn = (
@@ -7,8 +7,7 @@ const createReverseBtn = (
   playlistContainer: HTMLDivElement,
   playlistMenuBtns: HTMLDivElement | null,
 ) => {
-  // const sortOrder = (localGet("ytSortOrder") as YtSortOrder) || "keep";
-  let isReversed = localGet("ytSortisReversed") === "true";
+  let isReversed = cache.isReversed;
   console.log("isReversed ==> ", isReversed);
 
   const reverseBtn = document.createElement("button");
@@ -20,8 +19,6 @@ const createReverseBtn = (
   reverseBtn.style.height = "40px";
   reverseBtn.style.aspectRatio = "1/1";
   reverseBtn.style.color = "var(--yt-spec-text-primary)";
-  // reverseBtn.style.paddingBlock = "5px";
-  // reverseBtn.style.paddingInline = "10px";
   reverseBtn.style.padding = "5px";
   reverseBtn.style.borderRadius = "50%";
   reverseBtn.style.fontSize = "16px";
@@ -38,15 +35,15 @@ const createReverseBtn = (
   const reverseBtnFunc = () => {
     isReversed = !isReversed;
     changeBtnEffect();
-    console.log("isReversed ==> ", isReversed);
 
-    localSet("ytSortisReversed", isReversed ? "true" : "false");
+    clog("Reversed:", isReversed);
+    localAdd("apiCache", { isReversed: isReversed });
 
     sortRenderedPlaylist(
       playlistContainer,
       cache,
+      cache.sortOrder ?? "orig",
       isReversed,
-      localGet("ytSortOrder") as YtSortOrder,
     );
   };
 
