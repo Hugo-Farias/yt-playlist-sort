@@ -8,15 +8,15 @@ import {
 import { playlistItemSelector } from "@/config.ts";
 import pkg from "@/package.json";
 
-export const clog = (...content: any[]) => {
-  console.log("YT-Playlist-Sort: ", ...content);
+export const clog = (...content: Parameters<typeof console.log>) => {
+  console.log("YT-Playlist-Sort:", ...content);
 };
 
 type localSorageKeys = "ytSortisLoopOn" | "apiCache";
 
 export const localSet = (
   keyname: localSorageKeys,
-  obj: Object,
+  obj: object | string,
   session: boolean = false,
 ) => {
   const data = JSON.stringify(obj);
@@ -57,7 +57,7 @@ export const localRemove = (
   localStorage.removeItem(keyname);
 };
 
-export const localAdd = (keyname: localSorageKeys, add: Object) => {
+export const localAdd = (keyname: localSorageKeys, add: object) => {
   const data = localGet(keyname);
 
   if (!data) return null;
@@ -112,10 +112,8 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
     const newItems = playlistData.items.reduce(
       (acc, item, index) => {
         acc[item.contentDetails.videoId] = {
-          originalIndex: index,
-          videoPublishedAt: new Date(
-            item.contentDetails.videoPublishedAt,
-          ).getTime(),
+          index: index,
+          publishedAt: new Date(item.contentDetails.videoPublishedAt).getTime(),
         };
 
         return acc;
@@ -216,7 +214,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 
 const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
   const videoId = getVideoId(el);
-  return cache.items[videoId ?? ""]?.videoPublishedAt ?? Infinity;
+  return cache.items[videoId ?? ""]?.publishedAt ?? Infinity;
 };
 
 const getFromCache = (
@@ -234,8 +232,8 @@ const sortList = (
   direction: YtSortOrder = "orig",
 ): HTMLDivElement[] => {
   let order: keyof ApiCacheItems;
-  if (direction === "date") order = "videoPublishedAt";
-  if (direction === "orig") order = "originalIndex";
+  if (direction === "date") order = "publishedAt";
+  if (direction === "orig") order = "index";
 
   const sortedList = [...nodeList].sort((a, b) => {
     const aInfo = getFromCache(a, cache, order);
@@ -252,6 +250,10 @@ type GetInfoFromElementRT = {
   videoTitle: string;
   preview: string;
   href: string;
+};
+
+export const unusedFunction = () => {
+  return null;
 };
 
 export const getInfoFromElement = (
@@ -288,7 +290,7 @@ export const replaceTooltipInfo = (
 
 export const navigateEvent = (
   eventType: "yt-navigate" | "yt-navigate-finish",
-  payload: {},
+  payload: object,
 ) => {
   const event = new CustomEvent(eventType, {
     detail: {
@@ -324,8 +326,6 @@ export const sortRenderedPlaylist = (
   if (!playlistContainer) return null;
   if (!apiCache) return null;
 
-  let currentVideoElement: HTMLDivElement | null = null;
-
   const playlistItems: NodeListOf<HTMLDivElement> =
     playlistContainer.querySelectorAll(playlistItemSelector);
 
@@ -340,16 +340,13 @@ export const sortRenderedPlaylist = (
 
       if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
 
-      currentVideoElement = el;
-
       const indexMessage = document.querySelector(
         "yt-formatted-string.index-message",
       )?.firstChild;
 
       if (indexMessage) indexMessage.textContent = index + 1 + "";
 
-      // const prevVidInfo = getInfoFromElement(arr[index - 1]);
-      let nextVidInfo = getInfoFromElement(arr[index + 1]);
+      const nextVidInfo = getInfoFromElement(arr[index + 1]);
 
       const nextLabel = document.querySelector(
         "#next-video-title > #next-label",

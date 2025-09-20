@@ -55,7 +55,6 @@ export const createReverseBtn = (
   playlistMenuBtns: HTMLDivElement | null,
 ) => {
   isReversed = cache.isReversed;
-  console.log("isReversed ==> ", isReversed);
 
   const reverseBtn = document.createElement("button");
   reverseBtn.className = "ytSortReverseBtn ytSortDropdown";

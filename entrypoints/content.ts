@@ -224,8 +224,6 @@ export default defineContentScript({
 
       const { totalResults } = refreshedCache;
 
-      console.log("totalResults ==> ", totalResults);
-
       if (totalResults > 500) return null;
 
       const playlistMenuBtns = document.querySelector<HTMLDivElement>(
@@ -233,7 +231,6 @@ export default defineContentScript({
       );
 
       if (!playlistMenuBtns) return null;
-      console.log(refreshedCache.isReversed);
 
       createDropdownMenu(refreshedCache, playlistContainer, playlistMenuBtns);
 

@@ -25,9 +25,16 @@
     "@types/chrome": "^0.0.280",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.44.0",
+    "@typescript-eslint/parser": "^8.44.0",
     "@wxt-dev/module-react": "^1.1.2",
+    "eslint": "^9.36.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.4.0",
     "prettier": "^3.5.3",
     "typescript": "^5.6.3",
+    "typescript-eslint": "^8.44.0",
     "wxt": "^0.19.29"
   }
 }

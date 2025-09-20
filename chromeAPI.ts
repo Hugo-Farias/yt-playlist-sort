@@ -47,7 +47,7 @@ export const playlistAPI = async function (
     if (!recurData) return null;
     return {
       ...data,
-      items: [...data.items, ...recurData?.items],
+      items: [...data.items, ...recurData.items],
     };
   }
 
