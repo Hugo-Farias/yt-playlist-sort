@@ -11,6 +11,19 @@ export type YouTubePlaylistItem = {
     videoId: string;
     videoPublishedAt: string; // ISO 8601 date-time string
   };
+  snippet: {
+    title: string;
+    description: string;
+    channelTitle: string;
+    publishedAt: string; // ISO 8601 date-time string
+    thumbnails: {
+      default?: { url: string; width?: number; height?: number };
+      medium?: { url: string; width?: number; height?: number };
+      high?: { url: string; width?: number; height?: number };
+      standard?: { url: string; width?: number; height?: number };
+      maxres?: { url: string; width?: number; height?: number };
+    };
+  };
 };
 
 export type YoutubePlaylistResponse = {
@@ -25,9 +38,10 @@ export type YoutubePlaylistResponse = {
   };
 };
 
-export type YtSortOrder = "orig" | "date";
+export type YtSortOrder = "orig" | "date" | "title";
 
 export type ApiCacheItems = {
+  title: string;
   index: number;
   publishedAt: number;
 };

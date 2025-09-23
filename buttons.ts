@@ -1,4 +1,4 @@
-import { clog, localAdd, sortRenderedPlaylist } from "@/helper";
+import { localAdd, sortRenderedPlaylist } from "@/helper";
 import { ApiCache, YtSortOrder } from "@/types";
 import { reversePlaylistSVG } from "@/entrypoints/ui/reverseBtn";
 
@@ -25,6 +25,7 @@ export const createDropdownMenu = (
 
   const options: { value: YtSortOrder; label: string }[] = [
     { value: "orig", label: "Default Order" },
+    { value: "title", label: "Sort By Title" },
     { value: "date", label: "Sort By Date" },
   ];
 
@@ -38,8 +39,6 @@ export const createDropdownMenu = (
 
   select.addEventListener("change", () => {
     sortOrder = select.value as YtSortOrder;
-
-    clog("Sort order changed to:", sortOrder);
 
     localAdd("apiCache", { sortOrder: sortOrder });
 
@@ -82,7 +81,6 @@ export const createReverseBtn = (
     isReversed = !isReversed;
     changeBtnEffect();
 
-    clog("Reversed:", isReversed);
     localAdd("apiCache", { isReversed: isReversed });
 
     sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);

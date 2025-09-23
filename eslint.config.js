@@ -12,9 +12,6 @@ export default [
       import: importPlugin,
       react: react,
     },
-    rules: {
-      "import/no-unused-modules": ["error", { unusedExports: true }],
-    },
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -23,14 +20,26 @@ export default [
     },
   },
   {
+    // Apply to all JS/TS files in the project
+    files: ["**/*.{js,ts,jsx,tsx}"],
+    rules: {
+      "import/no-unused-modules": ["error", { unusedExports: true }],
+    },
+    settings: {
+      "import/resolver": {
+        typescript: true, // resolves path aliases
+      },
+    },
+  },
+  {
     ignores: [
+      ".git/",
+      "node_modules/",
+      "dist/",
       ".output/",
       ".wxt/",
       ".scratch/",
-      "node_modules/",
-      "dist/",
       "eslint.config.js", // prevent self-linting
     ],
   },
 ];
-

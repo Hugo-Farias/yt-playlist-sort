@@ -93,7 +93,14 @@ type storeCacheDataParam<T extends string> = T extends "apiCache"
   ? YoutubePlaylistResponse
   : string[];
 
-// TODO: add video title and more
+function removeEmojis(str: string): string {
+  return str.replace(
+    // covers pictographs, symbols, flags, modifiers, etc.
+    /[\p{Extended_Pictographic}\uFE0F\u200D]+/gu,
+    "",
+  );
+}
+
 export const storeCache = <T extends "apiCache" | "renderedCache">(
   storageKey: T,
   data: storeCacheDataParam<T> | null,
@@ -112,6 +119,7 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
     const newItems = playlistData.items.reduce(
       (acc, item, index) => {
         acc[item.contentDetails.videoId] = {
+          title: removeEmojis(item.snippet.title),
           index: index,
           publishedAt: new Date(item.contentDetails.videoPublishedAt).getTime(),
         };
@@ -234,11 +242,16 @@ const sortList = (
   let order: keyof ApiCacheItems;
   if (direction === "date") order = "publishedAt";
   if (direction === "orig") order = "index";
+  if (direction === "title") order = "title";
 
   const sortedList = [...nodeList].sort((a, b) => {
     const aInfo = getFromCache(a, cache, order);
     const bInfo = getFromCache(b, cache, order);
-    return aInfo - bInfo;
+    if (typeof aInfo === "number") {
+      return aInfo - (bInfo as number); // numeric sort
+    } else {
+      return (aInfo as string).localeCompare(bInfo as string); // string sort
+    }
   });
 
   // if (reverse) return sortedList.reverse();
@@ -316,7 +329,6 @@ export const isLoopOn = () => {
   );
 };
 
-// FIX: playlist not reversing if user clicks too early after switching list order
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,

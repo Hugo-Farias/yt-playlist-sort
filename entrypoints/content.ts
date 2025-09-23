@@ -21,7 +21,6 @@ import { ApiCache, YTNavigateEvent } from "@/types";
 import { createDropdownMenu, createReverseBtn } from "@/buttons";
 import { API_KEY } from "@/env";
 
-// TODO: solution for huge playlists (1000+ videos)
 export default defineContentScript({
   main() {
     let firstRun = true;
@@ -217,8 +216,7 @@ export default defineContentScript({
         playlistId,
       );
 
-      // TODO: item limit check
-      // if (refreshedCache?.items[getListId(location.href)!]) return null;
+      console.log("refreshedCache ==> ", refreshedCache);
 
       if (!refreshedCache) return null;
 
@@ -236,7 +234,6 @@ export default defineContentScript({
 
       createReverseBtn(refreshedCache, playlistContainer, playlistMenuBtns);
 
-      // TODO: separate function for reverse
       sortRenderedPlaylist(
         playlistContainer,
         refreshedCache,
