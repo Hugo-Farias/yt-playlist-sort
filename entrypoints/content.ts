@@ -34,12 +34,11 @@ export default defineContentScript({
       const videoContainer = document.querySelector("#full-bleed-container");
       if (videoContainer) {
         const video = document.querySelector("video");
-        clog("Pausing video... 🔴🔴🔴");
         if (!video) return null;
-        // video.currentTime = video.duration - 2;
+        clog("Pausing video... 🔴🔴🔴");
+        // video.currentTime = video.duration / 2;
         video.pause();
-        video.currentTime = video.duration / 2;
-        videoContainer.remove();
+        // videoContainer.remove();
       }
     };
 
@@ -216,8 +215,6 @@ export default defineContentScript({
         playlistId,
       );
 
-      console.log("refreshedCache ==> ", refreshedCache);
-
       if (!refreshedCache) return null;
 
       const { totalResults } = refreshedCache;
@@ -251,7 +248,7 @@ export default defineContentScript({
       }
 
       if (import.meta.env.DEV) {
-        devFunction(); // TEST: development function, remove/comment in production
+        devFunction();
       }
 
       if (!firstRun) return;

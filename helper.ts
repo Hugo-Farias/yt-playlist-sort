@@ -358,7 +358,15 @@ export const sortRenderedPlaylist = (
 
       if (indexMessage) indexMessage.textContent = index + 1 + "";
 
+      const prevVidInfo = arr[index - 1];
       const nextVidInfo = getInfoFromElement(arr[index + 1]);
+      const prevBtn = document.querySelector(".ytp-prev-button.ytp-button");
+
+      if (!prevVidInfo) {
+        prevBtn?.setAttribute("hidden", "");
+      } else {
+        prevBtn?.removeAttribute("hidden");
+      }
 
       const nextLabel = document.querySelector(
         "#next-video-title > #next-label",
