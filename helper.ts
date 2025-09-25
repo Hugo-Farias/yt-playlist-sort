@@ -94,11 +94,13 @@ type storeCacheDataParam<T extends string> = T extends "apiCache"
   : string[];
 
 function removeEmojis(str: string): string {
-  return str.replace(
-    // covers pictographs, symbols, flags, modifiers, etc.
-    /[\p{Extended_Pictographic}\uFE0F\u200D]+/gu,
-    "",
-  );
+  return str
+    .replace(
+      // covers pictographs, symbols, flags, modifiers, etc.
+      /[\p{Extended_Pictographic}\uFE0F\u200D]+/gu,
+      "",
+    )
+    .trim();
 }
 
 export const storeCache = <T extends "apiCache" | "renderedCache">(
@@ -250,11 +252,10 @@ const sortList = (
     if (typeof aInfo === "number") {
       return aInfo - (bInfo as number); // numeric sort
     } else {
-      return (aInfo as string).localeCompare(bInfo as string); // string sort
+      // TODO: fix this sorting bug
+      return aInfo.localeCompare(bInfo as string); // string sort
     }
   });
-
-  // if (reverse) return sortedList.reverse();
 
   return sortedList;
 };

@@ -1,4 +1,4 @@
-import { playlistAPI } from "@/chromeAPI.ts";
+import { fetchGist, playlistAPI } from "@/chromeAPI.ts";
 import { API_URL, playlistItemSelector } from "@/config";
 import {
   getVideoId,
@@ -25,6 +25,7 @@ export default defineContentScript({
   main() {
     let firstRun = true;
     let currUrl = location.href;
+    clog("init 🟢");
 
     const devFunction = () => {
       if (firstRun) {
@@ -36,9 +37,10 @@ export default defineContentScript({
         const video = document.querySelector("video");
         if (!video) return null;
         clog("Pausing video... 🔴🔴🔴");
-        // video.currentTime = video.duration / 2;
+        video.currentTime = video.duration / 2;
         video.pause();
-        // videoContainer.remove();
+        video.remove();
+        videoContainer.remove();
       }
     };
 
@@ -196,8 +198,6 @@ export default defineContentScript({
 
       const playlistId = getListId(currUrl);
       if (!playlistId) return null;
-
-      clog("init 🟢");
 
       let renderedCache = getCache("renderedCache", getListId(location.href));
       let apiCache = getCache("apiCache", getListId(location.href)!);

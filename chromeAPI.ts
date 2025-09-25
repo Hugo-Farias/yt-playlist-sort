@@ -1,7 +1,9 @@
-import { YoutubePlaylistResponse } from "@/types.ts";
+import { GistFile, YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
-import { API_KEY } from "@/env.ts";
+// import { API_KEY } from "@/env.ts";
 import { clog } from "@/helper.ts";
+
+// TODO: Make gist file to store API keys and rotate them when one fails
 
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
@@ -21,6 +23,13 @@ const fetchJson = async <T = unknown>(
   return (await res.json()) as Promise<T>;
 };
 
+export const fetchGist = async (): Promise<GistFile> => {
+  const data = await fetchJson<GistFile>(
+    "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
+  );
+  return data;
+};
+
 export const playlistAPI = async function (
   playlistId: string,
   nextpageToken: string | null = null,
@@ -29,8 +38,12 @@ export const playlistAPI = async function (
 
   clog("chromeAPI called");
 
+  const gist = await fetchGist();
+  // TODO: randomlly pick a key from the array
+  const key = gist.keys[0];
+
   const data = await fetchJson<YoutubePlaylistResponse>(
-    `${API_URL}&playlistId=${playlistId}&key=${API_KEY}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
+    `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
   if (data.pageInfo.totalResults === 0) return null;

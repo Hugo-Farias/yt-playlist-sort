@@ -115,3 +115,12 @@ export type YTNavigateEvent = CustomEvent<{
     };
   };
 }>;
+
+export type GistFile = {
+  settings: {
+    theme: "light" | "dark"; // if you only allow these two
+    notifications: boolean;
+    language: string;
+  };
+  keys: string[];
+};
