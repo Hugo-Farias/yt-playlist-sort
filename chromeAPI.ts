@@ -39,8 +39,8 @@ export const playlistAPI = async function (
   clog("chromeAPI called");
 
   const gist = await fetchGist();
-  // TODO: randomlly pick a key from the array
-  const key = gist.keys[0];
+  const keyNum = new Date().getSeconds() % gist.keys.length;
+  const key = gist.keys[keyNum] || "";
 
   const data = await fetchJson<YoutubePlaylistResponse>(
     `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
