@@ -1,6 +1,5 @@
 import { GistFile, YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
-// import { API_KEY } from "@/env.ts";
 import { clog } from "@/helper.ts";
 
 // TODO: Make gist file to store API keys and rotate them when one fails
@@ -30,6 +29,8 @@ export const fetchGist = async (): Promise<GistFile> => {
   return data;
 };
 
+let gist: GistFile;
+
 export const playlistAPI = async function (
   playlistId: string,
   nextpageToken: string | null = null,
@@ -38,7 +39,8 @@ export const playlistAPI = async function (
 
   clog("chromeAPI called");
 
-  const gist = await fetchGist();
+  if (!gist) gist = await fetchGist();
+
   const keyNum = new Date().getSeconds() % gist.keys.length;
   const key = gist.keys[keyNum] || "";
 
@@ -47,6 +49,7 @@ export const playlistAPI = async function (
   );
 
   if (data.pageInfo.totalResults === 0) return null;
+  // TODO: add limit for amount of items
   // if (Number(data.pageInfo.totalResults) > 500) return data;
 
   if (!data?.etag) {
