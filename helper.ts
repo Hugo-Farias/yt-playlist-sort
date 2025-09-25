@@ -142,7 +142,8 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
           extVersion: pkg.version,
           totalResults: playlistData.pageInfo.totalResults,
           isReversed: false,
-        },
+          etag: playlistData.etag,
+        } as ApiCache,
       }),
     );
   }
@@ -359,8 +360,9 @@ export const sortRenderedPlaylist = (
 
       if (indexMessage) indexMessage.textContent = index + 1 + "";
 
-      const prevVidInfo = arr[index - 1];
       const nextVidInfo = getInfoFromElement(arr[index + 1]);
+
+      const prevVidInfo = arr[index - 1];
       const prevBtn = document.querySelector(".ytp-prev-button.ytp-button");
 
       if (!prevVidInfo) {

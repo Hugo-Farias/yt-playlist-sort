@@ -1,4 +1,4 @@
-import { fetchGist, playlistAPI } from "@/chromeAPI.ts";
+import { playlistAPI } from "@/chromeAPI.ts";
 import { API_URL, playlistItemSelector } from "@/config";
 import {
   getVideoId,
@@ -17,7 +17,7 @@ import {
   localRemove,
   localGet,
 } from "@/helper.ts";
-import { ApiCache, YTNavigateEvent } from "@/types";
+import { YTNavigateEvent } from "@/types";
 import { createDropdownMenu, createReverseBtn } from "@/buttons";
 import { API_KEY } from "@/env";
 
@@ -161,14 +161,15 @@ export default defineContentScript({
 
     const hydrateCache = async (
       playlistContainer: HTMLDivElement,
-      cache: ApiCache | null,
-      renderedCache: string[] | null,
       playlistId: string,
     ) => {
       if (!playlistContainer) return null;
 
       const playlistItems: NodeListOf<HTMLDivElement> =
         playlistContainer.querySelectorAll(playlistItemSelector);
+
+      const renderedCache = getCache("renderedCache", getListId(location.href));
+      const apiCache = getCache("apiCache", getListId(location.href)!);
 
       const renderedPlaylistIds = [...playlistItems]
         .filter((el: HTMLDivElement) => {
@@ -181,13 +182,12 @@ export default defineContentScript({
       // or there is no cache, hydrate it
       if (
         !comparePlaylist(renderedCache, renderedPlaylistIds) ||
-        !cache?.items
+        !apiCache?.items
       ) {
         clog("Playlist Changed, Hydrating Cache!!! 🟡");
         storeCache("renderedCache", renderedPlaylistIds, playlistId);
         const data = await playlistAPI(playlistId);
         storeCache("apiCache", data, playlistId!);
-        renderedCache = getCache("renderedCache", playlistId);
       }
 
       return getCache("apiCache", playlistId!);
@@ -199,23 +199,17 @@ export default defineContentScript({
       const playlistId = getListId(currUrl);
       if (!playlistId) return null;
 
-      let renderedCache = getCache("renderedCache", getListId(location.href));
-      let apiCache = getCache("apiCache", getListId(location.href)!);
-
       const playlistContainer = document.querySelector<HTMLDivElement>(
         "ytd-playlist-panel-renderer #items",
       );
 
       if (!playlistContainer) return null;
 
-      const refreshedCache = await hydrateCache(
-        playlistContainer,
-        apiCache,
-        renderedCache,
-        playlistId,
-      );
+      const refreshedCache = await hydrateCache(playlistContainer, playlistId);
 
       if (!refreshedCache) return null;
+
+      console.log("refreshedCache ==> ", refreshedCache.totalResults);
 
       const { totalResults } = refreshedCache;
 

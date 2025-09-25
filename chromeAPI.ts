@@ -1,6 +1,6 @@
 import { GistFile, YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
-import { clog } from "@/helper.ts";
+import { clog, getCache, getListId } from "@/helper.ts";
 
 // TODO: Make gist file to store API keys and rotate them when one fails
 
@@ -49,8 +49,11 @@ export const playlistAPI = async function (
   );
 
   if (data.pageInfo.totalResults === 0) return null;
-  // TODO: add limit for amount of items
-  // if (Number(data.pageInfo.totalResults) > 500) return data;
+  const apiCache = getCache("apiCache", getListId(window.location.href));
+  if (data.pageInfo.totalResults >= 200 && data.etag === apiCache?.etag) {
+    console.log("etag match");
+    return null;
+  }
 
   if (!data?.etag) {
     clog("API key failed, rotating key");

@@ -56,6 +56,7 @@ export type ApiCache = {
   extVersion: string;
   isReversed: boolean;
   sortOrder: YtSortOrder;
+  etag: string;
 };
 
 export type YouTubeVideoResponse = {
