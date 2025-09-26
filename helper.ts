@@ -8,8 +8,10 @@ import {
 import { playlistItemSelector } from "@/config.ts";
 import pkg from "@/package.json";
 
-export const clog = (...content: Parameters<typeof console.log>) => {
-  console.log("YT-Playlist-Sort:", ...content);
+const { log } = console;
+
+export const clog = (...content: Parameters<typeof log>) => {
+  log("YT-Playlist-Sort:", ...content);
 };
 
 type localSorageKeys = "ytSortisLoopOn" | "apiCache";
@@ -139,11 +141,11 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
           items: newItems,
           listId: playlistId,
           storeTime: Date.now(),
-          extVersion: pkg.version,
           totalResults: playlistData.pageInfo.totalResults,
           isReversed: false,
           etag: playlistData.etag,
         } as ApiCache,
+        extVersion: pkg.version,
       }),
     );
   }
@@ -253,7 +255,6 @@ const sortList = (
     if (typeof aInfo === "number") {
       return aInfo - (bInfo as number); // numeric sort
     } else {
-      // TODO: fix this sorting bug
       return aInfo.localeCompare(bInfo as string); // string sort
     }
   });

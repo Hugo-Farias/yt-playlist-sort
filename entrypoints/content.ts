@@ -1,5 +1,5 @@
 import { playlistAPI } from "@/chromeAPI.ts";
-import { API_URL, playlistItemSelector } from "@/config";
+import { playlistItemSelector } from "@/config";
 import {
   getVideoId,
   comparePlaylist,
@@ -19,7 +19,6 @@ import {
 } from "@/helper.ts";
 import { YTNavigateEvent } from "@/types";
 import { createDropdownMenu, createReverseBtn } from "@/buttons";
-import { API_KEY } from "@/env";
 
 export default defineContentScript({
   main() {
@@ -29,18 +28,20 @@ export default defineContentScript({
 
     const devFunction = () => {
       if (firstRun) {
-        clog(`${API_URL}&playlistId=${getListId(currUrl)}&key=${API_KEY}`);
-      }
+        // clog(`${API_URL}&playlistId=${getListId(currUrl)}&key=${API_KEY}`);
 
-      const videoContainer = document.querySelector("#full-bleed-container");
-      if (videoContainer) {
-        const video = document.querySelector("video");
-        if (!video) return null;
-        clog("Pausing video... 🔴🔴🔴");
-        video.currentTime = video.duration / 2;
-        video.pause();
-        video.remove();
-        videoContainer.remove();
+        const videoContainer = document.querySelector("#full-bleed-container");
+        if (videoContainer) {
+          const video = document.querySelector("video");
+          if (!video) return null;
+          clog("Pausing video... 🔴🔴🔴");
+          // video.currentTime = video.duration / 2;
+          setTimeout(() => {
+            video.pause();
+          }, 1000);
+          // video.remove();
+          // videoContainer.remove();
+        }
       }
     };
 
@@ -63,12 +64,17 @@ export default defineContentScript({
           );
 
           const methodMap = {
-            next: "nextSibling",
-            previous: "previousSibling",
-            videoEnd: "nextSibling",
+            next: "nextElementSibling",
+            previous: "previousElementSibling",
+            videoEnd: "nextElementSibling",
           } as const;
 
-          let element = currentItem?.[methodMap[ytSort]];
+          let element: Element | null | undefined =
+            currentItem?.[methodMap[ytSort]];
+
+          if (element?.tagName !== "YTD-PLAYLIST-PANEL-VIDEO-RENDERER") {
+            element = null;
+          }
 
           if (ytSort !== "videoEnd") localRemove("ytSortisLoopOn", true);
           else if (isLoopOn()) localSet("ytSortisLoopOn", "true", true);
@@ -115,10 +121,19 @@ export default defineContentScript({
 
                   if (!currentVidEl) return null;
 
+                  const prevElement = currentVidEl.previousElementSibling;
+                  let nextElement = currentVidEl.nextElementSibling;
+
+                  if (nextElement?.tagName === "YTD-MESSAGE-RENDERER") {
+                    nextElement = document.querySelector(
+                      "yt-lockup-view-model",
+                    );
+                  }
+
                   const vidInfo = getInfoFromElement(
                     btnSelector === ".ytp-prev-button"
-                      ? currentVidEl.previousElementSibling
-                      : currentVidEl.nextElementSibling,
+                      ? prevElement
+                      : nextElement,
                   );
 
                   replaceTooltipInfo(btnElement, vidInfo);
@@ -208,8 +223,6 @@ export default defineContentScript({
       const refreshedCache = await hydrateCache(playlistContainer, playlistId);
 
       if (!refreshedCache) return null;
-
-      console.log("refreshedCache ==> ", refreshedCache.totalResults);
 
       const { totalResults } = refreshedCache;
 

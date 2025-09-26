@@ -2,8 +2,6 @@ import { GistFile, YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
 import { clog, getCache, getListId } from "@/helper.ts";
 
-// TODO: Make gist file to store API keys and rotate them when one fails
-
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
   init?: RequestInit,
@@ -29,7 +27,7 @@ export const fetchGist = async (): Promise<GistFile> => {
   return data;
 };
 
-let gist: GistFile;
+let gist: { keys: string[] };
 
 export const playlistAPI = async function (
   playlistId: string,
@@ -48,16 +46,18 @@ export const playlistAPI = async function (
     `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
-  if (data.pageInfo.totalResults === 0) return null;
-  const apiCache = getCache("apiCache", getListId(window.location.href));
-  if (data.pageInfo.totalResults >= 200 && data.etag === apiCache?.etag) {
-    console.log("etag match");
-    return null;
-  }
+  // if (!data?.etag) {
+  //   clog("API key failed, rotating key");
+  //   // TODO: recur with backup API key
+  //   return null;
+  // }
 
-  if (!data?.etag) {
-    clog("API key failed, rotating key");
-    // TODO: recur with backup API key
+  if (data.pageInfo.totalResults === 0) return null;
+
+  const apiCache = getCache("apiCache", getListId(window.location.href));
+
+  if (data.etag === apiCache?.etag) {
+    clog("etag match, interrupting fetch...");
     return null;
   }
 

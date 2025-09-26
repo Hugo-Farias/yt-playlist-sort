@@ -53,7 +53,6 @@ export type ApiCache = {
   listId: string;
   storeTime: number;
   totalResults: number;
-  extVersion: string;
   isReversed: boolean;
   sortOrder: YtSortOrder;
   etag: string;
@@ -116,12 +115,3 @@ export type YTNavigateEvent = CustomEvent<{
     };
   };
 }>;
-
-export type GistFile = {
-  settings: {
-    theme: "light" | "dark"; // if you only allow these two
-    notifications: boolean;
-    language: string;
-  };
-  keys: string[];
-};
