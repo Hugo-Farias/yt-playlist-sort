@@ -150,7 +150,7 @@ export default defineContentScript({
           document.querySelector<HTMLButtonElement>(".ytp-play-button");
 
         if (playBtn?.dataset.tooltipTitle === "Replay") {
-          navigateEvent("yt-navigate", { ytSort: "videoEnd" });
+          navigateEvent({ ytSort: "videoEnd" });
         }
       });
 
@@ -164,13 +164,12 @@ export default defineContentScript({
 
         if (direction !== "next" && direction !== "previous") return null;
 
-        navigateEvent("yt-navigate", { ytSort: direction });
+        navigateEvent({ ytSort: direction });
       });
 
       window.addEventListener("keydown", (e) => {
-        if (e.key === "N") navigateEvent("yt-navigate", { ytSort: "next" });
-        else if (e.key === "P")
-          navigateEvent("yt-navigate", { ytSort: "previous" });
+        if (e.key === "N") navigateEvent({ ytSort: "next" });
+        else if (e.key === "P") navigateEvent({ ytSort: "previous" });
       });
     };
 

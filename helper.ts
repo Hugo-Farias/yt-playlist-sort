@@ -304,11 +304,8 @@ export const replaceTooltipInfo = (
   element.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 };
 
-export const navigateEvent = (
-  eventType: "yt-navigate" | "yt-navigate-finish",
-  payload: object,
-) => {
-  const event = new CustomEvent(eventType, {
+export const navigateEvent = (payload: object) => {
+  const event = new CustomEvent("yt-navigate", {
     detail: {
       ...payload,
     },
