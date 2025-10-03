@@ -1,4 +1,4 @@
-import { GistFile, YoutubePlaylistResponse } from "@/types.ts";
+import { YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
 import { clog, getCache, getListId } from "@/helper.ts";
 
@@ -20,6 +20,8 @@ const fetchJson = async <T = unknown>(
   return (await res.json()) as Promise<T>;
 };
 
+type GistFile = { keys: string[] };
+
 export const fetchGist = async (): Promise<GistFile> => {
   const data = await fetchJson<GistFile>(
     "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
@@ -27,7 +29,7 @@ export const fetchGist = async (): Promise<GistFile> => {
   return data;
 };
 
-let gist: { keys: string[] };
+let gist: GistFile;
 
 export const playlistAPI = async function (
   playlistId: string,

@@ -133,6 +133,7 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
       {} as ApiCache["items"],
     );
 
+    // TODO: change the structure to include extVersion only once
     localStorage.setItem(
       storageKey,
       JSON.stringify({
