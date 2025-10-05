@@ -39,8 +39,8 @@ export default defineContentScript({
           setTimeout(() => {
             video.pause();
           }, 1000);
-          // video.remove();
-          // videoContainer.remove();
+          video.remove();
+          videoContainer.remove();
         }
       }
     };
@@ -76,11 +76,11 @@ export default defineContentScript({
             element = null;
           }
 
-          if (ytSort !== "videoEnd") localRemove("ytSortisLoopOn", true);
-          else if (isLoopOn()) localSet("ytSortisLoopOn", "true", true);
+          if (ytSort !== "videoEnd") localRemove("ytSortLoop", true);
+          else if (isLoopOn()) localSet("ytSortLoop", "true", true);
 
           if (!element && isLoopOn() && ytSort === "videoEnd") {
-            localSet("ytSortisLoopOn", "true", true);
+            localSet("ytSortLoop", "true", true);
             element = document.querySelector(
               "ytd-playlist-panel-video-renderer",
             );
@@ -143,6 +143,7 @@ export default defineContentScript({
             });
           },
         );
+        firstRun = false;
       });
 
       video?.addEventListener("pause", () => {
@@ -179,32 +180,37 @@ export default defineContentScript({
     ) => {
       if (!playlistContainer) return null;
 
-      const playlistItems: NodeListOf<HTMLDivElement> =
-        playlistContainer.querySelectorAll(playlistItemSelector);
+      if (firstRun) {
+        const playlistItems: NodeListOf<HTMLDivElement> =
+          playlistContainer.querySelectorAll(playlistItemSelector);
 
-      const renderedCache = getCache("renderedCache", getListId(location.href));
-      const apiCache = getCache("apiCache", getListId(location.href)!);
+        const renderedCache = getCache(
+          "ytSortRenderedCache",
+          getListId(location.href),
+        );
+        const apiCache = getCache("ytSortMainCache", getListId(location.href)!);
 
-      const renderedPlaylistIds = [...playlistItems]
-        .filter((el: HTMLDivElement) => {
-          const anchor = el.querySelector("a");
-          return getListId(anchor?.href) === playlistId;
-        })
-        .map((v) => getVideoId(v));
+        const renderedPlaylistIds = [...playlistItems]
+          .filter((el: HTMLDivElement) => {
+            const anchor = el.querySelector("a");
+            return getListId(anchor?.href) === playlistId;
+          })
+          .map((v) => getVideoId(v));
 
-      // If the rendered playlist items are different from the cache
-      // or there is no cache, hydrate it
-      if (
-        !comparePlaylist(renderedCache, renderedPlaylistIds) ||
-        !apiCache?.items
-      ) {
-        clog("Playlist Changed, Hydrating Cache!!! 🟡");
-        storeCache("renderedCache", renderedPlaylistIds, playlistId);
-        const data = await playlistAPI(playlistId);
-        storeCache("apiCache", data, playlistId!);
+        // If the rendered playlist items are different from the cache
+        // or there is no cache, hydrate it
+        if (
+          !comparePlaylist(renderedCache, renderedPlaylistIds) ||
+          !apiCache?.items
+        ) {
+          clog("Playlist Changed, Hydrating Cache!!! 🟡");
+          storeCache("ytSortRenderedCache", renderedPlaylistIds, playlistId);
+          const data = await playlistAPI(playlistId);
+          storeCache("ytSortMainCache", data, playlistId!);
+        }
       }
 
-      return getCache("apiCache", playlistId!);
+      return getCache("ytSortMainCache", playlistId!);
     };
 
     document.addEventListener("yt-navigate-finish", async () => {
@@ -244,7 +250,7 @@ export default defineContentScript({
         refreshedCache.isReversed,
       );
 
-      const wasLoop = localGet("ytSortisLoopOn", true);
+      const wasLoop = localGet("ytSortLoop", true);
 
       if (wasLoop) {
         const loopBtn = document.querySelector<HTMLButtonElement>(
@@ -258,13 +264,7 @@ export default defineContentScript({
       }
 
       if (!firstRun) return;
-      new MutationObserver((_, obs) => {
-        if (document.querySelector("video")) {
-          firstRunEvent();
-          firstRun = false;
-          obs.disconnect();
-        }
-      }).observe(document, { childList: true, subtree: true });
+      firstRunEvent();
     });
   },
   matches: ["*://*.youtube.com/*"],

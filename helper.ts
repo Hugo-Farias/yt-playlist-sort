@@ -1,12 +1,10 @@
 import {
   ApiCache,
   ApiCacheItems,
-  RenderedPlaylistItem,
   YoutubePlaylistResponse,
   YtSortOrder,
 } from "@/types.ts";
 import { playlistItemSelector } from "@/config.ts";
-import pkg from "@/package.json";
 
 const { log } = console;
 
@@ -14,7 +12,11 @@ export const clog = (...content: Parameters<typeof log>) => {
   log("YT-Playlist-Sort:", ...content);
 };
 
-type localSorageKeys = "ytSortisLoopOn" | "apiCache";
+type localSorageKeys =
+  | "ytSortLoop"
+  | "ytSortMainCache"
+  | "ytSortRenderedCache"
+  | "ytSortVer";
 
 export const localSet = (
   keyname: localSorageKeys,
@@ -91,7 +93,7 @@ export const getVideoId = (url: string | undefined | Element): string => {
   return new URL(url).searchParams.get("v") ?? "";
 };
 
-type storeCacheDataParam<T extends string> = T extends "apiCache"
+type storeCacheDataParam<T extends string> = T extends "ytSortMainCache"
   ? YoutubePlaylistResponse
   : string[];
 
@@ -105,7 +107,7 @@ function removeEmojis(str: string): string {
     .trim();
 }
 
-export const storeCache = <T extends "apiCache" | "renderedCache">(
+export const storeCache = <T extends "ytSortMainCache" | "ytSortRenderedCache">(
   storageKey: T,
   data: storeCacheDataParam<T> | null,
   playlistId: string,
@@ -113,12 +115,12 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
   if (!data || !playlistId) return null;
   clog("storeCache =>", playlistId);
 
-  if (storageKey === "renderedCache") {
+  if (storageKey === "ytSortRenderedCache") {
     localStorage.setItem(
       storageKey,
-      JSON.stringify({ ...getFullCache(storageKey), [playlistId]: data }),
+      JSON.stringify({ ...localGet(storageKey), [playlistId]: data }),
     );
-  } else if (storageKey === "apiCache") {
+  } else if (storageKey === "ytSortMainCache") {
     const playlistData = data as YoutubePlaylistResponse;
     const newItems = playlistData.items.reduce(
       (acc, item, index) => {
@@ -137,7 +139,7 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
     localStorage.setItem(
       storageKey,
       JSON.stringify({
-        ...getFullCache(storageKey),
+        ...localGet(storageKey),
         [playlistId]: {
           items: newItems,
           listId: playlistId,
@@ -146,16 +148,17 @@ export const storeCache = <T extends "apiCache" | "renderedCache">(
           isReversed: false,
           etag: playlistData.etag,
         } as ApiCache,
-        extVersion: pkg.version,
       }),
     );
   }
 };
 
-type getCacheRT<T extends string> = T extends "apiCache" ? ApiCache : string[];
+type getCacheRT<T extends string> = T extends "ytSortMainCache"
+  ? ApiCache
+  : string[];
 
 // Get a specific cache entry by playlist ID
-export const getCache = <T extends "apiCache" | "renderedCache">(
+export const getCache = <T extends "ytSortMainCache" | "ytSortRenderedCache">(
   storageKey: T,
   playlistId: string,
 ): getCacheRT<T> | null => {
@@ -169,6 +172,7 @@ export const comparePlaylist = (
   listA: string[] | null,
   idList: string[] | null,
 ): boolean => {
+  console.log("comparePlaylist ==> ", comparePlaylist);
   if (!listA || !idList) return false;
   if (!listA.length || !idList.length) return false;
   if (listA.length !== idList.length) return false;
@@ -176,17 +180,17 @@ export const comparePlaylist = (
   return listA.sort().every((id, index) => id === listBsorted[index]);
 };
 
-type getFullCacheRT<T extends string> = T extends "apiCache"
-  ? { [key: string]: ApiCache }
-  : { [key: string]: RenderedPlaylistItem[] };
-
-export const getFullCache = <T extends "apiCache" | "renderedCache">(
-  storageKey: T,
-): getFullCacheRT<T> | null => {
-  const data = localStorage.getItem(storageKey);
-  if (!data) return null;
-  return JSON.parse(data) as getFullCacheRT<T>;
-};
+// type getFullCacheRT<T extends string> = T extends "ytSortMainCache"
+//   ? { [key: string]: ApiCache }
+//   : { [key: string]: RenderedPlaylistItem[] };
+//
+// export const getFullCache = <T extends "ytSortMainCache" | "ytSortRenderedCache">(
+//   storageKey: T,
+// ): getFullCacheRT<T> | null => {
+//   const data = localStorage.getItem(storageKey);
+//   if (!data) return null;
+//   return JSON.parse(data) as getFullCacheRT<T>;
+// };
 
 // Format the date to a human-readable format
 const formatDate = (

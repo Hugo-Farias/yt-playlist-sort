@@ -40,7 +40,7 @@ export const createDropdownMenu = (
   select.addEventListener("change", () => {
     sortOrder = select.value as YtSortOrder;
 
-    localAdd("apiCache", { sortOrder: sortOrder });
+    localAdd("ytSortMainCache", { sortOrder: sortOrder });
 
     sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);
   });
@@ -81,7 +81,7 @@ export const createReverseBtn = (
     isReversed = !isReversed;
     changeBtnEffect();
 
-    localAdd("apiCache", { isReversed: isReversed });
+    localAdd("ytSortMainCache", { isReversed: isReversed });
 
     sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);
   };

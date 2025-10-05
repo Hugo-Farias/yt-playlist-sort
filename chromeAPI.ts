@@ -56,7 +56,7 @@ export const playlistAPI = async function (
 
   if (data.pageInfo.totalResults === 0) return null;
 
-  const apiCache = getCache("apiCache", getListId(window.location.href));
+  const apiCache = getCache("ytSortMainCache", getListId(window.location.href));
 
   if (data.etag === apiCache?.etag) {
     clog("etag match, interrupting fetch...");
