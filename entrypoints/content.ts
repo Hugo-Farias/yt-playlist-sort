@@ -16,12 +16,19 @@ import {
   localSet,
   localRemove,
   localGet,
+  clearOldCache,
 } from "@/helper.ts";
 import { YTNavigateEvent } from "@/types";
 import { createDropdownMenu, createReverseBtn } from "@/buttons";
+import pkg from "../package.json";
 
 export default defineContentScript({
   main() {
+    if (pkg.version !== localStorage.getItem("ytSortVersion") || !pkg.version) {
+      clearOldCache(pkg.version);
+      localStorage.setItem("ytSortVersion", pkg.version);
+    }
+
     let firstRun = true;
     let currUrl = location.href;
     clog("init 🟢");

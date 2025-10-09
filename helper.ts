@@ -18,6 +18,14 @@ type localSorageKeys =
   | "ytSortRenderedCache"
   | "ytSortVer";
 
+export const clearOldCache = (version: string) => {
+  localStorage.removeItem("ytSortMainCache");
+  localStorage.removeItem("ytSortRenderedCache");
+  localStorage.removeItem("ytSortLoop");
+  localStorage.removeItem("ytSortVer");
+  clog(`Updated to version ${version}, cleared cache 🧹`);
+};
+
 export const localSet = (
   keyname: localSorageKeys,
   obj: object | string,
@@ -172,7 +180,6 @@ export const comparePlaylist = (
   listA: string[] | null,
   idList: string[] | null,
 ): boolean => {
-  console.log("comparePlaylist ==> ", comparePlaylist);
   if (!listA || !idList) return false;
   if (!listA.length || !idList.length) return false;
   if (listA.length !== idList.length) return false;
