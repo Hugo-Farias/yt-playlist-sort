@@ -11,7 +11,9 @@ export const createDropdownMenu = (
   playlistMenuBtns: HTMLDivElement,
 ) => {
   const dropdownElList = document.querySelectorAll(".ytSortDropdown");
-  dropdownElList.forEach((el) => el.remove());
+  dropdownElList.forEach((el) => {
+    el.remove();
+  });
 
   sortOrder = cache?.sortOrder ?? "orig";
 

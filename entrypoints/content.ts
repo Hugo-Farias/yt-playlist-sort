@@ -24,12 +24,12 @@ import pkg from "../package.json";
 
 export default defineContentScript({
   main() {
-    const extVersion = localStorage.getItem("ytSortVersion");
+    const extVersion = localGet("ytSortVersion");
 
     // TODO: also check age of cache and clear if older than a month
     if (!extVersion || pkg.version !== extVersion) {
       clearOldCache(pkg.version);
-      localStorage.setItem("ytSortVersion", pkg.version);
+      localSet("ytSortVersion", pkg.version);
     }
 
     let firstRun = true;
@@ -198,7 +198,7 @@ export default defineContentScript({
           "ytSortRenderedCache",
           getListId(location.href),
         );
-        const apiCache = getCache("ytSortMainCache", getListId(location.href)!);
+        const apiCache = getCache("ytSortMainCache", getListId(location.href));
 
         const renderedPlaylistIds = [...playlistItems]
           .filter((el: HTMLDivElement) => {
@@ -216,11 +216,11 @@ export default defineContentScript({
           clog("Playlist Changed, Hydrating Cache!!! 🟡");
           storeCache("ytSortRenderedCache", renderedPlaylistIds, playlistId);
           const data = await playlistAPI(playlistId);
-          storeCache("ytSortMainCache", data, playlistId!);
+          storeCache("ytSortMainCache", data, playlistId);
         }
       }
 
-      return getCache("ytSortMainCache", playlistId!);
+      return getCache("ytSortMainCache", playlistId);
     };
 
     document.addEventListener("yt-navigate-finish", async () => {

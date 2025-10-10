@@ -16,14 +16,15 @@ type localSorageKeys =
   | "ytSortLoop"
   | "ytSortMainCache"
   | "ytSortRenderedCache"
-  | "ytSortVer";
+  | "ytSortVersion";
 
 export const clearOldCache = (version: string) => {
-  localStorage.removeItem("ytSortMainCache");
-  localStorage.removeItem("ytSortRenderedCache");
-  localStorage.removeItem("ytSortLoop");
-  localStorage.removeItem("ytSortVer");
-  clog(`Updated to version ${version}, cleared cache 🧹`);
+  Object.keys(localStorage).forEach((key: string) => {
+    if (!key.startsWith("ytSort")) return;
+    localStorage.removeItem(key);
+  });
+
+  clog(`Updated to version ${version}, clearing cache 🧹`);
 };
 
 export const localSet = (
@@ -109,7 +110,7 @@ function removeEmojis(str: string): string {
   return str
     .replace(
       // covers pictographs, symbols, flags, modifiers, etc.
-      /[\p{Extended_Pictographic}\uFE0F\u200D]+/gu,
+      /(?:\p{Extended_Pictographic}(?:\uFE0F|\p{Emoji_Modifier})*(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\p{Emoji_Modifier})*)*)/gu,
       "",
     )
     .trim();
@@ -143,7 +144,6 @@ export const storeCache = <T extends "ytSortMainCache" | "ytSortRenderedCache">(
       {} as ApiCache["items"],
     );
 
-    // TODO: change the structure to include extVersion only once
     localStorage.setItem(
       storageKey,
       JSON.stringify({
@@ -359,16 +359,16 @@ export const sortRenderedPlaylist = (
 
   sortedList.forEach(
     (el: HTMLDivElement, index: number, arr: HTMLDivElement[]) => {
-      renderDateToElement(el, apiCache!);
+      renderDateToElement(el, apiCache);
       playlistContainer.appendChild(el);
 
-      if (getVideoId(el) !== getVideoId(location.href)) return null; // Code below runs only on the current video
+      if (getVideoId(el) !== getVideoId(location.href)) return; // Code below runs only on the current video
 
       const indexMessage = document.querySelector(
         "yt-formatted-string.index-message",
       )?.firstChild;
 
-      if (indexMessage) indexMessage.textContent = index + 1 + "";
+      if (indexMessage) indexMessage.textContent = `${index + 1}`;
 
       const nextVidInfo = getInfoFromElement(arr[index + 1]);
 
@@ -390,7 +390,7 @@ export const sortRenderedPlaylist = (
       if (!nextVidInfo && nextLabel && nextLabel.nextSibling) {
         nextLabel.textContent = "End of playlist";
         sibling.textContent = "";
-      } else if (nextLabel && nextLabel.nextSibling) {
+      } else if (nextLabel?.nextSibling) {
         nextLabel.textContent = "Next:";
         sibling.textContent = nextVidInfo?.videoTitle ?? "";
         sibling.removeAttribute("is-empty");
