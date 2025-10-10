@@ -1,6 +1,6 @@
-import { localAdd, sortRenderedPlaylist } from "@/helper";
-import { ApiCache, YtSortOrder } from "@/types";
 import { reversePlaylistSVG } from "@/entrypoints/ui/reverseBtn";
+import { localAdd, sortRenderedPlaylist } from "@/helper";
+import type { ApiCache, YtSortOrder } from "@/types";
 
 let isReversed: boolean = false;
 let sortOrder: YtSortOrder = "orig";

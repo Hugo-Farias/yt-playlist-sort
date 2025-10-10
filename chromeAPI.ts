@@ -1,6 +1,6 @@
-import { YoutubePlaylistResponse } from "@/types.ts";
-import { API_URL } from "./config";
 import { clog, getCache, getListId } from "@/helper.ts";
+import type { YoutubePlaylistResponse } from "@/types.ts";
+import { API_URL } from "./config";
 
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
@@ -31,10 +31,10 @@ export const fetchGist = async (): Promise<GistFile> => {
 
 let gist: GistFile;
 
-export const playlistAPI = async function (
+export const playlistAPI = async (
   playlistId: string,
   nextpageToken: string | null = null,
-): Promise<YoutubePlaylistResponse | null> {
+): Promise<YoutubePlaylistResponse | null> => {
   if (!playlistId) return null;
 
   clog("chromeAPI called");

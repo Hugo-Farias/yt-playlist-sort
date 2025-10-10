@@ -1,30 +1,33 @@
+import { createDropdownMenu, createReverseBtn } from "@/buttons";
 import { playlistAPI } from "@/chromeAPI.ts";
 import { playlistItemSelector } from "@/config";
 import {
-  getVideoId,
-  comparePlaylist,
-  storeCache,
-  getCache,
-  getListId,
-  navigateEvent,
-  sortRenderedPlaylist,
-  clog,
-  replaceTooltipInfo,
-  getInfoFromElement,
-  isShuffleOn,
-  isLoopOn,
-  localSet,
-  localRemove,
-  localGet,
   clearOldCache,
+  clog,
+  comparePlaylist,
+  getCache,
+  getInfoFromElement,
+  getListId,
+  getVideoId,
+  isLoopOn,
+  isShuffleOn,
+  localGet,
+  localRemove,
+  localSet,
+  navigateEvent,
+  replaceTooltipInfo,
+  sortRenderedPlaylist,
+  storeCache,
 } from "@/helper.ts";
-import { YTNavigateEvent } from "@/types";
-import { createDropdownMenu, createReverseBtn } from "@/buttons";
+import type { YTNavigateEvent } from "@/types";
 import pkg from "../package.json";
 
 export default defineContentScript({
   main() {
-    if (pkg.version !== localStorage.getItem("ytSortVersion") || !pkg.version) {
+    const extVersion = localStorage.getItem("ytSortVersion");
+
+    // TODO: also check age of cache and clear if older than a month
+    if (!extVersion || pkg.version !== extVersion) {
       clearOldCache(pkg.version);
       localStorage.setItem("ytSortVersion", pkg.version);
     }

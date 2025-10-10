@@ -1,10 +1,10 @@
-import {
+import { playlistItemSelector } from "@/config.ts";
+import type {
   ApiCache,
   ApiCacheItems,
   YoutubePlaylistResponse,
   YtSortOrder,
 } from "@/types.ts";
-import { playlistItemSelector } from "@/config.ts";
 
 const { log } = console;
 
