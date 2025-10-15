@@ -32,14 +32,27 @@ export const fetchGist = async (): Promise<GistFile> => {
   return data;
 };
 
-// let gist: GistFile;
-// TODO: test with fake keys
-const dummyGist: GistFile = {
-  keys: [
-    "AIzaSyC7bX4gk1fJH3jv5r8KX9ZL5mY2Qz8X9YQ", // fake key
-    "AIzaSyAq1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6", // fake key
-  ],
-};
+let gist: GistFile;
+
+// TEST: test with fake keys
+// const dummyGist: GistFile = {
+//   keys: [
+//     // "AIzaSyC7bX4gk1fJH3jv5r8KX9ZL5mY2Qz8X9YQ", // fake key
+//     // "AIzaSyAq1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6", // fake key
+//     "fakekey1", // fake key
+//     "fakekey2", // fake key
+//     "fakekey3", // fake key
+//     "fakekey4", // fake key
+//     "fakekey5", // fake key
+//     "fakekey6", // fake key
+//     "fakekey7", // fake key
+//     "fakekey8", // fake key
+//     "fakekey9", // fake key
+//     "fakekey10", // fake key
+//   ],
+// };
+
+let keyNum: number = new Date().getSeconds();
 
 export const playlistAPI = async (
   playlistId: string,
@@ -49,28 +62,37 @@ export const playlistAPI = async (
 
   clog("chromeAPI called");
 
-  // if (!gist) gist = await fetchGist();
+  // if (!gist) {
+  //   gist = await fetchGist();
+  //   gist = { keys: [...dummyGist.keys, ...gist.keys] }; // TEST: remove this line before commiting
+  // }
 
-  const keyNum = new Date().getSeconds() % dummyGist.keys.length;
-  const key = dummyGist.keys[keyNum] || "";
+  if (!gist) gist = await fetchGist();
+
+  // const keyNum = new Date().getSeconds() % dummyGist.keys.length;
+  // const key = dummyGist.keys[keyNum] || "";
+  // console.log("key ==> ", key);
+  const key = gist.keys[keyNum % gist.keys.length] || "";
+
   console.log("key ==> ", key);
 
   const data = await fetchJson<YoutubePlaylistResponse>(
     `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
+
   console.log("data ==> ", data);
 
-  // if (!data?.etag) {
-  //   clog("API key failed, rotating key");
-  //   // TODO: recur with backup API key
-  //   return null;
-  // }
+  if (!data.etag) {
+    clog("API key failed, rotating key");
+    keyNum++;
+    return playlistAPI(playlistId, nextpageToken);
+  }
 
   if (!data.pageInfo || data.pageInfo.totalResults === 0) return null;
 
   const apiCache = getCache("ytSortMainCache", getListId(window.location.href));
 
-  if (data.etag === apiCache?.etag) {
+  if (apiCache?.etag) {
     clog("etag match, interrupting fetch...");
     return null;
   }

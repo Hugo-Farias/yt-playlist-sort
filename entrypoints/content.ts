@@ -27,7 +27,7 @@ export default defineContentScript({
     const extVersion = localGet("ytSortVersion");
 
     // TODO: also check age of cache and clear if older than a month
-    if (!extVersion || pkg.version !== extVersion) {
+    if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
       clearOldCache(pkg.version);
       localSet("ytSortVersion", pkg.version);
     }
