@@ -34,6 +34,7 @@ export default defineContentScript({
 
     let firstRun = true;
     let currUrl = location.href;
+
     clog("init 🟢");
 
     const devFunction = () => {
@@ -49,12 +50,13 @@ export default defineContentScript({
           setTimeout(() => {
             video.pause();
           }, 1000);
-          video.remove();
-          videoContainer.remove();
+          // video.remove();
+          // videoContainer.remove();
         }
       }
     };
 
+    // TODO: Loop is not supposed to remain active on user navigation only on video end
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
@@ -67,6 +69,7 @@ export default defineContentScript({
         if (detail?.endpoint?.commandMetadata) {
           e.stopImmediatePropagation();
         } else if (detail?.ytSort) {
+          console.log("detail?.ytSort ==> ", detail?.ytSort);
           const { ytSort } = detail;
 
           const currentItem = document.querySelector(

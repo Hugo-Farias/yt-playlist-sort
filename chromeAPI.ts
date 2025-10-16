@@ -13,7 +13,6 @@ const fetchJson = async <T = unknown>(
 
   if (!res.ok) {
     if (res.status === 403 || res.status === 400) {
-      // throw new Error("API key has reached its quota limit.");
       return {} as T;
     }
     const errorText = await res.text();
@@ -34,7 +33,7 @@ export const fetchGist = async (): Promise<GistFile> => {
 
 let gist: GistFile;
 
-// TEST: test with fake keys
+// // TEST: test with fake keys
 // const dummyGist: GistFile = {
 //   keys: [
 //     // "AIzaSyC7bX4gk1fJH3jv5r8KX9ZL5mY2Qz8X9YQ", // fake key
@@ -53,6 +52,7 @@ let gist: GistFile;
 // };
 
 let keyNum: number = new Date().getSeconds();
+let tries = 0;
 
 export const playlistAPI = async (
   playlistId: string,
@@ -74,15 +74,16 @@ export const playlistAPI = async (
   // console.log("key ==> ", key);
   const key = gist.keys[keyNum % gist.keys.length] || "";
 
-  console.log("key ==> ", key);
-
   const data = await fetchJson<YoutubePlaylistResponse>(
     `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
-  console.log("data ==> ", data);
-
   if (!data.etag) {
+    tries++;
+    if (tries >= gist.keys.length) {
+      console.error("All API keys have been tried and failed.");
+      return null;
+    }
     clog("API key failed, rotating key");
     keyNum++;
     return playlistAPI(playlistId, nextpageToken);
