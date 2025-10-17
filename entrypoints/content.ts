@@ -25,7 +25,6 @@ import pkg from "../package.json";
 export default defineContentScript({
   main() {
     const extVersion = localGet("ytSortVersion");
-
     // TODO: also check age of cache and clear if older than a month
     if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
       clearOldCache(pkg.version);
@@ -56,7 +55,7 @@ export default defineContentScript({
       }
     };
 
-    // TODO: Loop is not supposed to remain active on user navigation only on video end
+    // FIX: Loop button is not supposed to remain active on user navigation only on video end
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
@@ -69,7 +68,6 @@ export default defineContentScript({
         if (detail?.endpoint?.commandMetadata) {
           e.stopImmediatePropagation();
         } else if (detail?.ytSort) {
-          console.log("detail?.ytSort ==> ", detail?.ytSort);
           const { ytSort } = detail;
 
           const currentItem = document.querySelector(
@@ -98,8 +96,15 @@ export default defineContentScript({
               "ytd-playlist-panel-video-renderer",
             );
           } else if (!element) {
-            if (ytSort === "previous") return null;
-            element = document.querySelector("yt-lockup-view-model");
+            if (ytSort === "previous") {
+              const videoItems = document.querySelectorAll(
+                "ytd-playlist-panel-video-renderer",
+              );
+
+              element = [...videoItems].at(-1);
+            } else {
+              element = document.querySelector("yt-lockup-view-model");
+            }
           }
 
           if (!(element instanceof Element)) return null;
@@ -112,6 +117,7 @@ export default defineContentScript({
     const firstRunEvent = () => {
       const video = document.querySelector("video");
 
+      // FIX: Title of video does not appear in tooltip on new youtube layout
       (["click", "mouseenter"] as const).forEach((eventType) => {
         ([".ytp-prev-button", ".ytp-next-button"] as const).forEach(
           (btnSelector) => {
@@ -134,13 +140,22 @@ export default defineContentScript({
 
                   if (!currentVidEl) return null;
 
-                  const prevElement = currentVidEl.previousElementSibling;
+                  let prevElement = currentVidEl.previousElementSibling;
                   let nextElement = currentVidEl.nextElementSibling;
 
                   if (nextElement?.tagName === "YTD-MESSAGE-RENDERER") {
                     nextElement = document.querySelector(
                       "yt-lockup-view-model",
                     );
+                  } else if (prevElement === null) {
+                    const videoItems =
+                      document.querySelectorAll<HTMLDivElement>(
+                        "ytd-playlist-panel-video-renderer",
+                      );
+
+                    const lastVideoItem = [...videoItems].at(-1);
+
+                    if (lastVideoItem) prevElement = lastVideoItem;
                   }
 
                   const vidInfo = getInfoFromElement(

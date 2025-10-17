@@ -341,6 +341,13 @@ export const isLoopOn = () => {
   );
 };
 
+// TODO: use new layout to change behavior if needed
+const newLayout =
+  document.querySelector(".ytp-left-controls")?.firstElementChild?.className ===
+  "ytp-play-button ytp-button";
+
+console.log("newLayout ==> ", newLayout);
+
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
@@ -375,7 +382,7 @@ export const sortRenderedPlaylist = (
       const prevVidInfo = arr[index - 1];
       const prevBtn = document.querySelector(".ytp-prev-button.ytp-button");
 
-      if (!prevVidInfo) {
+      if (!prevVidInfo && !newLayout) {
         prevBtn?.setAttribute("hidden", "");
       } else {
         prevBtn?.removeAttribute("hidden");
