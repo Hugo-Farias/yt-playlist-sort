@@ -341,7 +341,6 @@ export const isLoopOn = () => {
   );
 };
 
-// TODO: use new layout to change behavior if needed
 const newLayout =
   document.querySelector(".ytp-left-controls")?.firstElementChild?.className ===
   "ytp-play-button ytp-button";

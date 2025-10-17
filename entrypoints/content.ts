@@ -48,14 +48,13 @@ export default defineContentScript({
           // video.currentTime = video.duration / 2;
           setTimeout(() => {
             video.pause();
-          }, 1000);
+          }, 2000);
           // video.remove();
           // videoContainer.remove();
         }
       }
     };
 
-    // FIX: Loop button is not supposed to remain active on user navigation only on video end
     window.addEventListener(
       "yt-navigate",
       (e: Event) => {
@@ -117,7 +116,6 @@ export default defineContentScript({
     const firstRunEvent = () => {
       const video = document.querySelector("video");
 
-      // FIX: Title of video does not appear in tooltip on new youtube layout
       (["click", "mouseenter"] as const).forEach((eventType) => {
         ([".ytp-prev-button", ".ytp-next-button"] as const).forEach(
           (btnSelector) => {
@@ -285,6 +283,7 @@ export default defineContentScript({
           'button[aria-label="Loop playlist"]',
         );
         loopBtn?.click();
+        localRemove("ytSortLoop", true);
       }
 
       if (import.meta.env.DEV) {
