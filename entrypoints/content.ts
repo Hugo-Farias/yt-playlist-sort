@@ -31,6 +31,8 @@ export default defineContentScript({
       localSet("ytSortVersion", pkg.version);
     }
 
+    let mainList: HTMLDivElement[];
+
     let firstRun = true;
     let currUrl = location.href;
 
@@ -64,6 +66,9 @@ export default defineContentScript({
         const event = e as YTNavigateEvent;
         const { detail } = event;
 
+        // FIX: Ignore navigation when triggered early on page load
+        console.log("detail?.endpoint ==> ", detail?.endpoint);
+
         if (detail?.endpoint?.commandMetadata) {
           e.stopImmediatePropagation();
         } else if (detail?.ytSort) {
@@ -72,6 +77,12 @@ export default defineContentScript({
           const currentItem = document.querySelector(
             "ytd-playlist-panel-video-renderer[selected]",
           );
+
+          // const test = currentItem?.querySelector("a")?.href;
+          // console.log("test ==> ", test === location.href, {
+          //   test,
+          //   href: location.href,
+          // });
 
           const methodMap = {
             next: "nextElementSibling",
@@ -239,7 +250,8 @@ export default defineContentScript({
       return getCache("ytSortMainCache", playlistId);
     };
 
-    document.addEventListener("yt-navigate-finish", async () => {
+    // document.addEventListener("yt-navigate-finish", async () => {
+    document.addEventListener("yt-page-data-updated", async () => {
       currUrl = location.href;
 
       const playlistId = getListId(currUrl);
@@ -269,12 +281,14 @@ export default defineContentScript({
 
       createReverseBtn(refreshedCache, playlistContainer, playlistMenuBtns);
 
-      sortRenderedPlaylist(
+      const sortedList = sortRenderedPlaylist(
         playlistContainer,
         refreshedCache,
         refreshedCache.sortOrder,
         refreshedCache.isReversed,
       );
+
+      if (sortedList) mainList = sortedList;
 
       const wasLoop = localGet("ytSortLoop", true);
 

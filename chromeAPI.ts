@@ -9,7 +9,6 @@ const fetchJson = async <T = unknown>(
   init?: RequestInit,
 ): Promise<T> => {
   const res = await fetch(input, init);
-  console.log("res ==> ", res);
 
   if (!res.ok) {
     if (res.status === 403 || res.status === 400) {

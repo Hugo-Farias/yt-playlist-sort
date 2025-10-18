@@ -345,8 +345,6 @@ const newLayout =
   document.querySelector(".ytp-left-controls")?.firstElementChild?.className ===
   "ytp-play-button ytp-button";
 
-console.log("newLayout ==> ", newLayout);
-
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
@@ -408,4 +406,6 @@ export const sortRenderedPlaylist = (
   const messageRender = playlistContainer.querySelector("ytd-message-renderer");
   if (!messageRender) return null;
   playlistContainer.appendChild(messageRender);
+
+  return sortedList;
 };
