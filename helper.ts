@@ -16,7 +16,8 @@ type localSorageKeys =
   | "ytSortLoop"
   | "ytSortMainCache"
   | "ytSortRenderedCache"
-  | "ytSortVersion";
+  | "ytSortVersion"
+  | "ytSortBlockNav";
 
 export const clearOldCache = (version: string) => {
   Object.keys(localStorage).forEach((key: string) => {
@@ -29,7 +30,7 @@ export const clearOldCache = (version: string) => {
 
 export const localSet = (
   keyname: localSorageKeys,
-  obj: object | string,
+  obj: object | string | boolean,
   session: boolean = false,
 ) => {
   const data = JSON.stringify(obj);
@@ -345,14 +346,15 @@ const newLayout =
   document.querySelector(".ytp-left-controls")?.firstElementChild?.className ===
   "ytp-play-button ytp-button";
 
+// TODO: read sort order from session storage if available to increase performance
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
   order: YtSortOrder,
   reverse: boolean,
-) => {
-  if (!playlistContainer) return null;
-  if (!apiCache) return null;
+): void => {
+  if (!playlistContainer) throw new Error("Playlist container not found");
+  if (!apiCache) throw new Error("API cache missing");
 
   const playlistItems: NodeListOf<HTMLDivElement> =
     playlistContainer.querySelectorAll(playlistItemSelector);
@@ -404,8 +406,6 @@ export const sortRenderedPlaylist = (
 
   // moves "unavailable videos are hidden" message back to bottom of playlist
   const messageRender = playlistContainer.querySelector("ytd-message-renderer");
-  if (!messageRender) return null;
+  if (!messageRender) return;
   playlistContainer.appendChild(messageRender);
-
-  return sortedList;
 };

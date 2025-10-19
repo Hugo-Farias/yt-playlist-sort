@@ -31,8 +31,6 @@ export default defineContentScript({
       localSet("ytSortVersion", pkg.version);
     }
 
-    let mainList: HTMLDivElement[];
-
     let firstRun = true;
     let currUrl = location.href;
 
@@ -62,12 +60,13 @@ export default defineContentScript({
       (e: Event) => {
         if (isShuffleOn()) return null;
         if (!getListId(currUrl)) return null;
+        if (localGet("ytSortBlockNav", true)) {
+          e.stopImmediatePropagation();
+          return null;
+        }
 
         const event = e as YTNavigateEvent;
         const { detail } = event;
-
-        // FIX: Ignore navigation when triggered early on page load
-        console.log("detail?.endpoint ==> ", detail?.endpoint);
 
         if (detail?.endpoint?.commandMetadata) {
           e.stopImmediatePropagation();
@@ -77,12 +76,6 @@ export default defineContentScript({
           const currentItem = document.querySelector(
             "ytd-playlist-panel-video-renderer[selected]",
           );
-
-          // const test = currentItem?.querySelector("a")?.href;
-          // console.log("test ==> ", test === location.href, {
-          //   test,
-          //   href: location.href,
-          // });
 
           const methodMap = {
             next: "nextElementSibling",
@@ -250,8 +243,14 @@ export default defineContentScript({
       return getCache("ytSortMainCache", playlistId);
     };
 
+    document.addEventListener("yt-navigate-start", () => {
+      console.log("yt-navigate-start event detected");
+      localSet("ytSortBlockNav", true, true);
+    });
+
     // document.addEventListener("yt-navigate-finish", async () => {
     document.addEventListener("yt-page-data-updated", async () => {
+      console.log("yt-page-data-updated event detected");
       currUrl = location.href;
 
       const playlistId = getListId(currUrl);
@@ -281,14 +280,14 @@ export default defineContentScript({
 
       createReverseBtn(refreshedCache, playlistContainer, playlistMenuBtns);
 
-      const sortedList = sortRenderedPlaylist(
+      sortRenderedPlaylist(
         playlistContainer,
         refreshedCache,
         refreshedCache.sortOrder,
         refreshedCache.isReversed,
       );
 
-      if (sortedList) mainList = sortedList;
+      setTimeout(() => localRemove("ytSortBlockNav", true), 300);
 
       const wasLoop = localGet("ytSortLoop", true);
 
