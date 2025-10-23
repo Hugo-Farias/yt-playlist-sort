@@ -33,6 +33,7 @@ export default defineContentScript({
 
     let firstRun = true;
     let currUrl = location.href;
+    let prevListId: string | null = null;
 
     clog("init 🟢");
 
@@ -49,8 +50,8 @@ export default defineContentScript({
           setTimeout(() => {
             video.pause();
           }, 2000);
-          // video.remove();
-          // videoContainer.remove();
+          video.remove();
+          videoContainer.remove();
         }
       }
     };
@@ -210,7 +211,7 @@ export default defineContentScript({
     ) => {
       if (!playlistContainer) return null;
 
-      if (firstRun) {
+      if (prevListId !== playlistId) {
         const playlistItems: NodeListOf<HTMLDivElement> =
           playlistContainer.querySelectorAll(playlistItemSelector);
 
@@ -240,17 +241,16 @@ export default defineContentScript({
         }
       }
 
+      prevListId = playlistId;
       return getCache("ytSortMainCache", playlistId);
     };
 
-    document.addEventListener("yt-navigate-start", () => {
-      console.log("yt-navigate-start event detected");
-      localSet("ytSortBlockNav", true, true);
-    });
+    // document.addEventListener("yt-navigate-start", () => {
+    //   localSet("ytSortBlockNav", true, true);
+    // });
 
-    // document.addEventListener("yt-navigate-finish", async () => {
-    document.addEventListener("yt-page-data-updated", async () => {
-      console.log("yt-page-data-updated event detected");
+    document.addEventListener("yt-navigate-finish", async () => {
+      // document.addEventListener("yt-page-data-updated", async () => {
       currUrl = location.href;
 
       const playlistId = getListId(currUrl);

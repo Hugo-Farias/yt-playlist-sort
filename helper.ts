@@ -117,6 +117,7 @@ function removeEmojis(str: string): string {
     .trim();
 }
 
+// FIX: Store cache is storing each character as separate entry
 export const storeCache = <T extends "ytSortMainCache" | "ytSortRenderedCache">(
   storageKey: T,
   data: storeCacheDataParam<T> | null,
@@ -124,6 +125,8 @@ export const storeCache = <T extends "ytSortMainCache" | "ytSortRenderedCache">(
 ) => {
   if (!data || !playlistId) return null;
   clog("storeCache =>", playlistId);
+
+  // console.log("Storing data for", storageKey, playlistId, ": ", data);
 
   if (storageKey === "ytSortRenderedCache") {
     localStorage.setItem(
