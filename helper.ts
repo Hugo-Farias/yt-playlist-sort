@@ -12,7 +12,7 @@ export const clog = (...content: Parameters<typeof log>) => {
   log("YT-Playlist-Sort:", ...content);
 };
 
-type localSorageKeys =
+type localStorageKeys =
   | "ytSortLoop"
   | "ytSortMainCache"
   | "ytSortRenderedCache"
@@ -29,7 +29,7 @@ export const clearOldCache = (version: string) => {
 };
 
 export const localSet = (
-  keyname: localSorageKeys,
+  keyname: localStorageKeys,
   obj: object | string | boolean,
   session: boolean = false,
 ) => {
@@ -43,7 +43,7 @@ export const localSet = (
 };
 
 export const localGet = (
-  keyname: localSorageKeys,
+  keyname: localStorageKeys,
   session: boolean = false,
 ) => {
   let data: string | null;
@@ -54,13 +54,13 @@ export const localGet = (
   }
 
   if (!data) return null;
-  if (typeof data === "string") return data;
 
-  return JSON.parse(data);
+  // console.log("localGet =>", keyname, data);
+  return data;
 };
 
 export const localRemove = (
-  keyname: localSorageKeys,
+  keyname: localStorageKeys,
   session: boolean = false,
 ) => {
   if (session) {
@@ -71,7 +71,7 @@ export const localRemove = (
   localStorage.removeItem(keyname);
 };
 
-export const localAdd = (keyname: localSorageKeys, add: object) => {
+export const localAdd = (keyname: localStorageKeys, add: object) => {
   const data = localGet(keyname);
 
   if (!data) return null;
@@ -103,10 +103,6 @@ export const getVideoId = (url: string | undefined | Element): string => {
   return new URL(url).searchParams.get("v") ?? "";
 };
 
-type storeCacheDataParam<T extends string> = T extends "ytSortMainCache"
-  ? YoutubePlaylistResponse
-  : string[];
-
 function removeEmojis(str: string): string {
   return str
     .replace(
@@ -117,52 +113,40 @@ function removeEmojis(str: string): string {
     .trim();
 }
 
-// FIX: Store cache is storing each character as separate entry
-export const storeCache = <T extends "ytSortMainCache" | "ytSortRenderedCache">(
-  storageKey: T,
-  data: storeCacheDataParam<T> | null,
+export const storeMainCache = (
+  data: YoutubePlaylistResponse,
   playlistId: string,
 ) => {
   if (!data || !playlistId) return null;
   clog("storeCache =>", playlistId);
 
-  // console.log("Storing data for", storageKey, playlistId, ": ", data);
+  const newItems = data.items.reduce(
+    (acc, item, index) => {
+      acc[item.contentDetails.videoId] = {
+        title: removeEmojis(item.snippet.title),
+        index: index,
+        publishedAt: new Date(item.contentDetails.videoPublishedAt).getTime(),
+      };
 
-  if (storageKey === "ytSortRenderedCache") {
-    localStorage.setItem(
-      storageKey,
-      JSON.stringify({ ...localGet(storageKey), [playlistId]: data }),
-    );
-  } else if (storageKey === "ytSortMainCache") {
-    const playlistData = data as YoutubePlaylistResponse;
-    const newItems = playlistData.items.reduce(
-      (acc, item, index) => {
-        acc[item.contentDetails.videoId] = {
-          title: removeEmojis(item.snippet.title),
-          index: index,
-          publishedAt: new Date(item.contentDetails.videoPublishedAt).getTime(),
-        };
+      return acc;
+    },
+    {} as ApiCache["items"],
+  );
 
-        return acc;
-      },
-      {} as ApiCache["items"],
-    );
-
-    localStorage.setItem(
-      storageKey,
-      JSON.stringify({
-        ...localGet(storageKey),
-        [playlistId]: {
-          items: newItems,
-          listId: playlistId,
-          storeTime: Date.now(),
-          totalResults: playlistData.pageInfo.totalResults,
-          isReversed: false,
-          etag: playlistData.etag,
-        } as ApiCache,
-      }),
-    );
-  }
+  localStorage.setItem(
+    "ytSortMainCache",
+    JSON.stringify({
+      ...JSON.parse(localGet("ytSortMainCache") || "{}"),
+      [playlistId]: {
+        items: newItems,
+        listId: playlistId,
+        storeTime: Date.now(),
+        totalResults: data.pageInfo.totalResults,
+        isReversed: false,
+        etag: data.etag,
+      } as ApiCache,
+    }),
+  );
 };
 
 type getCacheRT<T extends string> = T extends "ytSortMainCache"

@@ -11,13 +11,14 @@ import {
   getVideoId,
   isLoopOn,
   isShuffleOn,
+  localAdd,
   localGet,
   localRemove,
   localSet,
   navigateEvent,
   replaceTooltipInfo,
   sortRenderedPlaylist,
-  storeCache,
+  storeMainCache,
 } from "@/helper.ts";
 import type { YTNavigateEvent } from "@/types";
 import pkg from "../package.json";
@@ -49,9 +50,9 @@ export default defineContentScript({
           // video.currentTime = video.duration / 2;
           setTimeout(() => {
             video.pause();
-          }, 2000);
-          video.remove();
-          videoContainer.remove();
+          }, 3000);
+          // video.remove();
+          // videoContainer.remove();
         }
       }
     };
@@ -221,7 +222,7 @@ export default defineContentScript({
         );
         const apiCache = getCache("ytSortMainCache", getListId(location.href));
 
-        const renderedPlaylistIds = [...playlistItems]
+        const renderedPlaylistIds: string[] = [...playlistItems]
           .filter((el: HTMLDivElement) => {
             const anchor = el.querySelector("a");
             return getListId(anchor?.href) === playlistId;
@@ -235,13 +236,13 @@ export default defineContentScript({
           !apiCache?.items
         ) {
           clog("Playlist Changed, Hydrating Cache!!! 🟡");
-          storeCache("ytSortRenderedCache", renderedPlaylistIds, playlistId);
+          localAdd("ytSortRenderedCache", renderedPlaylistIds);
           const data = await playlistAPI(playlistId);
-          storeCache("ytSortMainCache", data, playlistId);
+          if (data) storeMainCache(data, playlistId);
         }
+        prevListId = playlistId;
       }
 
-      prevListId = playlistId;
       return getCache("ytSortMainCache", playlistId);
     };
 
@@ -263,6 +264,8 @@ export default defineContentScript({
       if (!playlistContainer) return null;
 
       const refreshedCache = await hydrateCache(playlistContainer, playlistId);
+
+      console.log("refreshedCache ==> ", refreshedCache);
 
       if (!refreshedCache) return null;
 

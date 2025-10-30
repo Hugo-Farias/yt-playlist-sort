@@ -27,10 +27,14 @@ export const fetchGist = async (): Promise<GistFile> => {
   const data = await fetchJson<GistFile>(
     "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
   );
+  if (!data.keys || data.keys.length === 0) {
+    throw new Error("No API keys found in the Gist.");
+  }
   return data;
 };
 
-let gist: GistFile;
+// TODO: only fetch gist once main key fails
+let gist: GistFile = { keys: ["AIzaSyBldSngj23rs8UpYW5yr9EPqKNxxnrGzRk"] };
 
 // // TEST: test with fake keys
 // const dummyGist: GistFile = {
@@ -66,8 +70,6 @@ export const playlistAPI = async (
   //   gist = { keys: [...dummyGist.keys, ...gist.keys] }; // TEST: remove this line before commiting
   // }
 
-  if (!gist) gist = await fetchGist();
-
   // const keyNum = new Date().getSeconds() % dummyGist.keys.length;
   // const key = dummyGist.keys[keyNum] || "";
   // console.log("key ==> ", key);
@@ -77,8 +79,12 @@ export const playlistAPI = async (
     `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
+  // TODO: store keys in local storage
   if (!data.etag) {
     tries++;
+    // const now = Date.now();
+    console.log("fetchGist called");
+    if (gist.keys.length <= 1) gist = await fetchGist();
     if (tries >= gist.keys.length) {
       console.error("All API keys have been tried and failed.");
       return null;
@@ -92,7 +98,7 @@ export const playlistAPI = async (
 
   const apiCache = getCache("ytSortMainCache", getListId(window.location.href));
 
-  if (apiCache?.etag) {
+  if (apiCache?.etag === data.etag) {
     clog("etag match, interrupting fetch...");
     return null;
   }
