@@ -46,9 +46,9 @@ export default defineContentScript({
         if (videoContainer) {
           const video = document.querySelector("video");
           if (!video) return null;
-          clog("Pausing video... 🔴🔴🔴");
           // video.currentTime = video.duration / 2;
           setTimeout(() => {
+            clog("Pausing video... 🔴🔴🔴");
             video.pause();
           }, 3000);
           // video.remove();
@@ -236,7 +236,11 @@ export default defineContentScript({
           !apiCache?.items
         ) {
           clog("Playlist Changed, Hydrating Cache!!! 🟡");
-          localAdd("ytSortRenderedCache", renderedPlaylistIds);
+          // FIX: this is storing as an object instead of array
+          localSet("ytSortRenderedCache", {
+            ...JSON.parse(localGet("ytSortRenderedCache") ?? "{}"),
+            [playlistId]: renderedPlaylistIds,
+          });
           const data = await playlistAPI(playlistId);
           if (data) storeMainCache(data, playlistId);
         }
@@ -264,8 +268,6 @@ export default defineContentScript({
       if (!playlistContainer) return null;
 
       const refreshedCache = await hydrateCache(playlistContainer, playlistId);
-
-      console.log("refreshedCache ==> ", refreshedCache);
 
       if (!refreshedCache) return null;
 

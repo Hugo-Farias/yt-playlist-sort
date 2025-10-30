@@ -30,7 +30,7 @@ export const clearOldCache = (version: string) => {
 
 export const localSet = (
   keyname: localStorageKeys,
-  obj: object | string | boolean,
+  obj: object | string[],
   session: boolean = false,
 ) => {
   const data = JSON.stringify(obj);
@@ -71,7 +71,10 @@ export const localRemove = (
   localStorage.removeItem(keyname);
 };
 
-export const localAdd = (keyname: localStorageKeys, add: object) => {
+export const localAdd = (
+  keyname: "ytSortMainCache" | "ytSortRenderedCache",
+  add: object | string[],
+) => {
   const data = localGet(keyname);
 
   if (!data) return null;
@@ -79,11 +82,14 @@ export const localAdd = (keyname: localStorageKeys, add: object) => {
   const parsedData: { [key: string]: ApiCache } = JSON.parse(data);
   const listId = getListId(location.href);
 
+  const content =
+    keyname === "ytSortMainCache" ? { ...parsedData[listId], ...add } : add;
+
   localStorage.setItem(
     keyname,
     JSON.stringify({
       ...parsedData,
-      [listId]: { ...parsedData[listId], ...add },
+      [listId]: content,
     }),
   );
 };
