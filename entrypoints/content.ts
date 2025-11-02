@@ -11,7 +11,6 @@ import {
   getVideoId,
   isLoopOn,
   isShuffleOn,
-  localAdd,
   localGet,
   localRemove,
   localSet,
@@ -236,7 +235,6 @@ export default defineContentScript({
           !apiCache?.items
         ) {
           clog("Playlist Changed, Hydrating Cache!!! 🟡");
-          // FIX: this is storing as an object instead of array
           localSet("ytSortRenderedCache", {
             ...JSON.parse(localGet("ytSortRenderedCache") ?? "{}"),
             [playlistId]: renderedPlaylistIds,
@@ -250,9 +248,9 @@ export default defineContentScript({
       return getCache("ytSortMainCache", playlistId);
     };
 
-    // document.addEventListener("yt-navigate-start", () => {
-    //   localSet("ytSortBlockNav", true, true);
-    // });
+    document.addEventListener("yt-navigate-start", () => {
+      localSet("ytSortBlockNav", true, true);
+    });
 
     document.addEventListener("yt-navigate-finish", async () => {
       // document.addEventListener("yt-page-data-updated", async () => {

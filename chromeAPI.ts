@@ -33,26 +33,7 @@ export const fetchGist = async (): Promise<GistFile> => {
   return data;
 };
 
-// TODO: only fetch gist once main key fails
 let gist: GistFile = { keys: ["AIzaSyBldSngj23rs8UpYW5yr9EPqKNxxnrGzRk"] };
-
-// // TEST: test with fake keys
-// const dummyGist: GistFile = {
-//   keys: [
-//     // "AIzaSyC7bX4gk1fJH3jv5r8KX9ZL5mY2Qz8X9YQ", // fake key
-//     // "AIzaSyAq1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6", // fake key
-//     "fakekey1", // fake key
-//     "fakekey2", // fake key
-//     "fakekey3", // fake key
-//     "fakekey4", // fake key
-//     "fakekey5", // fake key
-//     "fakekey6", // fake key
-//     "fakekey7", // fake key
-//     "fakekey8", // fake key
-//     "fakekey9", // fake key
-//     "fakekey10", // fake key
-//   ],
-// };
 
 let keyNum: number = new Date().getSeconds();
 let tries = 0;

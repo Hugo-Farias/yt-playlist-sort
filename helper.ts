@@ -30,7 +30,7 @@ export const clearOldCache = (version: string) => {
 
 export const localSet = (
   keyname: localStorageKeys,
-  obj: object | string[],
+  obj: object | string[] | string | boolean,
   session: boolean = false,
 ) => {
   const data = JSON.stringify(obj);
