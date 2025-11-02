@@ -16,8 +16,7 @@ type localStorageKeys =
   | "ytSortLoop"
   | "ytSortMainCache"
   | "ytSortRenderedCache"
-  | "ytSortVersion"
-  | "ytSortBlockNav";
+  | "ytSortVersion";
 
 export const clearOldCache = (version: string) => {
   Object.keys(localStorage).forEach((key: string) => {

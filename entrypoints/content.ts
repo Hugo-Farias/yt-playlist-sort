@@ -24,6 +24,7 @@ import pkg from "../package.json";
 
 export default defineContentScript({
   main() {
+    let navBlock = false;
     const extVersion = localGet("ytSortVersion");
     // TODO: also check age of cache and clear if older than a month
     if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
@@ -61,7 +62,7 @@ export default defineContentScript({
       (e: Event) => {
         if (isShuffleOn()) return null;
         if (!getListId(currUrl)) return null;
-        if (localGet("ytSortBlockNav", true)) {
+        if (navBlock) {
           e.stopImmediatePropagation();
           return null;
         }
@@ -249,7 +250,7 @@ export default defineContentScript({
     };
 
     document.addEventListener("yt-navigate-start", () => {
-      localSet("ytSortBlockNav", true, true);
+      navBlock = true;
     });
 
     document.addEventListener("yt-navigate-finish", async () => {
@@ -290,7 +291,9 @@ export default defineContentScript({
         refreshedCache.isReversed,
       );
 
-      setTimeout(() => localRemove("ytSortBlockNav", true), 300);
+      setTimeout(() => {
+        navBlock = false;
+      }, 100);
 
       const wasLoop = localGet("ytSortLoop", true);
 
