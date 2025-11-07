@@ -1,4 +1,4 @@
-import { clog, getCache, getListId } from "@/helper.ts";
+import { clog, getCache, getListId, localGet, localSet } from "@/helper.ts";
 import type { YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
 
@@ -22,18 +22,35 @@ const fetchJson = async <T = unknown>(
 };
 
 type GistFile = { keys: string[] };
+type GistCache = { keys: string[]; fetchedAt: number };
 
 export const fetchGist = async (): Promise<GistFile> => {
+  const chachedGist: GistCache = JSON.parse(
+    localGet("ytSortGist", true) || "null",
+  );
+  console.log("chachedGist ==> ", chachedGist);
+  console.log("chachedGist ==> ", typeof chachedGist);
+
+  if (chachedGist) {
+    console.log("Using cached Gist");
+    return chachedGist;
+  }
+
+  console.log("Gist Called");
   const data = await fetchJson<GistFile>(
     "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
   );
+
+  localSet("ytSortGist", { ...data, fetchedAt: Date.now() }, true);
+
   if (!data.keys || data.keys.length === 0) {
-    throw new Error("No API keys found in the Gist.");
+    clog("No API keys found in the Gist. Using default key.");
+    return { keys: ["AIyzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY"] };
   }
   return data;
 };
 
-let gist: GistFile = { keys: ["AIzaSyBldSngj23rs8UpYW5yr9EPqKNxxnrGzRk"] };
+let gist: GistFile;
 
 let keyNum: number = new Date().getSeconds();
 let tries = 0;
@@ -46,26 +63,15 @@ export const playlistAPI = async (
 
   clog("chromeAPI called");
 
-  // if (!gist) {
-  //   gist = await fetchGist();
-  //   gist = { keys: [...dummyGist.keys, ...gist.keys] }; // TEST: remove this line before commiting
-  // }
-
-  // const keyNum = new Date().getSeconds() % dummyGist.keys.length;
-  // const key = dummyGist.keys[keyNum] || "";
-  // console.log("key ==> ", key);
+  gist = gist || (await fetchGist());
   const key = gist.keys[keyNum % gist.keys.length] || "";
 
   const data = await fetchJson<YoutubePlaylistResponse>(
     `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
-  // TODO: store keys in local storage
   if (!data.etag) {
     tries++;
-    // const now = Date.now();
-    console.log("fetchGist called");
-    if (gist.keys.length <= 1) gist = await fetchGist();
     if (tries >= gist.keys.length) {
       console.error("All API keys have been tried and failed.");
       return null;

@@ -24,14 +24,13 @@ import pkg from "../package.json";
 
 export default defineContentScript({
   main() {
-    let navBlock = false;
+    let navBlock = false; // prevent navigation events during playlist load
     const extVersion = localGet("ytSortVersion");
-    // TODO: also check age of cache and clear if older than a month
+    // TODO: also check age of cache and clear if older than a month for main cache and gist cache
     if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
       clearOldCache(pkg.version);
       localSet("ytSortVersion", pkg.version);
     }
-
     let firstRun = true;
     let currUrl = location.href;
     let prevListId: string | null = null;

@@ -16,7 +16,8 @@ type localStorageKeys =
   | "ytSortLoop"
   | "ytSortMainCache"
   | "ytSortRenderedCache"
-  | "ytSortVersion";
+  | "ytSortVersion"
+  | "ytSortGist";
 
 export const clearOldCache = (version: string) => {
   Object.keys(localStorage).forEach((key: string) => {
@@ -44,7 +45,7 @@ export const localSet = (
 export const localGet = (
   keyname: localStorageKeys,
   session: boolean = false,
-) => {
+): string | null => {
   let data: string | null;
   if (session) {
     data = sessionStorage.getItem(keyname);
@@ -54,7 +55,6 @@ export const localGet = (
 
   if (!data) return null;
 
-  // console.log("localGet =>", keyname, data);
   return data;
 };
 
