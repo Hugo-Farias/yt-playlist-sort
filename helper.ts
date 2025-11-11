@@ -401,3 +401,15 @@ export const sortRenderedPlaylist = (
   if (!messageRender) return;
   playlistContainer.appendChild(messageRender);
 };
+
+// TODO: finish implementing this function
+export const checkCacheAge = (cache: ApiCache) => {
+  const maxAge = 1000 * 60 * 60 * 24 * 7; // 7 days
+  const currentTime = Date.now();
+  return currentTime - cache.storeTime > maxAge;
+};
+
+const deleteFromObject = (object: object, listId: string) => {
+  const { [listId]: _, ...rest } = object as { [key: string]: unknown };
+  return rest;
+};

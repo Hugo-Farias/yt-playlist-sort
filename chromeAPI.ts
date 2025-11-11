@@ -2,8 +2,6 @@ import { clog, getCache, getListId, localGet, localSet } from "@/helper.ts";
 import type { YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
 
-// let tries = 0;
-
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
   init?: RequestInit,
@@ -23,30 +21,41 @@ const fetchJson = async <T = unknown>(
 
 type GistFile = { keys: string[] };
 type GistCache = { keys: string[]; fetchedAt: number };
+const now = Date.now();
 
+//  TEST: this!!!
 export const fetchGist = async (): Promise<GistFile> => {
+  console.log("Gist Called");
+
   const chachedGist: GistCache = JSON.parse(
     localGet("ytSortGist", true) || "null",
   );
+
+  const cacheIsOld = chachedGist
+    ? chachedGist.fetchedAt - now >= 24 * 60 * 60 * 1000
+    : true;
+
   console.log("chachedGist ==> ", chachedGist);
-  console.log("chachedGist ==> ", typeof chachedGist);
 
-  if (chachedGist) {
-    console.log("Using cached Gist");
-    return chachedGist;
-  }
+  const data: GistCache | GistFile = cacheIsOld
+    ? await fetchJson<GistFile>(
+        "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
+      )
+    : chachedGist;
 
-  console.log("Gist Called");
-  const data = await fetchJson<GistFile>(
-    "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
-  );
+  if (!data) {
+    if (chachedGist) {
+      console.log("Using cached Gist");
 
-  localSet("ytSortGist", { ...data, fetchedAt: Date.now() }, true);
+      return chachedGist;
+    }
 
-  if (!data.keys || data.keys.length === 0) {
     clog("No API keys found in the Gist. Using default key.");
     return { keys: ["AIyzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY"] };
   }
+
+  localSet("ytSortGist", { ...data, fetchedAt: Date.now() }, true);
+
   return data;
 };
 

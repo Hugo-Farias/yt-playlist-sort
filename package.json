@@ -7,7 +7,7 @@
   "scripts": {
     "git": "git add -A && tsc -noEmit && git commit -m",
     "dev": "wxt -b chromium",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit && biome check && ts-prune",
     "dev:chromium": "wxt -b chromium",
     "dev:firefox": "wxt -b firefox",
     "build": "wxt build",
@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "ts-prune": "^0.10.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.5",
