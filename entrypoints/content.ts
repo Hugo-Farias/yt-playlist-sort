@@ -1,5 +1,5 @@
 import { createDropdownMenu, createReverseBtn } from "@/buttons";
-import { playlistAPI } from "@/chromeAPI.ts";
+import { GistCache, playlistAPI } from "@/chromeAPI.ts";
 import { playlistItemSelector } from "@/config";
 import {
   clearOldCache,
@@ -50,8 +50,8 @@ export default defineContentScript({
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
           }, 3000);
-          // video.remove();
-          // videoContainer.remove();
+          video.remove();
+          videoContainer.remove();
         }
       }
     };

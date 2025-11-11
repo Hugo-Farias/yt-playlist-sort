@@ -5,56 +5,47 @@ import { API_URL } from "./config";
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
   init?: RequestInit,
-): Promise<T> => {
-  const res = await fetch(input, init);
+): Promise<T | null> => {
+  console.log("FetchJson Called with URL:", input);
+  try {
+    const res = await fetch(input, init);
 
-  if (!res.ok) {
-    if (res.status === 403 || res.status === 400) {
-      return {} as T;
-    }
-    const errorText = await res.text();
-    throw new Error(`Fetch error ${res.status}: ${errorText}`);
+    return (await res.json()) as Promise<T>;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    // throw error;
+    return null;
   }
-
-  return (await res.json()) as Promise<T>;
 };
 
 type GistFile = { keys: string[] };
-type GistCache = { keys: string[]; fetchedAt: number };
+export type GistCache = { keys: string[]; fetchedAt: number };
 const now = Date.now();
 
-//  TEST: this!!!
 export const fetchGist = async (): Promise<GistFile> => {
-  console.log("Gist Called");
+  const gistCache: GistCache = JSON.parse(localGet("ytSortGist") || "null");
 
-  const chachedGist: GistCache = JSON.parse(
-    localGet("ytSortGist", true) || "null",
-  );
-
-  const cacheIsOld = chachedGist
-    ? chachedGist.fetchedAt - now >= 24 * 60 * 60 * 1000
+  const cacheIsOld = gistCache
+    ? now - gistCache.fetchedAt >= 24 * 60 * 60 * 1000
     : true;
 
-  console.log("chachedGist ==> ", chachedGist);
-
-  const data: GistCache | GistFile = cacheIsOld
+  const data: GistCache | GistFile | null = cacheIsOld
     ? await fetchJson<GistFile>(
         "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
       )
-    : chachedGist;
+    : gistCache;
 
   if (!data) {
-    if (chachedGist) {
-      console.log("Using cached Gist");
-
-      return chachedGist;
+    if (gistCache) {
+      console.log("Fecth failed. Using cached gist data");
+      return gistCache;
     }
 
     clog("No API keys found in the Gist. Using default key.");
     return { keys: ["AIyzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY"] };
   }
 
-  localSet("ytSortGist", { ...data, fetchedAt: Date.now() }, true);
+  localSet("ytSortGist", { ...data, fetchedAt: Date.now() });
 
   return data;
 };
@@ -79,7 +70,7 @@ export const playlistAPI = async (
     `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
-  if (!data.etag) {
+  if (!data) {
     tries++;
     if (tries >= gist.keys.length) {
       console.error("All API keys have been tried and failed.");
