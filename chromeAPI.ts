@@ -1,4 +1,11 @@
-import { clog, getCache, getListId, localGet, localSet } from "@/helper.ts";
+import {
+  checkCacheAge,
+  clog,
+  getCache,
+  getListId,
+  localGet,
+  localSet,
+} from "@/helper.ts";
 import type { YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
 
@@ -20,14 +27,11 @@ const fetchJson = async <T = unknown>(
 
 type GistFile = { keys: string[] };
 export type GistCache = { keys: string[]; fetchedAt: number };
-const now = Date.now();
 
 export const fetchGist = async (): Promise<GistFile> => {
   const gistCache: GistCache = JSON.parse(localGet("ytSortGist") || "null");
 
-  const cacheIsOld = gistCache
-    ? now - gistCache.fetchedAt >= 24 * 60 * 60 * 1000
-    : true;
+  const cacheIsOld = gistCache ? checkCacheAge(gistCache.fetchedAt, 1) : true;
 
   const data: GistCache | GistFile | null = cacheIsOld
     ? await fetchJson<GistFile>(

@@ -1,7 +1,8 @@
 import { createDropdownMenu, createReverseBtn } from "@/buttons";
-import { GistCache, playlistAPI } from "@/chromeAPI.ts";
+import { playlistAPI } from "@/chromeAPI.ts";
 import { playlistItemSelector } from "@/config";
 import {
+  checkCacheAge,
   clearOldCache,
   clog,
   comparePlaylist,
@@ -26,7 +27,7 @@ export default defineContentScript({
   main() {
     let navBlock = false; // prevent navigation events during playlist load
     const extVersion = localGet("ytSortVersion");
-    // TODO: also check age of cache and clear if older than a month for main cache and gist cache
+    console.log("extVersion ==> ", extVersion);
     if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
       clearOldCache(pkg.version);
       localSet("ytSortVersion", pkg.version);
@@ -49,9 +50,9 @@ export default defineContentScript({
           setTimeout(() => {
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
+            video.remove();
+            videoContainer.remove();
           }, 3000);
-          video.remove();
-          videoContainer.remove();
         }
       }
     };
@@ -61,6 +62,7 @@ export default defineContentScript({
       (e: Event) => {
         if (isShuffleOn()) return null;
         if (!getListId(currUrl)) return null;
+        if (!getVideoId(currUrl)) return null;
         if (navBlock) {
           e.stopImmediatePropagation();
           return null;
@@ -232,7 +234,8 @@ export default defineContentScript({
         // or there is no cache, hydrate it
         if (
           !comparePlaylist(renderedCache, renderedPlaylistIds) ||
-          !apiCache?.items
+          !apiCache?.items ||
+          checkCacheAge(apiCache.storeTime, 30)
         ) {
           clog("Playlist Changed, Hydrating Cache!!! 🟡");
           localSet("ytSortRenderedCache", {

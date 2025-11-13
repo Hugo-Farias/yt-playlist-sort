@@ -123,7 +123,7 @@ export const storeMainCache = (
   playlistId: string,
 ) => {
   if (!data || !playlistId) return null;
-  clog("storeCache =>", playlistId);
+  clog("storeCache =>", data);
 
   const newItems = data.items.reduce(
     (acc, item, index) => {
@@ -138,20 +138,17 @@ export const storeMainCache = (
     {} as ApiCache["items"],
   );
 
-  localStorage.setItem(
-    "ytSortMainCache",
-    JSON.stringify({
-      ...JSON.parse(localGet("ytSortMainCache") || "{}"),
-      [playlistId]: {
-        items: newItems,
-        listId: playlistId,
-        storeTime: Date.now(),
-        totalResults: data.pageInfo.totalResults,
-        isReversed: false,
-        etag: data.etag,
-      } as ApiCache,
-    }),
-  );
+  localSet("ytSortMainCache", {
+    ...JSON.parse(localGet("ytSortMainCache") || "{}"),
+    [playlistId]: {
+      items: newItems,
+      listId: playlistId,
+      storeTime: Date.now(),
+      totalResults: data.pageInfo.totalResults,
+      isReversed: false,
+      etag: data.etag,
+    } as ApiCache,
+  });
 };
 
 type getCacheRT<T extends string> = T extends "ytSortMainCache"
@@ -161,8 +158,9 @@ type getCacheRT<T extends string> = T extends "ytSortMainCache"
 // Get a specific cache entry by playlist ID
 export const getCache = <T extends "ytSortMainCache" | "ytSortRenderedCache">(
   storageKey: T,
-  playlistId: string,
+  playlistId: string | null,
 ): getCacheRT<T> | null => {
+  if (!storageKey || !playlistId) return null;
   const data = localStorage.getItem(storageKey);
   if (!data || !playlistId) return null;
   return JSON.parse(data)[playlistId] as getCacheRT<T>;
@@ -338,7 +336,6 @@ const newLayout =
   document.querySelector(".ytp-left-controls")?.firstElementChild?.className ===
   "ytp-play-button ytp-button";
 
-// TODO: read sort order from session storage if available to increase performance
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
@@ -402,14 +399,10 @@ export const sortRenderedPlaylist = (
   playlistContainer.appendChild(messageRender);
 };
 
-// TODO: finish implementing this function
-export const checkCacheAge = (cache: ApiCache) => {
-  const maxAge = 1000 * 60 * 60 * 24 * 7; // 7 days
+export const checkCacheAge = (cache: number, days: number) => {
+  const maxAge = 1000 * 60 * 60 * 24 * days;
   const currentTime = Date.now();
-  return currentTime - cache.storeTime > maxAge;
-};
-
-const deleteFromObject = (object: object, listId: string) => {
-  const { [listId]: _, ...rest } = object as { [key: string]: unknown };
-  return rest;
+  console.log("checkCacheAge", currentTime - cache);
+  console.log("maxAge ==> ", maxAge);
+  return currentTime - cache >= maxAge;
 };
