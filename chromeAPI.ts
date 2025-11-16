@@ -13,7 +13,7 @@ const fetchJson = async <T = unknown>(
   input: RequestInfo,
   init?: RequestInit,
 ): Promise<T | null> => {
-  console.log("FetchJson Called with URL:", input);
+  clog("FetchJson Called with URL:", input);
   try {
     const res = await fetch(input, init);
 
@@ -41,7 +41,7 @@ export const fetchGist = async (): Promise<GistFile> => {
 
   if (!data) {
     if (gistCache) {
-      console.log("Fecth failed. Using cached gist data");
+      clog("Fecth failed. Using cached gist data");
       return gistCache;
     }
 

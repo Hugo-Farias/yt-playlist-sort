@@ -3,6 +3,7 @@ import { playlistAPI } from "@/chromeAPI.ts";
 import { playlistItemSelector } from "@/config";
 import {
   checkCacheAge,
+  cleanOldMainCacheEntries,
   clearOldCache,
   clog,
   comparePlaylist,
@@ -20,14 +21,29 @@ import {
   sortRenderedPlaylist,
   storeMainCache,
 } from "@/helper.ts";
-import type { YTNavigateEvent } from "@/types";
+import type { ApiCache, YTNavigateEvent } from "@/types";
 import pkg from "../package.json";
 
 export default defineContentScript({
   main() {
+    // TODO: decide if the speed up from this is worth the potential bug risk
+    // there's possibly no bug. Program fetches cache before saving anyway.
+    // need to look into it further
+    let fullCache: { [key: string]: ApiCache } = {};
+    try {
+      fullCache = JSON.parse(localGet("ytSortMainCache") || "{}");
+      console.log("fullCache ==> ", fullCache);
+    } catch (e) {
+      clog("Error parsing main cache JSON: \n", e);
+      clog("Cleaning Cache");
+      localRemove("ytSortMainCache");
+      localRemove("ytSortRenderedCache");
+    }
+
+    cleanOldMainCacheEntries(fullCache);
+
     let navBlock = false; // prevent navigation events during playlist load
     const extVersion = localGet("ytSortVersion");
-    console.log("extVersion ==> ", extVersion);
     if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
       clearOldCache(pkg.version);
       localSet("ytSortVersion", pkg.version);
@@ -50,8 +66,8 @@ export default defineContentScript({
           setTimeout(() => {
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
-            video.remove();
-            videoContainer.remove();
+            // video.remove();
+            // videoContainer.remove();
           }, 3000);
         }
       }
@@ -221,7 +237,9 @@ export default defineContentScript({
           "ytSortRenderedCache",
           getListId(location.href),
         );
-        const apiCache = getCache("ytSortMainCache", getListId(location.href));
+
+        // const apiCache = getCache("ytSortMainCache", getListId(location.href));
+        const apiCache = fullCache?.[playlistId];
 
         const renderedPlaylistIds: string[] = [...playlistItems]
           .filter((el: HTMLDivElement) => {
@@ -243,12 +261,19 @@ export default defineContentScript({
             [playlistId]: renderedPlaylistIds,
           });
           const data = await playlistAPI(playlistId);
-          if (data) storeMainCache(data, playlistId);
+
+          if (data) {
+            storeMainCache(data, playlistId);
+            fullCache[playlistId] = getCache(
+              "ytSortMainCache",
+              playlistId,
+            ) as ApiCache;
+          }
         }
         prevListId = playlistId;
       }
 
-      return getCache("ytSortMainCache", playlistId);
+      return fullCache?.[playlistId];
     };
 
     document.addEventListener("yt-navigate-start", () => {

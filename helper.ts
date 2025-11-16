@@ -124,6 +124,9 @@ export const storeMainCache = (
 ) => {
   if (!data || !playlistId) return null;
   clog("storeCache =>", data);
+  const originalCache = getCache("ytSortMainCache", playlistId);
+  // TEST: this to see if it's necessary to remove old cache
+  // localRemove("ytSortMainCache");
 
   const newItems = data.items.reduce(
     (acc, item, index) => {
@@ -145,7 +148,8 @@ export const storeMainCache = (
       listId: playlistId,
       storeTime: Date.now(),
       totalResults: data.pageInfo.totalResults,
-      isReversed: false,
+      isReversed: originalCache?.isReversed || false,
+      sortOrder: originalCache?.sortOrder || "orig",
       etag: data.etag,
     } as ApiCache,
   });
@@ -399,10 +403,26 @@ export const sortRenderedPlaylist = (
   playlistContainer.appendChild(messageRender);
 };
 
-export const checkCacheAge = (cache: number, days: number) => {
+export const checkCacheAge = (cacheAge: number, days: number) => {
   const maxAge = 1000 * 60 * 60 * 24 * days;
   const currentTime = Date.now();
-  console.log("checkCacheAge", currentTime - cache);
-  console.log("maxAge ==> ", maxAge);
-  return currentTime - cache >= maxAge;
+  return currentTime - cacheAge >= maxAge;
+};
+
+export const cleanOldMainCacheEntries = (fullCache: {
+  [key: string]: ApiCache;
+}) => {
+  if (!fullCache) return null;
+  const keys = Object.keys(fullCache ?? {});
+  if (!keys.length) return null;
+
+  keys.forEach((key) => {
+    const entry = fullCache[key];
+    if (checkCacheAge(entry.storeTime, 60)) {
+      clog(`Cleaning old cache entry for playlist ID: ${key} 🧹`);
+      const updatedCache = JSON.parse(localGet("ytSortMainCache") ?? "{}");
+      delete updatedCache[key];
+      localSet("ytSortMainCache", updatedCache);
+    }
+  });
 };
