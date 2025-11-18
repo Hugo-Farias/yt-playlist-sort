@@ -252,7 +252,7 @@ export default defineContentScript({
         // or there is no cache, hydrate it
         if (
           !comparePlaylist(renderedCache, renderedPlaylistIds) ||
-          !apiCache?.items ||
+          !apiCache?.videos ||
           checkCacheAge(apiCache.storeTime, 30)
         ) {
           clog("Playlist Changed, Hydrating Cache!!! 🟡");

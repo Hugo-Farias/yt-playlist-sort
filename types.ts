@@ -47,7 +47,7 @@ export type ApiCacheItems = {
 };
 
 export type ApiCache = {
-  items: {
+  videos: {
     [videoId: string]: ApiCacheItems;
   };
   listId: string;

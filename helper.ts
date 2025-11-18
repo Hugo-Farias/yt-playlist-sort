@@ -138,13 +138,13 @@ export const storeMainCache = (
 
       return acc;
     },
-    {} as ApiCache["items"],
+    {} as ApiCache["videos"],
   );
 
   localSet("ytSortMainCache", {
     ...JSON.parse(localGet("ytSortMainCache") || "{}"),
     [playlistId]: {
-      items: newItems,
+      videos: newItems,
       listId: playlistId,
       storeTime: Date.now(),
       totalResults: data.pageInfo.totalResults,
@@ -234,7 +234,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 
 const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
   const videoId = getVideoId(el);
-  return cache.items[videoId ?? ""]?.publishedAt ?? Infinity;
+  return cache.videos[videoId ?? ""]?.publishedAt ?? Infinity;
 };
 
 const getFromCache = (
@@ -243,7 +243,7 @@ const getFromCache = (
   type: keyof ApiCacheItems,
 ) => {
   const videoId = getVideoId(el);
-  return cache.items[videoId ?? ""]?.[type] ?? Infinity;
+  return cache.videos[videoId ?? ""]?.[type] ?? Infinity;
 };
 
 const sortList = (
