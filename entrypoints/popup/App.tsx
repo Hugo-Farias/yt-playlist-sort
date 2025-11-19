@@ -1,7 +1,6 @@
 import { useState } from "react";
 import reactLogo from "@/assets/react.svg";
 import wxtLogo from "/wxt.svg";
-import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -10,9 +9,9 @@ function App() {
   // hide/show dates etc...
   return (
     <>
-      <div>
+      <div className="w-96 border-red-400">
         <a href="https://wxt.dev" target="_blank" rel="noopener">
-          <img src={wxtLogo} className="logo" alt="WXT logo" />
+          <img src={wxtLogo} className="bg-blue-700" alt="WXT logo" />
         </a>
         <a href="https://react.dev" target="_blank" rel="noopener">
           <img src={reactLogo} className="logo react" alt="React logo" />
@@ -23,6 +22,7 @@ function App() {
         <button
           type="button"
           onClick={() => setCount((count: number) => count + 1)}
+          className="bg-red-700"
         >
           count is {count}
         </button>

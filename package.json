@@ -19,15 +19,17 @@
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "ts-prune": "^0.10.3"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.5",
+    "@tailwindcss/vite": "^4.1.17",
     "@types/chrome": "^0.0.280",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
     "@wxt-dev/module-react": "^1.1.2",
+    "tailwindcss": "^4.1.17",
+    "ts-prune": "^0.10.3",
     "typescript": "^5.6.3",
     "wxt": "^0.19.29"
   }
