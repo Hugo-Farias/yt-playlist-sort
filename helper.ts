@@ -208,6 +208,7 @@ const formatDate = (
   return date.toLocaleDateString(locale, options);
 };
 
+// TODO: add date to tooltip so it shows on hover
 export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
   const dateEl = el.querySelector(".playlistSort-date");
   if (dateEl) dateEl.remove();

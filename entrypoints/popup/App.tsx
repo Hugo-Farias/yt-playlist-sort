@@ -1,39 +1,48 @@
-import { useState } from "react";
-import reactLogo from "@/assets/react.svg";
-import wxtLogo from "/wxt.svg";
+type settingsT = {
+  date: boolean;
+};
+
+const initialSettings: settingsT = {
+  date: false,
+};
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [settings, setSettings] = useState<settingsT>(initialSettings);
 
-  // TODO: Write the settings for the app
-  // hide/show dates etc...
+  // const onClick = () => {
+  //   console.log("key down");
+  //   setSettings((prev) => ({ ...prev, date: !prev.date }));
+  // };
+
+  const onChange = () => {
+    setSettings((prev) => ({ ...prev, date: !prev.date }));
+  };
+
   return (
-    <>
-      <div className="w-96 border-red-400">
-        <a href="https://wxt.dev" target="_blank" rel="noopener">
-          <img src={wxtLogo} className="bg-blue-700" alt="WXT logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noopener">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>WXT + React</h1>
-      <div className="card">
-        <button
-          type="button"
-          onClick={() => setCount((count: number) => count + 1)}
-          className="bg-red-700"
+    <div
+      className={
+        "min-w-80 select-none bg-stone-900 p-1 pb-5 text-base text-stone-300"
+      }
+    >
+      <form className={"flex px-1"}>
+        <label
+          className={
+            "w-full cursor-pointer bg-red-700/30 px-3 transition-colors hover:bg-stone-300/15 hover:text-stone-100"
+          }
+          htmlFor={"test"}
         >
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the WXT and React logos to learn more
-      </p>
-    </>
+          <input
+            className={"mr-3 cursor-pointer"}
+            type={"checkbox"}
+            aria-label={"Toggle display dates"}
+            checked={settings.date}
+            id={"test"}
+            onChange={onChange}
+          />
+          Display Dates
+        </label>
+      </form>
+    </div>
   );
 }
 

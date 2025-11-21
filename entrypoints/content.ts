@@ -26,9 +26,6 @@ import pkg from "../package.json";
 
 export default defineContentScript({
   main() {
-    // TODO: decide if the speed up from this is worth the potential bug risk
-    // there's possibly no bug. Program fetches cache before saving anyway.
-    // need to look into it further
     let fullCache: { [key: string]: ApiCache } = {};
     try {
       fullCache = JSON.parse(localGet("ytSortMainCache") || "{}");
