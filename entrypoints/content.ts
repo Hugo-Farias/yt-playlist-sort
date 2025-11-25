@@ -1,6 +1,6 @@
-import { createDropdownMenu, createReverseBtn } from "@/buttons";
 import { playlistAPI } from "@/chromeAPI.ts";
 import { playlistItemSelector } from "@/config";
+import { createDropdownMenu, createReverseBtn } from "@/entrypoints/ui/buttons";
 import {
   checkCacheAge,
   cleanOldMainCacheEntries,
@@ -20,16 +20,17 @@ import {
   replaceTooltipInfo,
   sortRenderedPlaylist,
   storeMainCache,
-} from "@/helper.ts";
+} from "@/helper";
 import type { ApiCache, YTNavigateEvent } from "@/types";
 import pkg from "../package.json";
 
 export default defineContentScript({
   main() {
+    // FIX: this needs to be updated when sort order is updated
     let fullCache: { [key: string]: ApiCache } = {};
+
     try {
       fullCache = JSON.parse(localGet("ytSortMainCache") || "{}");
-      console.log("fullCache ==> ", fullCache);
     } catch (e) {
       clog("Error parsing main cache JSON: \n", e);
       clog("Cleaning Cache");
@@ -304,9 +305,19 @@ export default defineContentScript({
 
       if (!playlistMenuBtns) return null;
 
-      createDropdownMenu(refreshedCache, playlistContainer, playlistMenuBtns);
+      createDropdownMenu(
+        refreshedCache,
+        playlistContainer,
+        playlistMenuBtns,
+        fullCache,
+      );
 
-      createReverseBtn(refreshedCache, playlistContainer, playlistMenuBtns);
+      createReverseBtn(
+        refreshedCache,
+        playlistContainer,
+        playlistMenuBtns,
+        fullCache,
+      );
 
       sortRenderedPlaylist(
         playlistContainer,

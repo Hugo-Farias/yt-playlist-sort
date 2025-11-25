@@ -1,7 +1,6 @@
 import OptionEl from "./components/OptionEl";
 
-// TODO: finish this
-// add option to change the date format
+// TODO: finish this, add option to change the date format
 function App() {
   return (
     <div

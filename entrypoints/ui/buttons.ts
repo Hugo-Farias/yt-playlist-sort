@@ -9,6 +9,7 @@ export const createDropdownMenu = (
   cache: ApiCache | null,
   playlistContainer: HTMLDivElement,
   playlistMenuBtns: HTMLDivElement,
+  loadedCache: { [key: string]: ApiCache },
 ) => {
   const dropdownElList = document.querySelectorAll(".ytSortDropdown");
   dropdownElList.forEach((el) => {
@@ -44,6 +45,8 @@ export const createDropdownMenu = (
 
     localAdd("ytSortMainCache", { sortOrder: sortOrder });
 
+    if (cache) loadedCache[cache.listId].sortOrder = sortOrder;
+
     sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);
   });
 
@@ -54,6 +57,7 @@ export const createReverseBtn = (
   cache: ApiCache,
   playlistContainer: HTMLDivElement,
   playlistMenuBtns: HTMLDivElement | null,
+  loadedCache: { [key: string]: ApiCache },
 ) => {
   isReversed = cache.isReversed;
 
@@ -84,6 +88,8 @@ export const createReverseBtn = (
     changeBtnEffect();
 
     localAdd("ytSortMainCache", { isReversed: isReversed });
+
+    loadedCache[cache.listId].isReversed = isReversed;
 
     sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);
   };

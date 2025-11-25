@@ -1,11 +1,13 @@
-type PropsT = {
-  id: keyof SettingsT;
-  label: string;
-};
-
 type SettingsT = {
   date: boolean;
   scroll: boolean;
+};
+
+type PropsT = {
+  id: keyof SettingsT;
+  label: string;
+  type?: "text" | "password" | "checkbox" | "radio" | "email" | "number";
+  storedSettings: SettingsT;
 };
 
 const initialSettings: SettingsT = {
@@ -13,15 +15,33 @@ const initialSettings: SettingsT = {
   scroll: false,
 };
 
-const OptionEl = ({ id, label }: PropsT) => {
-  const [settings, setSettings] = useState<SettingsT>(initialSettings);
+function isSettingKey(id: string): id is keyof SettingsT {
+  return id in initialSettings;
+}
 
-  const onChange = (id: keyof SettingsT) => {
-    console.log(settings);
+const OptionEl = ({
+  id,
+  label,
+  type = "checkbox",
+  storedSettings = initialSettings,
+}: PropsT) => {
+  const [settings, setSettings] = useState<SettingsT>(
+    storedSettings || initialSettings,
+  );
 
-    setSettings((prev) => {
-      return { ...prev, [id]: !prev[id] };
-    });
+  // console.log(chrome);
+  // console.log(chrome.storage.local);
+
+  useEffect(() => {
+    chrome.storage.local.set(settings);
+  }, [settings]);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id = e.target.id;
+
+    if (!isSettingKey(id)) return null;
+
+    setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
@@ -34,11 +54,11 @@ const OptionEl = ({ id, label }: PropsT) => {
     >
       <input
         className={"mr-3 cursor-pointer"}
-        type={"checkbox"}
+        type={type}
         aria-label={label}
         checked={settings[id]}
         id={id}
-        onChange={() => onChange(id)}
+        onChange={onChange}
       />
       {label}
     </label>

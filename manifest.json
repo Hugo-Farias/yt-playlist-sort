@@ -3,7 +3,6 @@
   "name": "Youtube playlist sort",
   "version": "0.0.1",
   "description": "Sorts playlist items in youtube",
-  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],

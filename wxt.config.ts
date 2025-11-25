@@ -6,5 +6,8 @@ export default defineConfig({
   extensionApi: "chrome",
   modules: ["@wxt-dev/module-react"],
   runner: { disabled: true },
+  manifest: {
+    permissions: ["storage"],
+  },
   vite: () => vite,
 });

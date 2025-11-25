@@ -5,7 +5,7 @@ import {
   getListId,
   localGet,
   localSet,
-} from "@/helper.ts";
+} from "@/helper";
 import type { YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL } from "./config";
 
