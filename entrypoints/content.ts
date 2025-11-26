@@ -26,7 +26,6 @@ import pkg from "../package.json";
 
 export default defineContentScript({
   main() {
-    // FIX: this needs to be updated when sort order is updated
     let fullCache: { [key: string]: ApiCache } = {};
 
     try {

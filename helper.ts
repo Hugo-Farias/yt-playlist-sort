@@ -5,6 +5,7 @@ import type {
   YoutubePlaylistResponse,
   YtSortOrder,
 } from "@/types.ts";
+import { SettingsT } from "./entrypoints/popup/App";
 
 const { log } = console;
 
@@ -213,24 +214,28 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
   const dateEl = el.querySelector(".playlistSort-date");
   if (dateEl) dateEl.remove();
 
-  const itemEl = el.querySelector("#byline-container");
-  if (!itemEl) return null;
+  chrome.storage.local.get<SettingsT>((settings) => {
+    if (!settings.date) return;
 
-  const videoPublishedAt = getDateFromCache(el, cache);
+    const itemEl = el.querySelector("#byline-container");
+    if (!itemEl) return null;
 
-  const formattedDate = formatDate(videoPublishedAt);
+    const videoPublishedAt = getDateFromCache(el, cache);
 
-  const span = document.createElement("span");
-  span.textContent = `- ${formattedDate}`;
-  span.classList.add(
-    "style-scope",
-    "ytd-playlist-panel-video-renderer",
-    "playlistSort-date",
-  );
-  span.id = "byline";
-  span.style.marginLeft = "-5px";
+    const formattedDate = formatDate(videoPublishedAt);
 
-  itemEl.appendChild(span);
+    const span = document.createElement("span");
+    span.textContent = `- ${formattedDate}`;
+    span.classList.add(
+      "style-scope",
+      "ytd-playlist-panel-video-renderer",
+      "playlistSort-date",
+    );
+    span.id = "byline";
+    span.style.marginLeft = "-5px";
+
+    itemEl.appendChild(span);
+  });
 };
 
 const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
