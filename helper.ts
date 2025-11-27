@@ -94,6 +94,27 @@ export const localAdd = (
   );
 };
 
+export const waitForElement = (
+  selector: string,
+  timeout = 10000,
+): Promise<Element> => {
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(() => {
+      const el = document.querySelector(selector);
+      if (el) {
+        clearInterval(interval);
+        clearTimeout(timer);
+        resolve(el);
+      }
+    }, 1000);
+
+    const timer = setTimeout(() => {
+      clearInterval(interval);
+      reject(new Error(`Timeout waiting for element: ${selector}`));
+    }, timeout);
+  });
+};
+
 export const getListId = (url: string | undefined): string => {
   if (!url || url.length <= 0) return "";
   const listId = new URL(url).searchParams.get("list") ?? "";
@@ -223,9 +244,9 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 
     // TODO: add setting for date format
     const formattedDate = formatDate(videoPublishedAt, {
-      year: "numeric",
-      month: "long",
       day: "numeric",
+      month: "numeric",
+      year: "2-digit",
     });
 
     const span = document.createElement("span");

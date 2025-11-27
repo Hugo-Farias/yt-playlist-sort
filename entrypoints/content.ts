@@ -20,6 +20,7 @@ import {
   replaceTooltipInfo,
   sortRenderedPlaylist,
   storeMainCache,
+  waitForElement,
 } from "@/helper";
 import type { ApiCache, YTNavigateEvent } from "@/types";
 import pkg from "../package.json";
@@ -59,7 +60,7 @@ export default defineContentScript({
         if (videoContainer) {
           const video = document.querySelector("video");
           if (!video) return null;
-          video.currentTime = video.duration / 2;
+          video.currentTime = video.duration / 10;
           setTimeout(() => {
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
@@ -184,7 +185,7 @@ export default defineContentScript({
 
                   replaceTooltipInfo(btnElement, vidInfo);
                 },
-                eventType === "click" ? 50 : 0,
+                eventType === "click" ? 80 : 0,
               );
             });
           },
@@ -281,10 +282,6 @@ export default defineContentScript({
       return fullCache?.[playlistId];
     };
 
-    document.addEventListener("yt-navigate-start", () => {
-      navBlock = true;
-    });
-
     document.addEventListener("yt-navigate-finish", async () => {
       // document.addEventListener("yt-page-data-updated", async () => {
       currUrl = location.href;
@@ -352,8 +349,15 @@ export default defineContentScript({
       }
 
       if (!firstRun) return;
-      // FIX: This must wait for the video element
-      setTimeout(() => firstRunEvent(), 5000);
+      waitForElement("video").then(() => {
+        console.log("video loaded 🟣🟣🟣");
+
+        firstRunEvent();
+      });
+    });
+
+    document.addEventListener("yt-navigate-start", () => {
+      navBlock = true;
     });
   },
   matches: ["*://*.youtube.com/*"],
