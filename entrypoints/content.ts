@@ -65,7 +65,7 @@ export default defineContentScript({
             video.pause();
             // video.remove();
             // videoContainer.remove();
-          }, 3000);
+          }, 1000);
         }
       }
     };
@@ -88,6 +88,7 @@ export default defineContentScript({
           e.stopImmediatePropagation();
         } else if (detail?.ytSort) {
           const { ytSort } = detail;
+          console.log("ytSort ==> ", ytSort);
 
           const currentItem = document.querySelector(
             "ytd-playlist-panel-video-renderer[selected]",
@@ -95,7 +96,7 @@ export default defineContentScript({
 
           const methodMap = {
             next: "nextElementSibling",
-            previous: "previousElementSibling",
+            prev: "previousElementSibling",
             videoEnd: "nextElementSibling",
           } as const;
 
@@ -115,7 +116,7 @@ export default defineContentScript({
               "ytd-playlist-panel-video-renderer",
             );
           } else if (!element) {
-            if (ytSort === "previous") {
+            if (ytSort === "prev") {
               const videoItems = document.querySelectorAll(
                 "ytd-playlist-panel-video-renderer",
               );
@@ -193,10 +194,15 @@ export default defineContentScript({
       });
 
       video?.addEventListener("pause", () => {
-        const playBtn =
-          document.querySelector<HTMLButtonElement>(".ytp-play-button");
+        // const playBtn =
+        //   document.querySelector<HTMLButtonElement>(".ytp-play-button");
 
-        if (playBtn?.dataset.tooltipTitle === "Replay") {
+        const current =
+          document.querySelector(".ytp-time-current")?.textContent;
+        const duration =
+          document.querySelector(".ytp-time-duration")?.textContent;
+
+        if (current === duration) {
           navigateEvent({ ytSort: "videoEnd" });
         }
       });
@@ -205,18 +211,17 @@ export default defineContentScript({
       videoControlBtns?.addEventListener("click", (e) => {
         const target = e.target as HTMLDivElement;
 
-        const direction = target
-          .getAttribute("data-title-no-tooltip")
-          ?.toLowerCase();
+        const direction = target.classList[0].split("-")[1];
+        console.log("direction ==> ", direction);
 
-        if (direction !== "next" && direction !== "previous") return null;
+        if (direction !== "next" && direction !== "prev") return null;
 
         navigateEvent({ ytSort: direction });
       });
 
       window.addEventListener("keydown", (e) => {
         if (e.key === "N") navigateEvent({ ytSort: "next" });
-        else if (e.key === "P") navigateEvent({ ytSort: "previous" });
+        else if (e.key === "P") navigateEvent({ ytSort: "prev" });
       });
     };
 

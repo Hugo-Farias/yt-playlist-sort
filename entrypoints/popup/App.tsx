@@ -9,7 +9,7 @@ export type SettingsT = {
 
 let initialSettings: SettingsT = {
   date: true,
-  scroll: false,
+  scroll: true,
 };
 
 function isSettingKey(id: string): id is keyof SettingsT {
@@ -30,17 +30,13 @@ function App() {
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const id = e.target.id;
-
     if (!isSettingKey(id)) return null;
-
     setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
     <div
-      className={
-        "min-w-80 select-none bg-stone-900 p-1 text-base text-stone-300"
-      }
+      className={"min-w-80 select-none bg-stone-900 p-1 text-sm text-stone-300"}
     >
       <form className={"items-center divide-y divide-white/20"}>
         <OptionEl
@@ -51,7 +47,7 @@ function App() {
         />
         <OptionEl
           id="scroll"
-          label="Scroll to currently playing"
+          label="Scroll to current video after reorder"
           checked={settings.scroll}
           onChange={onChange}
         />

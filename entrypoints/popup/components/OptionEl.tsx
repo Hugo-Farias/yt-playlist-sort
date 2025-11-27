@@ -8,24 +8,19 @@ type PropsT = {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const OptionEl = ({
-  id,
-  label,
-  checked,
-  type = "checkbox",
-  onChange,
-}: PropsT) => {
+const OptionEl = (props: PropsT) => {
+  const { id, label, type, checked, onChange } = props;
+
   return (
     <label
-      key={id}
       className={
-        "inline-block w-full cursor-pointer items-center p-1 px-3 transition-colors hover:bg-white/5 hover:text-stone-100"
+        "inline-block w-full cursor-pointer items-center whitespace-nowrap p-1 px-3 transition-colors hover:bg-white/5 hover:text-stone-100"
       }
       htmlFor={id}
     >
       <input
         className={"mr-3 cursor-pointer"}
-        type={type}
+        type={type || "checkbox"}
         aria-label={label}
         checked={checked}
         id={id}

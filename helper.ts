@@ -5,7 +5,7 @@ import type {
   YoutubePlaylistResponse,
   YtSortOrder,
 } from "@/types.ts";
-import { SettingsT } from "./entrypoints/popup/App";
+import type { SettingsT } from "./entrypoints/popup/App";
 
 const { log } = console;
 
@@ -203,7 +203,7 @@ const formatDate = (
     month: "short",
     day: "numeric",
   },
-  locale = "en-US",
+  locale = document.querySelector("html")?.lang || "en-US",
 ): string => {
   const date = new Date(dateInput);
   return date.toLocaleDateString(locale, options);
@@ -220,9 +220,15 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     const itemEl = el.querySelector("#byline-container");
     if (!itemEl) return null;
 
-    const videoPublishedAt = getDateFromCache(el, cache);
+    const videoPublishedAt =
+      cache.videos[getVideoId(el) ?? ""]?.publishedAt ?? Infinity;
 
-    const formattedDate = formatDate(videoPublishedAt);
+    // TODO: add setting for date format
+    const formattedDate = formatDate(videoPublishedAt, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
     const span = document.createElement("span");
     span.textContent = `- ${formattedDate}`;
@@ -236,11 +242,6 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 
     itemEl.appendChild(span);
   });
-};
-
-const getDateFromCache = (el: HTMLDivElement, cache: ApiCache) => {
-  const videoId = getVideoId(el);
-  return cache.videos[videoId ?? ""]?.publishedAt ?? Infinity;
 };
 
 const getFromCache = (
@@ -330,7 +331,7 @@ export const navigateEvent = (payload: object) => {
 
 export const isShuffleOn = (): boolean => {
   const shuffleBtn = document.querySelector<HTMLButtonElement>(
-    'button[aria-label="Shuffle playlist"]',
+    "#top-level-buttons-computed > ytd-toggle-button-renderer > yt-button-shape > button",
   );
 
   return shuffleBtn?.getAttribute("aria-pressed") === "true";
@@ -400,6 +401,17 @@ export const sortRenderedPlaylist = (
         sibling.textContent = nextVidInfo?.videoTitle ?? "";
         sibling.removeAttribute("is-empty");
       }
+
+      // Focus back on playing video item
+      chrome.storage.local.get<SettingsT>((settings) => {
+        if (!settings.scroll) return;
+        setTimeout(() => {
+          playlistContainer.scrollTo({
+            top: el.offsetTop - playlistContainer.offsetHeight / 1.5,
+            behavior: "smooth",
+          });
+        }, 200);
+      });
     },
   );
 
