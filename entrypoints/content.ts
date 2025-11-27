@@ -59,7 +59,7 @@ export default defineContentScript({
         if (videoContainer) {
           const video = document.querySelector("video");
           if (!video) return null;
-          // video.currentTime = video.duration / 2;
+          video.currentTime = video.duration / 2;
           setTimeout(() => {
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
@@ -193,14 +193,10 @@ export default defineContentScript({
       });
 
       video?.addEventListener("pause", () => {
-        // const playBtn =
-        //   document.querySelector<HTMLButtonElement>(".ytp-play-button");
-
         const current =
           document.querySelector(".ytp-time-current")?.textContent;
         const duration =
           document.querySelector(".ytp-time-duration")?.textContent;
-
         if (current === duration) {
           navigateEvent({ ytSort: "videoEnd" });
         }
@@ -213,6 +209,7 @@ export default defineContentScript({
         const direction = target.classList[0].split("-")[1];
 
         if (direction !== "next" && direction !== "prev") return null;
+        if (!target.dataset.preview) return;
 
         navigateEvent({ ytSort: direction });
       });
@@ -355,7 +352,8 @@ export default defineContentScript({
       }
 
       if (!firstRun) return;
-      firstRunEvent();
+      // FIX: This must wait for the video element
+      setTimeout(() => firstRunEvent(), 5000);
     });
   },
   matches: ["*://*.youtube.com/*"],

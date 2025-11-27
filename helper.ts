@@ -126,8 +126,6 @@ export const storeMainCache = (
   if (!data || !playlistId) return null;
   clog("storeCache =>", data);
   const originalCache = getCache("ytSortMainCache", playlistId);
-  // TEST: this to see if it's necessary to remove old cache
-  // localRemove("ytSortMainCache");
 
   const newItems = data.items.reduce(
     (acc, item, index) => {

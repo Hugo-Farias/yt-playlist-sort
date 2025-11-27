@@ -26,11 +26,13 @@ function App() {
 
   useEffect(() => {
     chrome.storage.local.set(settings);
+    console.log("settings ==> ", settings);
   }, [settings]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const id = e.target.id;
     if (!isSettingKey(id)) return null;
+    console.log("id ==> ", id);
     setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
