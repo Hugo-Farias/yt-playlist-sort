@@ -65,7 +65,7 @@ export default defineContentScript({
             video.pause();
             // video.remove();
             // videoContainer.remove();
-          }, 1000);
+          }, 2000);
         }
       }
     };
@@ -88,7 +88,6 @@ export default defineContentScript({
           e.stopImmediatePropagation();
         } else if (detail?.ytSort) {
           const { ytSort } = detail;
-          console.log("ytSort ==> ", ytSort);
 
           const currentItem = document.querySelector(
             "ytd-playlist-panel-video-renderer[selected]",
@@ -212,7 +211,6 @@ export default defineContentScript({
         const target = e.target as HTMLDivElement;
 
         const direction = target.classList[0].split("-")[1];
-        console.log("direction ==> ", direction);
 
         if (direction !== "next" && direction !== "prev") return null;
 
@@ -220,6 +218,14 @@ export default defineContentScript({
       });
 
       window.addEventListener("keydown", (e) => {
+        if (
+          e.target instanceof HTMLInputElement ||
+          e.target instanceof HTMLTextAreaElement ||
+          (e.target instanceof HTMLElement && e.target.isContentEditable)
+        ) {
+          return;
+        }
+
         if (e.key === "N") navigateEvent({ ytSort: "next" });
         else if (e.key === "P") navigateEvent({ ytSort: "prev" });
       });
