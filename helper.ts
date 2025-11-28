@@ -96,7 +96,7 @@ export const localAdd = (
 
 export const waitForElement = (
   selector: string,
-  timeout = 10000,
+  timeout = 20000,
 ): Promise<Element> => {
   return new Promise((resolve, reject) => {
     const interval = setInterval(() => {
@@ -215,12 +215,12 @@ export const comparePlaylist = (
 // };
 
 // Format the date to a human-readable format
-const formatDate = (
+export const formatDate = (
   dateInput: Date | number,
   options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "short",
     day: "numeric",
+    month: "short",
+    year: "numeric",
   },
   locale = document.querySelector("html")?.lang || "en-US",
 ): string => {
@@ -245,8 +245,8 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     // TODO: add setting for date format
     const formattedDate = formatDate(videoPublishedAt, {
       day: "numeric",
-      month: "numeric",
-      year: "2-digit",
+      month: "long",
+      year: "numeric",
     });
 
     const span = document.createElement("span");

@@ -9,7 +9,7 @@ export const createDropdownMenu = (
   cache: ApiCache | null,
   playlistContainer: HTMLDivElement,
   playlistMenuBtns: HTMLDivElement,
-  loadedCache: { [key: string]: ApiCache },
+  fullCache: { [key: string]: ApiCache },
 ) => {
   const dropdownElList = document.querySelectorAll(".ytSortDropdown");
   dropdownElList.forEach((el) => {
@@ -45,7 +45,7 @@ export const createDropdownMenu = (
 
     localAdd("ytSortMainCache", { sortOrder: sortOrder });
 
-    if (cache) loadedCache[cache.listId].sortOrder = sortOrder;
+    if (cache) fullCache[cache.listId].sortOrder = sortOrder;
 
     sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);
   });
@@ -57,7 +57,7 @@ export const createReverseBtn = (
   cache: ApiCache,
   playlistContainer: HTMLDivElement,
   playlistMenuBtns: HTMLDivElement | null,
-  loadedCache: { [key: string]: ApiCache },
+  fullCache: { [key: string]: ApiCache },
 ) => {
   isReversed = cache.isReversed;
 
@@ -89,13 +89,13 @@ export const createReverseBtn = (
 
     localAdd("ytSortMainCache", { isReversed: isReversed });
 
-    loadedCache[cache.listId].isReversed = isReversed;
+    fullCache[cache.listId].isReversed = isReversed;
 
     sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);
   };
 
   reverseBtn.addEventListener("click", () => {
-    reverseBtnFunc();
+    return reverseBtnFunc();
   });
 
   reverseBtn.addEventListener("mouseenter", () => {

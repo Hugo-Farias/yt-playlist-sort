@@ -1,4 +1,5 @@
 import OptionEl from "./components/OptionEl";
+import SelectDateFormat from "./components/SelectDateFormat";
 
 // TODO: finish this, add option to change the date format
 
@@ -44,7 +45,9 @@ function App() {
           label="Display dates"
           checked={settings.date}
           onChange={onChange}
-        />
+        >
+          <SelectDateFormat />
+        </OptionEl>
         <OptionEl
           id="scroll"
           label="Scroll to current video after reorder"

@@ -58,10 +58,10 @@ export default defineContentScript({
 
         const videoContainer = document.querySelector("#full-bleed-container");
         if (videoContainer) {
-          const video = document.querySelector("video");
-          if (!video) return null;
-          video.currentTime = video.duration / 10;
           setTimeout(() => {
+            const video = document.querySelector("video");
+            if (!video) return null;
+            video.currentTime = video.duration / 10;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
             // video.remove();
@@ -350,8 +350,6 @@ export default defineContentScript({
 
       if (!firstRun) return;
       waitForElement("video").then(() => {
-        console.log("video loaded 🟣🟣🟣");
-
         firstRunEvent();
       });
     });
