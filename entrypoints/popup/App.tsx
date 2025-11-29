@@ -1,8 +1,6 @@
 import OptionEl from "./components/OptionEl";
 import SelectDateFormat from "./components/SelectDateFormat";
 
-// TODO: finish this, add option to change the date format
-
 export type SettingsT = {
   date: boolean;
   scroll: boolean;
@@ -39,7 +37,13 @@ function App() {
     <div
       className={"min-w-80 select-none bg-stone-900 p-1 text-sm text-stone-300"}
     >
-      <form className={"items-center divide-y divide-white/20"}>
+      <form className={"flex flex-col space-y-1"}>
+        <OptionEl
+          id="scroll"
+          label="Scroll to current video after reorder"
+          checked={settings.scroll}
+          onChange={onChange}
+        />
         <OptionEl
           id="date"
           label="Display dates"
@@ -48,12 +52,6 @@ function App() {
         >
           <SelectDateFormat />
         </OptionEl>
-        <OptionEl
-          id="scroll"
-          label="Scroll to current video after reorder"
-          checked={settings.scroll}
-          onChange={onChange}
-        />
       </form>
     </div>
   );

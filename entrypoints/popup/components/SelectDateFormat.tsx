@@ -1,6 +1,10 @@
 import { formatDate } from "@/helper";
 
-const SAMPLE_DATE = new Date(2025, 8, 23); // 23 September 2025
+type PropsT = {
+  className?: string;
+};
+
+const SAMPLE_DATE = new Date(2025, 3, 23); // 23 September 2025
 
 const dateFormats = [
   {
@@ -35,9 +39,9 @@ const dateFormats = [
   },
 ] as const;
 
-const SelectDateFormat = () => {
+const SelectDateFormat = (props: PropsT) => {
   return (
-    <select className={"rounded-sm border border-stone-500"}>
+    <select className={`rounded-sm border border-stone-500 ${props.className}`}>
       {dateFormats.map((date) => {
         return (
           <option

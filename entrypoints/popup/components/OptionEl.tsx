@@ -14,7 +14,7 @@ const OptionEl = (props: PropsT) => {
   return (
     <label
       className={
-        "flex min-h-8 w-full cursor-pointer items-center whitespace-nowrap p-1 px-3 transition-colors hover:bg-white/5 hover:text-stone-100"
+        "flex min-h-8 cursor-pointer items-center whitespace-nowrap p-1 px-3 transition-colors hover:bg-white/5 hover:text-stone-100"
       }
       htmlFor={id}
     >
@@ -27,7 +27,11 @@ const OptionEl = (props: PropsT) => {
         onChange={onChange}
       />
       {label}
-      {checked && <div className={`ml-4`}>{children}</div>}
+      <div
+        className={`${checked ? "pointer-events-auto" : "pointer-events-none opacity-15"} ml-4`}
+      >
+        {children}
+      </div>
     </label>
   );
 };
