@@ -4,6 +4,7 @@ import SelectDateFormat from "./components/SelectDateFormat";
 export type SettingsT = {
   date: boolean;
   scroll: boolean;
+  lang?: string;
 };
 
 let initialSettings: SettingsT = {
@@ -35,9 +36,11 @@ function App() {
 
   return (
     <div
-      className={"min-w-80 select-none bg-stone-900 p-1 text-sm text-stone-300"}
+      className={
+        "min-w-80 select-none bg-stone-900 px-2 py-2 text-sm text-stone-300"
+      }
     >
-      <form className={"flex flex-col space-y-1"}>
+      <form className={"flex flex-col"}>
         <OptionEl
           id="scroll"
           label="Scroll to current video after reorder"
@@ -50,7 +53,7 @@ function App() {
           checked={settings.date}
           onChange={onChange}
         >
-          <SelectDateFormat />
+          <SelectDateFormat settings={settings} />
         </OptionEl>
       </form>
     </div>

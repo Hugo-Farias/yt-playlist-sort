@@ -202,18 +202,6 @@ export const comparePlaylist = (
   return listA.sort().every((id, index) => id === listBsorted[index]);
 };
 
-// type getFullCacheRT<T extends string> = T extends "ytSortMainCache"
-//   ? { [key: string]: ApiCache }
-//   : { [key: string]: RenderedPlaylistItem[] };
-//
-// export const getFullCache = <T extends "ytSortMainCache" | "ytSortRenderedCache">(
-//   storageKey: T,
-// ): getFullCacheRT<T> | null => {
-//   const data = localStorage.getItem(storageKey);
-//   if (!data) return null;
-//   return JSON.parse(data) as getFullCacheRT<T>;
-// };
-
 // Format the date to a human-readable format
 export const formatDate = (
   dateInput: Date | number,
@@ -222,7 +210,7 @@ export const formatDate = (
     month: "short",
     year: "numeric",
   },
-  locale = document.querySelector("html")?.lang || "en-US",
+  locale = document.querySelector("html")?.lang || "en-GB",
 ): string => {
   const date = new Date(dateInput);
   return date.toLocaleDateString(locale, options);

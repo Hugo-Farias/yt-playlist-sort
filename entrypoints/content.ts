@@ -38,6 +38,8 @@ export default defineContentScript({
       localRemove("ytSortRenderedCache");
     }
 
+    chrome.storage.local.set({ lang: document.querySelector("html")?.lang });
+
     cleanOldMainCacheEntries(fullCache);
 
     let navBlock = false; // prevent navigation events during playlist load
@@ -64,8 +66,8 @@ export default defineContentScript({
             video.currentTime = video.duration / 10;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
-            // video.remove();
-            // videoContainer.remove();
+            video.remove();
+            videoContainer.remove();
           }, 2000);
         }
       }
