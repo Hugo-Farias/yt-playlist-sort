@@ -1,6 +1,8 @@
 import OptionEl from "./components/OptionEl";
 import SelectDateFormat from "./components/SelectDateFormat";
 
+export type LanguageCodeT = Intl.Locale;
+
 export type SettingsT = {
   date: boolean;
   scroll: boolean;

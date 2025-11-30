@@ -1,3 +1,4 @@
+import LANGUAGES from "@/data/languages";
 import { formatDate } from "@/helper";
 import type { SettingsT } from "../App";
 
@@ -62,24 +63,44 @@ const SelectDateFormat = (props: PropsT) => {
   const dupCheck: string[] = [];
 
   return (
-    <>
-      <span>Format: </span>
-      <select className={`rounded-sm border border-stone-500 ${className}`}>
-        {dateFormats(settings.lang).map((date) => {
-          if (dupCheck.includes(date.label)) return null;
-          dupCheck.push(date.label);
-          return (
-            <option
-              key={date.id}
-              className={"bg-stone-900 text-center text-inherit"}
-              value={date.value}
-            >
-              {date.label}
-            </option>
-          );
-        })}
-      </select>
-    </>
+    <div className="space-y-1">
+      <div>
+        <span>Format: </span>
+        <select className={`rounded-sm border border-stone-500 ${className}`}>
+          {dateFormats(settings.lang).map((date) => {
+            if (dupCheck.includes(date.label)) return null;
+            dupCheck.push(date.label);
+            return (
+              <option
+                key={date.id}
+                className={"bg-stone-900 text-center text-inherit"}
+                value={date.value}
+              >
+                {date.label}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+      <div>
+        <span>Language: </span>
+        <select
+          className={`w-fit rounded-sm border border-stone-500 px-1 ${className}`}
+        >
+          {LANGUAGES.map((language) => {
+            return (
+              <option
+                key={language.id}
+                className={"bg-stone-900 text-inherit"}
+                value={language.code}
+              >
+                {language.name}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+    </div>
   );
 };
 
