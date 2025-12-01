@@ -1,10 +1,12 @@
-import LANGUAGES from "@/data/languages";
+import type React from "react";
+import LANGUAGES from "@/data/LANGUAGES";
 import { formatDate } from "@/helper";
 import type { SettingsT } from "../App";
 
 type PropsT = {
   className?: string;
   settings: SettingsT;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
 const SAMPLE_DATE = new Date(2025, 8, 24); // 23 April 2025
@@ -24,7 +26,7 @@ const dateFormats = (langSetting: string | undefined) => {
         lang,
       ),
       value: "DD/MMM/YYYY",
-      options: { day: "2-digit", month: "short", year: "numeric" } as const,
+      options: "short" as const,
     },
     {
       id: 1,
@@ -38,7 +40,7 @@ const dateFormats = (langSetting: string | undefined) => {
         lang,
       ),
       value: "DD/MM/YYYY",
-      options: { day: "2-digit", month: "2-digit", year: "numeric" } as const,
+      options: "2-digit" as const,
     },
     {
       id: 2,
@@ -52,13 +54,13 @@ const dateFormats = (langSetting: string | undefined) => {
         lang,
       ),
       value: "DD MMMM YYYY",
-      options: { day: "2-digit", month: "long", year: "numeric" } as const,
+      options: "long" as const,
     },
   ] as const;
 };
 
 const SelectDateFormat = (props: PropsT) => {
-  const { className, settings } = props;
+  const { className, settings, onChange } = props;
 
   const dupCheck: string[] = [];
 
@@ -66,15 +68,20 @@ const SelectDateFormat = (props: PropsT) => {
     <div className="space-y-1">
       <div>
         <span>Format: </span>
-        <select className={`rounded-sm border border-stone-500 ${className}`}>
-          {dateFormats(settings.lang).map((date) => {
+        <select
+          className={`rounded-sm border border-stone-500 ${className}`}
+          onChange={onChange}
+          value={settings.dateFormat}
+          id={"dateFormat"}
+        >
+          {dateFormats(settings.dateLanguage || settings.lang).map((date) => {
             if (dupCheck.includes(date.label)) return null;
             dupCheck.push(date.label);
             return (
               <option
                 key={date.id}
-                className={"bg-stone-900 text-center text-inherit"}
-                value={date.value}
+                className={"bg-stone-900 text-inherit"}
+                value={date.options}
               >
                 {date.label}
               </option>
@@ -86,6 +93,9 @@ const SelectDateFormat = (props: PropsT) => {
         <span>Language: </span>
         <select
           className={`w-fit rounded-sm border border-stone-500 px-1 ${className}`}
+          onChange={onChange}
+          value={settings.dateLanguage}
+          id={"dateLanguage"}
         >
           {LANGUAGES.map((language) => {
             return (

@@ -1,3 +1,4 @@
+import type LANGUAGES from "@/data/LANGUAGES";
 import OptionEl from "./components/OptionEl";
 import SelectDateFormat from "./components/SelectDateFormat";
 
@@ -5,12 +6,16 @@ export type LanguageCodeT = Intl.Locale;
 
 export type SettingsT = {
   date: boolean;
+  dateFormat: "short" | "long" | "2-digit";
+  dateLanguage: (typeof LANGUAGES)[number]["code"];
   scroll: boolean;
   lang?: string;
 };
 
 let initialSettings: SettingsT = {
   date: true,
+  dateFormat: "short",
+  dateLanguage: "",
   scroll: true,
 };
 
@@ -26,14 +31,28 @@ chrome.storage.local.get<SettingsT>((settings) => {
 function App() {
   const [settings, setSettings] = useState<SettingsT>(initialSettings);
 
+  console.log("settings ==> ", settings);
+
   useEffect(() => {
     chrome.storage.local.set(settings);
   }, [settings]);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const id = e.target.id;
+    const value = e.target.value;
+
     if (!isSettingKey(id)) return null;
-    setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
+
+    console.log("e ==> ", e.target.id);
+    console.log("value ==> ", value);
+
+    if (value === "on" || value === "off") {
+      setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
+    } else {
+      setSettings((prev) => ({ ...prev, [id]: value }));
+    }
   };
 
   return (
@@ -55,7 +74,7 @@ function App() {
           checked={settings.date}
           onChange={onChange}
         >
-          <SelectDateFormat settings={settings} />
+          <SelectDateFormat settings={settings} onChange={onChange} />
         </OptionEl>
       </form>
     </div>
