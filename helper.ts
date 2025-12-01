@@ -210,7 +210,7 @@ export const formatDate = (
     month: "short",
     year: "numeric",
   },
-  locale = document.querySelector("html")?.lang || "en-GB",
+  locale = "en-GB",
 ): string => {
   const date = new Date(dateInput);
   return date.toLocaleDateString(locale, options);
@@ -230,12 +230,16 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     const videoPublishedAt =
       cache.videos[getVideoId(el) ?? ""]?.publishedAt ?? Infinity;
 
-    // TODO: add setting for date format
-    const formattedDate = formatDate(videoPublishedAt, {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    // TEST: add setting for date format
+    const formattedDate = formatDate(
+      videoPublishedAt,
+      {
+        day: "2-digit",
+        month: settings.dateFormat,
+        year: "numeric",
+      },
+      settings.dateLanguage || settings.lang,
+    );
 
     const span = document.createElement("span");
     span.textContent = `- ${formattedDate}`;

@@ -30,7 +30,6 @@ chrome.storage.local.get<SettingsT>((settings) => {
 
 function App() {
   const [settings, setSettings] = useState<SettingsT>(initialSettings);
-
   console.log("settings ==> ", settings);
 
   useEffect(() => {
@@ -44,9 +43,6 @@ function App() {
     const value = e.target.value;
 
     if (!isSettingKey(id)) return null;
-
-    console.log("e ==> ", e.target.id);
-    console.log("value ==> ", value);
 
     if (value === "on" || value === "off") {
       setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
