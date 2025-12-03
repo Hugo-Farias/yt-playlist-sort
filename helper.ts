@@ -230,11 +230,10 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     const videoPublishedAt =
       cache.videos[getVideoId(el) ?? ""]?.publishedAt ?? Infinity;
 
-    // TEST: add setting for date format
     const formattedDate = formatDate(
       videoPublishedAt,
       {
-        day: "2-digit",
+        day: "numeric",
         month: settings.dateFormat,
         year: "numeric",
       },

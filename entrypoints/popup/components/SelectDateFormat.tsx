@@ -19,7 +19,7 @@ const dateFormats = (langSetting: string | undefined) => {
       label: formatDate(
         SAMPLE_DATE,
         {
-          day: "2-digit",
+          day: "numeric",
           month: "short",
           year: "numeric",
         },
@@ -33,7 +33,7 @@ const dateFormats = (langSetting: string | undefined) => {
       label: formatDate(
         SAMPLE_DATE,
         {
-          day: "2-digit",
+          day: "numeric",
           month: "2-digit",
           year: "numeric",
         },
@@ -47,7 +47,7 @@ const dateFormats = (langSetting: string | undefined) => {
       label: formatDate(
         SAMPLE_DATE,
         {
-          day: "2-digit",
+          day: "numeric",
           month: "long",
           year: "numeric",
         },

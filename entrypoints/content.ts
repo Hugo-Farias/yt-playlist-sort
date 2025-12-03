@@ -28,6 +28,13 @@ import pkg from "../package.json";
 export default defineContentScript({
   main() {
     let fullCache: { [key: string]: ApiCache } = {};
+    let currUrl = location.href;
+    let playlistId: string = getListId(currUrl);
+    let firstRun = true;
+    let prevListId: string | null = null;
+    let playlistContainer = document.querySelector<HTMLDivElement>(
+      "ytd-playlist-panel-renderer #items",
+    );
 
     try {
       fullCache = JSON.parse(localGet("ytSortMainCache") || "{}");
@@ -48,9 +55,6 @@ export default defineContentScript({
       clearOldCache(pkg.version);
       localSet("ytSortVersion", pkg.version);
     }
-    let firstRun = true;
-    let currUrl = location.href;
-    let prevListId: string | null = null;
 
     clog("init 🟢");
 
@@ -231,10 +235,7 @@ export default defineContentScript({
       });
     };
 
-    const hydrateCache = async (
-      playlistContainer: HTMLDivElement,
-      playlistId: string,
-    ) => {
+    const hydrateCache = async (playlistContainer: HTMLDivElement) => {
       if (!playlistContainer) return null;
 
       if (prevListId !== playlistId) {
@@ -288,16 +289,16 @@ export default defineContentScript({
       // document.addEventListener("yt-page-data-updated", async () => {
       currUrl = location.href;
 
-      const playlistId = getListId(currUrl);
+      playlistId = getListId(currUrl);
       if (!playlistId) return null;
 
-      const playlistContainer = document.querySelector<HTMLDivElement>(
+      playlistContainer = document.querySelector<HTMLDivElement>(
         "ytd-playlist-panel-renderer #items",
       );
 
       if (!playlistContainer) return null;
 
-      const refreshedCache = await hydrateCache(playlistContainer, playlistId);
+      const refreshedCache = await hydrateCache(playlistContainer);
 
       if (!refreshedCache) return null;
 
@@ -358,6 +359,22 @@ export default defineContentScript({
 
     document.addEventListener("yt-navigate-start", () => {
       navBlock = true;
+    });
+
+    chrome.storage.onChanged.addListener(() => {
+      const playlistContainer = document.querySelector<HTMLDivElement>(
+        "ytd-playlist-panel-renderer #items",
+      );
+
+      const playlistId = getListId(currUrl);
+      const cache = fullCache[playlistId];
+
+      sortRenderedPlaylist(
+        playlistContainer,
+        cache,
+        cache.sortOrder,
+        cache.isReversed,
+      );
     });
   },
   matches: ["*://*.youtube.com/*"],

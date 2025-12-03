@@ -25,7 +25,7 @@ function isSettingKey(id: string): id is keyof SettingsT {
 
 chrome.storage.local.get<SettingsT>((settings) => {
   if (!settings) return;
-  initialSettings = settings;
+  initialSettings = { ...initialSettings, ...settings };
 });
 
 function App() {
