@@ -30,7 +30,6 @@ chrome.storage.local.get<SettingsT>((settings) => {
 
 function App() {
   const [settings, setSettings] = useState<SettingsT>(initialSettings);
-  console.log("settings ==> ", settings);
 
   useEffect(() => {
     chrome.storage.local.set(settings);
@@ -51,6 +50,7 @@ function App() {
     }
   };
 
+  // TODO: add translation
   return (
     <div
       className={
@@ -60,13 +60,13 @@ function App() {
       <form className={"flex flex-col"}>
         <OptionEl
           id="scroll"
-          label="Scroll to current video after reorder"
+          label={i18n.t("settingsScroll")}
           checked={settings.scroll}
           onChange={onChange}
         />
         <OptionEl
           id="date"
-          label="Display dates"
+          label={i18n.t("settingsDate")}
           checked={settings.date}
           onChange={onChange}
         >

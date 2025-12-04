@@ -28,6 +28,7 @@
     "@types/chrome": "^0.0.280",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
+    "@wxt-dev/i18n": "^0.2.4",
     "@wxt-dev/module-react": "^1.1.2",
     "tailwindcss": "^4.1.17",
     "ts-prune": "^0.10.3",

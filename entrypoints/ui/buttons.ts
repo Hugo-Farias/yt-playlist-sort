@@ -26,6 +26,7 @@ export const createDropdownMenu = (
   select.style.borderRadius = "5px";
   select.style.marginInline = "5px";
 
+  // TODO: add locale chrome api for translations
   const options: { value: YtSortOrder; label: string }[] = [
     { value: "orig", label: "Default Order" },
     { value: "title", label: "Sort By Title" },

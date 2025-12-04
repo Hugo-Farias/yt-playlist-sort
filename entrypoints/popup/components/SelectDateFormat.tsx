@@ -1,4 +1,5 @@
 import type React from "react";
+import { i18n } from "#i18n";
 import LANGUAGES from "@/data/LANGUAGES";
 import { formatDate } from "@/helper";
 import type { SettingsT } from "../App";
@@ -25,7 +26,6 @@ const dateFormats = (langSetting: string | undefined) => {
         },
         lang,
       ),
-      value: "DD/MMM/YYYY",
       options: "short" as const,
     },
     {
@@ -39,7 +39,6 @@ const dateFormats = (langSetting: string | undefined) => {
         },
         lang,
       ),
-      value: "DD/MM/YYYY",
       options: "2-digit" as const,
     },
     {
@@ -53,7 +52,6 @@ const dateFormats = (langSetting: string | undefined) => {
         },
         lang,
       ),
-      value: "DD MMMM YYYY",
       options: "long" as const,
     },
   ] as const;
@@ -67,7 +65,7 @@ const SelectDateFormat = (props: PropsT) => {
   return (
     <div className="space-y-1">
       <div>
-        <span>Format: </span>
+        <span>{i18n.t("settingsDateFormat")}: </span>
         <select
           className={`rounded-sm border border-stone-500 ${className}`}
           onChange={onChange}
@@ -90,7 +88,7 @@ const SelectDateFormat = (props: PropsT) => {
         </select>
       </div>
       <div>
-        <span>Language: </span>
+        <span>{i18n.t("settingsDateLanguage")}: </span>
         <select
           className={`w-fit rounded-sm border border-stone-500 px-1 ${className}`}
           onChange={onChange}
