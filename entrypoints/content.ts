@@ -205,6 +205,8 @@ export default defineContentScript({
           document.querySelector(".ytp-time-current")?.textContent;
         const duration =
           document.querySelector(".ytp-time-duration")?.textContent;
+        if (!current) return;
+        if (!duration) return;
         if (current === duration) {
           navigateEvent({ ytSort: "videoEnd" });
         }
