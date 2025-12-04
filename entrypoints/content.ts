@@ -71,8 +71,8 @@ export default defineContentScript({
             video.currentTime = video.duration / 10;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
-            video.remove();
-            videoContainer.remove();
+            // video.remove();
+            // videoContainer.remove();
           }, 2000);
         }
       }
@@ -201,13 +201,13 @@ export default defineContentScript({
       });
 
       video?.addEventListener("pause", () => {
-        const current =
-          document.querySelector(".ytp-time-current")?.textContent;
-        const duration =
-          document.querySelector(".ytp-time-duration")?.textContent;
+        const current = document
+          .querySelector(".ytp-progress-bar")
+          ?.getAttribute("aria-valuenow");
+
         if (!current) return;
-        if (!duration) return;
-        if (current === duration) {
+
+        if (+current + 1 >= Math.trunc(video.duration)) {
           navigateEvent({ ytSort: "videoEnd" });
         }
       });
