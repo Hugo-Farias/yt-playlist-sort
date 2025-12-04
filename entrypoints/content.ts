@@ -7,6 +7,7 @@ import {
   clearOldCache,
   clog,
   comparePlaylist,
+  debounce,
   getCache,
   getInfoFromElement,
   getListId,
@@ -362,19 +363,23 @@ export default defineContentScript({
     });
 
     chrome.storage.onChanged.addListener(() => {
-      const playlistContainer = document.querySelector<HTMLDivElement>(
-        "ytd-playlist-panel-renderer #items",
-      );
+      if (!playlistId) return null;
+      debounce(() => {
+        clog("Settings Updated");
+        const playlistContainer = document.querySelector<HTMLDivElement>(
+          "ytd-playlist-panel-renderer #items",
+        );
 
-      const playlistId = getListId(currUrl);
-      const cache = fullCache[playlistId];
+        const playlistId = getListId(currUrl);
+        const cache = fullCache[playlistId];
 
-      sortRenderedPlaylist(
-        playlistContainer,
-        cache,
-        cache.sortOrder,
-        cache.isReversed,
-      );
+        sortRenderedPlaylist(
+          playlistContainer,
+          cache,
+          cache.sortOrder,
+          cache.isReversed,
+        );
+      });
     });
   },
   matches: ["*://*.youtube.com/*"],

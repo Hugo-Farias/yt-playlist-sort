@@ -94,6 +94,16 @@ export const localAdd = (
   );
 };
 
+let timeoutTimer: ReturnType<typeof setTimeout>;
+
+export const debounce = (callback: () => void, delay: number = 250) => {
+  clearTimeout(timeoutTimer);
+
+  timeoutTimer = setTimeout(() => {
+    callback();
+  }, delay);
+};
+
 export const waitForElement = (
   selector: string,
   timeout = 20000,
@@ -454,11 +464,3 @@ export const cleanOldMainCacheEntries = (fullCache: {
     }
   });
 };
-
-function debounce<T extends (...args: any[]) => void>(fn: T, delay = 250) {
-  let timer: ReturnType<typeof setTimeout>;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
-  };
-}
