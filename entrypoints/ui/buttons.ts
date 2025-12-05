@@ -1,3 +1,4 @@
+import { i18n } from "#i18n";
 import { reversePlaylistSVG } from "@/entrypoints/ui/reverseBtn";
 import { localAdd, sortRenderedPlaylist } from "@/helper";
 import type { ApiCache, YtSortOrder } from "@/types";
@@ -26,11 +27,10 @@ export const createDropdownMenu = (
   select.style.borderRadius = "5px";
   select.style.marginInline = "5px";
 
-  // TODO: add locale chrome api for translations
   const options: { value: YtSortOrder; label: string }[] = [
-    { value: "orig", label: "Default Order" },
-    { value: "title", label: "Sort By Title" },
-    { value: "date", label: "Sort By Date" },
+    { value: "orig", label: i18n.t("selectDefaultOrder") },
+    { value: "title", label: i18n.t("selectTitle") },
+    { value: "date", label: i18n.t("selectDate") },
   ];
 
   for (const { value, label } of options) {

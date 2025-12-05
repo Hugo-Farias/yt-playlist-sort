@@ -50,7 +50,6 @@ function App() {
     }
   };
 
-  // TODO: add translation
   return (
     <div
       className={

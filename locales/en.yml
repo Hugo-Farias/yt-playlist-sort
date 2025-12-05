@@ -1,3 +1,6 @@
+selectDefaultOrder: "Default Order"
+selectDate: "Sort by Date"
+selectTitle: "Sort by Title"
 settingsScroll: "Scroll to current video after reorder"
 settingsDate: "Display dates"
 settingsDateFormat: "Format"

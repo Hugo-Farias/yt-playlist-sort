@@ -233,6 +233,11 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 
   chrome.storage.local.get<SettingsT>((settings) => {
     if (!settings.date) return;
+    let lang = settings.dateLanguage || settings.lang;
+
+    if (settings.dateLanguage === "browser") {
+      lang = i18n.t("@@ui_locale").replace("_", "-");
+    }
 
     const itemEl = el.querySelector("#byline-container");
     if (!itemEl) return null;
@@ -247,7 +252,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
         month: settings.dateFormat,
         year: "numeric",
       },
-      settings.dateLanguage || settings.lang,
+      lang,
     );
 
     const span = document.createElement("span");
