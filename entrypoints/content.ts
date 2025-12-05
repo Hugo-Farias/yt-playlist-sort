@@ -68,7 +68,7 @@ export default defineContentScript({
           setTimeout(() => {
             const video = document.querySelector("video");
             if (!video) return null;
-            video.currentTime = video.duration / 10;
+            video.currentTime = video.duration - 3;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
             // video.remove();
@@ -97,6 +97,8 @@ export default defineContentScript({
         } else if (detail?.ytSort) {
           const { ytSort } = detail;
 
+          const loopStatus: boolean = isLoopOn();
+
           const currentItem = document.querySelector(
             "ytd-playlist-panel-video-renderer[selected]",
           );
@@ -115,9 +117,9 @@ export default defineContentScript({
           }
 
           if (ytSort !== "videoEnd") localRemove("ytSortLoop", true);
-          else if (isLoopOn()) localSet("ytSortLoop", "true", true);
+          else if (loopStatus) localSet("ytSortLoop", "true", true);
 
-          if (!element && isLoopOn() && ytSort === "videoEnd") {
+          if (!element && loopStatus && ytSort === "videoEnd") {
             localSet("ytSortLoop", "true", true);
             element = document.querySelector(
               "ytd-playlist-panel-video-renderer",
@@ -169,7 +171,10 @@ export default defineContentScript({
                   let prevElement = currentVidEl.previousElementSibling;
                   let nextElement = currentVidEl.nextElementSibling;
 
-                  if (nextElement?.tagName === "YTD-MESSAGE-RENDERER") {
+                  if (
+                    nextElement === null ||
+                    nextElement?.tagName === "YTD-MESSAGE-RENDERER"
+                  ) {
                     nextElement = document.querySelector(
                       "yt-lockup-view-model",
                     );
@@ -344,8 +349,9 @@ export default defineContentScript({
 
       if (wasLoop) {
         const loopBtn = document.querySelector<HTMLButtonElement>(
-          'button[aria-label="Loop playlist"]',
+          "#button > ytd-button-renderer > yt-button-shape > button",
         );
+
         loopBtn?.click();
         localRemove("ytSortLoop", true);
       }

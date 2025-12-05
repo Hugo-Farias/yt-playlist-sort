@@ -357,10 +357,15 @@ export const isShuffleOn = (): boolean => {
   return shuffleBtn?.getAttribute("aria-pressed") === "true";
 };
 
-export const isLoopOn = () => {
-  return !!document.querySelector<HTMLButtonElement>(
-    'button[aria-label="Loop video"]',
-  );
+export const isLoopOn = (): boolean => {
+  const output = document
+    .querySelector(
+      "#button > ytd-button-renderer > yt-button-shape > button > div > span > span > div > svg > path",
+    )
+    ?.getAttribute("d")
+    ?.startsWith("M21");
+
+  return output ? output : false;
 };
 
 const newLayout =
