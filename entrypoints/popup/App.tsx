@@ -23,6 +23,7 @@ function isSettingKey(id: string): id is keyof SettingsT {
   return id in initialSettings;
 }
 
+// TODO: add setting to force the language of the app
 chrome.storage.local.get<SettingsT>((settings) => {
   if (!settings) return;
   initialSettings = { ...initialSettings, ...settings };

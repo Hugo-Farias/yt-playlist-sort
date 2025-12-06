@@ -2,6 +2,13 @@ export type RenderedPlaylistItem = {
   videoId: string | null;
 };
 
+export type GistFile = {
+  keys: string[];
+  API_URL: string;
+  playlistItemSelector: string;
+  fetchedAt?: number;
+};
+
 export type YouTubePlaylistItem = {
   kind: "youtube#playlistItem";
   etag: string;

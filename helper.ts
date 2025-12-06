@@ -7,10 +7,14 @@ import type {
 } from "@/types.ts";
 import type { SettingsT } from "./entrypoints/popup/App";
 
-const { log } = console;
+const { log, error } = console;
 
 export const clog = (...content: Parameters<typeof log>) => {
   log("YT-Playlist-Sort:", ...content);
+};
+
+export const cerr = (...content: Parameters<typeof log>) => {
+  error("YT-Playlist-Sort:", ...content);
 };
 
 type localStorageKeys =
@@ -233,11 +237,6 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 
   chrome.storage.local.get<SettingsT>((settings) => {
     if (!settings.date) return;
-    let lang = settings.dateLanguage || settings.lang;
-
-    if (settings.dateLanguage === "browser") {
-      lang = i18n.t("@@ui_locale").replace("_", "-");
-    }
 
     const itemEl = el.querySelector("#byline-container");
     if (!itemEl) return null;
@@ -252,7 +251,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
         month: settings.dateFormat,
         year: "numeric",
       },
-      lang,
+      settings.dateLanguage || settings.lang,
     );
 
     const span = document.createElement("span");
@@ -363,12 +362,11 @@ export const isShuffleOn = (): boolean => {
 };
 
 export const isLoopOn = (): boolean => {
-  const output = document
-    .querySelector(
-      "#button > ytd-button-renderer > yt-button-shape > button > div > span > span > div > svg > path",
-    )
-    ?.getAttribute("d")
-    ?.startsWith("M21");
+  const loopBtn = document.querySelector(
+    "#button > ytd-button-renderer > yt-button-shape > button > div > span > span > div > svg > path",
+  );
+
+  const output = loopBtn?.getAttribute("d")?.startsWith("M21");
 
   return output ? output : false;
 };

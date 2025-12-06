@@ -1,6 +1,12 @@
+import { i18n } from "#i18n";
+
 const LANGUAGES = [
-  { id: 0, name: "Match Youtube", code: "" },
-  { id: 0, name: "Match Browser", code: "browser" },
+  { id: 0, name: i18n.t("languagesMatchYoutube"), code: "" },
+  {
+    id: 0,
+    name: i18n.t("languagesMatchBrowser"),
+    code: i18n.t("@@ui_locale").replace("_", "-"),
+  },
   { id: 1, name: "Afrikaans", code: "af" },
   { id: 2, name: "Azərbaycan", code: "az" },
   { id: 3, name: "Bahasa Indonesia", code: "id" },

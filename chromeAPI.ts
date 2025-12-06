@@ -1,4 +1,5 @@
 import {
+  cerr,
   checkCacheAge,
   clog,
   getCache,
@@ -6,8 +7,7 @@ import {
   localGet,
   localSet,
 } from "@/helper";
-import type { YoutubePlaylistResponse } from "@/types.ts";
-import { API_URL } from "./config";
+import type { GistFile, YoutubePlaylistResponse } from "@/types.ts";
 
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
@@ -16,7 +16,6 @@ const fetchJson = async <T = unknown>(
   clog("FetchJson Called with URL:", input);
   try {
     const res = await fetch(input, init);
-
     return (await res.json()) as Promise<T>;
   } catch (error) {
     console.error("Fetch error:", error);
@@ -25,15 +24,22 @@ const fetchJson = async <T = unknown>(
   }
 };
 
-type GistFile = { keys: string[] };
-export type GistCache = { keys: string[]; fetchedAt: number };
+const gistDefault: GistFile = {
+  keys: ["AIyzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY"],
+  API_URL:
+    "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50",
+  playlistItemSelector:
+    "ytd-playlist-panel-video-renderer#playlist-items:not([within-miniplayer])",
+};
 
 export const fetchGist = async (): Promise<GistFile> => {
-  const gistCache: GistCache = JSON.parse(localGet("ytSortGist") || "null");
+  const gistCache: GistFile = JSON.parse(localGet("ytSortGist") || "null");
 
-  const cacheIsOld = gistCache ? checkCacheAge(gistCache.fetchedAt, 1) : true;
+  const cacheIsOld = gistCache
+    ? checkCacheAge(gistCache.fetchedAt || Infinity, 1)
+    : true;
 
-  const data: GistCache | GistFile | null = cacheIsOld
+  const data: GistFile | null = cacheIsOld
     ? await fetchJson<GistFile>(
         "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
       )
@@ -41,12 +47,12 @@ export const fetchGist = async (): Promise<GistFile> => {
 
   if (!data) {
     if (gistCache) {
-      clog("Fecth failed. Using cached gist data");
+      cerr("Fecth failed. Using cached gist data");
       return gistCache;
     }
 
-    clog("No API keys found in the Gist. Using default key.");
-    return { keys: ["AIyzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY"] };
+    cerr("Gist file could not be accessed. Using default.");
+    return gistDefault;
   }
 
   localSet("ytSortGist", { ...data, fetchedAt: Date.now() });
@@ -71,7 +77,7 @@ export const playlistAPI = async (
   const key = gist.keys[keyNum % gist.keys.length] || "";
 
   const data = await fetchJson<YoutubePlaylistResponse>(
-    `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
+    `${gist.API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
   if (!data) {

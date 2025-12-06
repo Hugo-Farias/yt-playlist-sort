@@ -1,5 +1,4 @@
-import { playlistAPI } from "@/chromeAPI.ts";
-import { playlistItemSelector } from "@/config";
+import { fetchGist, playlistAPI } from "@/chromeAPI.ts";
 import { createDropdownMenu, createReverseBtn } from "@/entrypoints/ui/buttons";
 import {
   checkCacheAge,
@@ -68,7 +67,7 @@ export default defineContentScript({
           setTimeout(() => {
             const video = document.querySelector("video");
             if (!video) return null;
-            video.currentTime = video.duration - 3;
+            video.currentTime = video.duration / 3;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
             // video.remove();
@@ -246,9 +245,11 @@ export default defineContentScript({
     const hydrateCache = async (playlistContainer: HTMLDivElement) => {
       if (!playlistContainer) return null;
 
+      const gistFile = await fetchGist();
+
       if (prevListId !== playlistId) {
         const playlistItems: NodeListOf<HTMLDivElement> =
-          playlistContainer.querySelectorAll(playlistItemSelector);
+          playlistContainer.querySelectorAll(gistFile.playlistItemSelector);
 
         const renderedCache = getCache(
           "ytSortRenderedCache",
