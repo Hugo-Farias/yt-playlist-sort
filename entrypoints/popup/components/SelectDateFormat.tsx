@@ -16,7 +16,7 @@ const dateFormats = (langSetting: string | undefined) => {
   const lang = langSetting || navigator.language;
   return [
     {
-      id: 3,
+      id: 1,
       label: formatDate(
         SAMPLE_DATE,
         {
@@ -26,10 +26,10 @@ const dateFormats = (langSetting: string | undefined) => {
         },
         lang,
       ),
-      options: "short" as const,
+      opt: "short" as const,
     },
     {
-      id: 1,
+      id: 2,
       label: formatDate(
         SAMPLE_DATE,
         {
@@ -39,10 +39,10 @@ const dateFormats = (langSetting: string | undefined) => {
         },
         lang,
       ),
-      options: "2-digit" as const,
+      opt: "2-digit" as const,
     },
     {
-      id: 2,
+      id: 3,
       label: formatDate(
         SAMPLE_DATE,
         {
@@ -52,10 +52,27 @@ const dateFormats = (langSetting: string | undefined) => {
         },
         lang,
       ),
-      options: "long" as const,
+      opt: "long" as const,
     },
   ] as const;
 };
+
+// const options = [
+//   {
+//     id: 1,
+//     label: "Format",
+//     value: "dateFormat",
+//     locale: "settingsDateFormat",
+//     loop: dateFormats,
+//   },
+//   {
+//     id: 2,
+//     label: "Language",
+//     value: "dateLanguge",
+//     locale: "settingsDateLanguage",
+//     loop: LANGUAGES,
+//   },
+// ] as const;
 
 const SelectDateFormat = (props: PropsT) => {
   const { className, settings, onChange } = props;
@@ -72,6 +89,7 @@ const SelectDateFormat = (props: PropsT) => {
           value={settings.dateFormat}
           id={"dateFormat"}
         >
+          {/* TODO: find a solution to make this a loop */}
           {dateFormats(settings.dateLanguage || settings.lang).map((date) => {
             if (dupCheck.includes(date.label)) return null;
             dupCheck.push(date.label);
@@ -79,7 +97,7 @@ const SelectDateFormat = (props: PropsT) => {
               <option
                 key={date.id}
                 className={"bg-stone-900 text-inherit"}
-                value={date.options}
+                value={date.opt}
               >
                 {date.label}
               </option>
@@ -90,7 +108,7 @@ const SelectDateFormat = (props: PropsT) => {
       <div>
         <span>{i18n.t("settingsDateLanguage")}: </span>
         <select
-          className={`w-fit rounded-sm border border-stone-500 px-1 ${className}`}
+          className={`rounded-sm border border-stone-500 ${className}`}
           onChange={onChange}
           value={settings.dateLanguage}
           id={"dateLanguage"}
@@ -100,9 +118,9 @@ const SelectDateFormat = (props: PropsT) => {
               <option
                 key={language.id}
                 className={"bg-stone-900 text-inherit"}
-                value={language.code}
+                value={language.opt}
               >
-                {language.name}
+                {language.label}
               </option>
             );
           })}

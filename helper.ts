@@ -1,10 +1,10 @@
-import { playlistItemSelector } from "@/config.ts";
 import type {
   ApiCache,
   ApiCacheItems,
   YoutubePlaylistResponse,
   YtSortOrder,
 } from "@/types.ts";
+import { gistFile } from "./entrypoints/content";
 import type { SettingsT } from "./entrypoints/popup/App";
 
 const { log, error } = console;
@@ -100,7 +100,7 @@ export const localAdd = (
 
 let timeoutTimer: ReturnType<typeof setTimeout>;
 
-export const debounce = (callback: () => void, delay: number = 250) => {
+export const debounce = (callback: () => void, delay: number = 500) => {
   clearTimeout(timeoutTimer);
 
   timeoutTimer = setTimeout(() => {
@@ -234,12 +234,23 @@ export const formatDate = (
 export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
   const dateEl = el.querySelector(".playlistSort-date");
   if (dateEl) dateEl.remove();
+  log();
 
   chrome.storage.local.get<SettingsT>((settings) => {
     if (!settings.date) return;
 
     const itemEl = el.querySelector("#byline-container");
     if (!itemEl) return null;
+
+    let lang = settings.dateLanguage;
+
+    if (lang === "browser") {
+      lang = i18n.t("@@ui_locale").replace("_", "-") as "browser";
+    } else if (lang === "youtube") {
+      lang = settings.lang as "youtube";
+    }
+
+    console.log("lang ==> ", lang);
 
     const videoPublishedAt =
       cache.videos[getVideoId(el) ?? ""]?.publishedAt ?? Infinity;
@@ -251,7 +262,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
         month: settings.dateFormat,
         year: "numeric",
       },
-      settings.dateLanguage || settings.lang,
+      lang,
     );
 
     const span = document.createElement("span");
@@ -385,7 +396,7 @@ export const sortRenderedPlaylist = (
   if (!apiCache) throw new Error("API cache missing");
 
   const playlistItems: NodeListOf<HTMLDivElement> =
-    playlistContainer.querySelectorAll(playlistItemSelector);
+    playlistContainer.querySelectorAll(gistFile.playlistItemSelector);
 
   const sortedList = sortList(playlistItems, apiCache, order);
 

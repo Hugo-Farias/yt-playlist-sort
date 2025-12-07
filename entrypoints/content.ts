@@ -22,12 +22,14 @@ import {
   storeMainCache,
   waitForElement,
 } from "@/helper";
-import type { ApiCache, YTNavigateEvent } from "@/types";
+import type { ApiCache, GistFile, YTNavigateEvent } from "@/types";
 import pkg from "../package.json";
+
+export let gistFile: GistFile;
+export let fullCache: { [key: string]: ApiCache } = {};
 
 export default defineContentScript({
   main() {
-    let fullCache: { [key: string]: ApiCache } = {};
     let currUrl = location.href;
     let playlistId: string = getListId(currUrl);
     let firstRun = true;
@@ -35,6 +37,10 @@ export default defineContentScript({
     let playlistContainer = document.querySelector<HTMLDivElement>(
       "ytd-playlist-panel-renderer #items",
     );
+
+    fetchGist().then((gist) => {
+      gistFile = gist;
+    });
 
     try {
       fullCache = JSON.parse(localGet("ytSortMainCache") || "{}");
@@ -245,7 +251,7 @@ export default defineContentScript({
     const hydrateCache = async (playlistContainer: HTMLDivElement) => {
       if (!playlistContainer) return null;
 
-      const gistFile = await fetchGist();
+      if (!gistFile) gistFile = await fetchGist();
 
       if (prevListId !== playlistId) {
         const playlistItems: NodeListOf<HTMLDivElement> =

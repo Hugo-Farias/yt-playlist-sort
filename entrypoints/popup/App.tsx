@@ -7,7 +7,7 @@ export type LanguageCodeT = Intl.Locale;
 export type SettingsT = {
   date: boolean;
   dateFormat: "short" | "long" | "2-digit";
-  dateLanguage: (typeof LANGUAGES)[number]["code"];
+  dateLanguage: (typeof LANGUAGES)[number]["opt"];
   scroll: boolean;
   lang?: string;
 };
@@ -15,7 +15,7 @@ export type SettingsT = {
 let initialSettings: SettingsT = {
   date: true,
   dateFormat: "short",
-  dateLanguage: "",
+  dateLanguage: "youtube",
   scroll: true,
 };
 
@@ -52,12 +52,8 @@ function App() {
   };
 
   return (
-    <div
-      className={
-        "min-w-80 select-none bg-stone-900 px-2 py-2 text-sm text-stone-300"
-      }
-    >
-      <form className={"flex flex-col"}>
+    <div className={"select-none bg-stone-900 p-2 text-sm text-stone-300"}>
+      <form>
         <OptionEl
           id="scroll"
           label={i18n.t("settingsScroll")}
