@@ -1,7 +1,7 @@
 import type React from "react";
 import { i18n } from "#i18n";
 import LANGUAGES from "@/data/LANGUAGES";
-import { formatDate } from "@/helper";
+import { formatDate, parseLang } from "@/helper";
 import type { SettingsT } from "../App";
 
 type PropsT = {
@@ -12,8 +12,8 @@ type PropsT = {
 
 const SAMPLE_DATE = new Date(2025, 8, 24); // 23 April 2025
 
-const dateFormats = (langSetting: string | undefined) => {
-  const lang = langSetting || navigator.language;
+const dateFormats = (settings: SettingsT | undefined) => {
+  const lang = parseLang(settings);
   return [
     {
       id: 1,
@@ -57,23 +57,6 @@ const dateFormats = (langSetting: string | undefined) => {
   ] as const;
 };
 
-// const options = [
-//   {
-//     id: 1,
-//     label: "Format",
-//     value: "dateFormat",
-//     locale: "settingsDateFormat",
-//     loop: dateFormats,
-//   },
-//   {
-//     id: 2,
-//     label: "Language",
-//     value: "dateLanguge",
-//     locale: "settingsDateLanguage",
-//     loop: LANGUAGES,
-//   },
-// ] as const;
-
 const SelectDateFormat = (props: PropsT) => {
   const { className, settings, onChange } = props;
 
@@ -84,13 +67,13 @@ const SelectDateFormat = (props: PropsT) => {
       <div>
         <span>{i18n.t("settingsDateFormat")}: </span>
         <select
-          className={`rounded-sm border border-stone-500 ${className}`}
+          className={className}
           onChange={onChange}
           value={settings.dateFormat}
           id={"dateFormat"}
         >
           {/* TODO: find a solution to make this a loop */}
-          {dateFormats(settings.dateLanguage || settings.lang).map((date) => {
+          {dateFormats(settings).map((date) => {
             if (dupCheck.includes(date.label)) return null;
             dupCheck.push(date.label);
             return (
@@ -108,7 +91,7 @@ const SelectDateFormat = (props: PropsT) => {
       <div>
         <span>{i18n.t("settingsDateLanguage")}: </span>
         <select
-          className={`rounded-sm border border-stone-500 ${className}`}
+          className={className}
           onChange={onChange}
           value={settings.dateLanguage}
           id={"dateLanguage"}

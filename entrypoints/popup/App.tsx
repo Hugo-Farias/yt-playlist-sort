@@ -66,7 +66,11 @@ function App() {
           checked={settings.date}
           onChange={onChange}
         >
-          <SelectDateFormat settings={settings} onChange={onChange} />
+          <SelectDateFormat
+            settings={settings}
+            onChange={onChange}
+            className={"block rounded-sm border border-stone-500"}
+          />
         </OptionEl>
       </form>
     </div>

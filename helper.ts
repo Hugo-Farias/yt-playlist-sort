@@ -6,6 +6,7 @@ import type {
 } from "@/types.ts";
 import { gistFile } from "./entrypoints/content";
 import type { SettingsT } from "./entrypoints/popup/App";
+import "./data/LANGUAGES";
 
 const { log, error } = console;
 
@@ -230,6 +231,17 @@ export const formatDate = (
   return date.toLocaleDateString(locale, options);
 };
 
+export const parseLang = (langSetting: SettingsT | undefined) => {
+  let lang = langSetting?.dateLanguage;
+
+  if (lang === "browser") {
+    lang = navigator.language as "browser";
+  } else if (lang === "youtube") {
+    lang = langSetting?.lang as "youtube";
+  }
+  return lang || navigator.language;
+};
+
 // TODO: add date to tooltip so it shows on hover
 export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
   const dateEl = el.querySelector(".playlistSort-date");
@@ -242,15 +254,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     const itemEl = el.querySelector("#byline-container");
     if (!itemEl) return null;
 
-    let lang = settings.dateLanguage;
-
-    if (lang === "browser") {
-      lang = i18n.t("@@ui_locale").replace("_", "-") as "browser";
-    } else if (lang === "youtube") {
-      lang = settings.lang as "youtube";
-    }
-
-    console.log("lang ==> ", lang);
+    const lang = parseLang(settings);
 
     const videoPublishedAt =
       cache.videos[getVideoId(el) ?? ""]?.publishedAt ?? Infinity;
