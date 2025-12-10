@@ -1,4 +1,5 @@
-import { fetchGist, playlistAPI } from "@/chromeAPI.ts";
+import { playlistAPI } from "@/chromeAPI.ts";
+import { playlistItemSelector } from "@/config";
 import { createDropdownMenu, createReverseBtn } from "@/entrypoints/ui/buttons";
 import {
   checkCacheAge,
@@ -22,10 +23,9 @@ import {
   storeMainCache,
   waitForElement,
 } from "@/helper";
-import type { ApiCache, GistFile, YTNavigateEvent } from "@/types";
+import type { ApiCache, YTNavigateEvent } from "@/types";
 import pkg from "../package.json";
 
-export let gistFile: GistFile;
 export let fullCache: { [key: string]: ApiCache } = {};
 
 export default defineContentScript({
@@ -37,10 +37,6 @@ export default defineContentScript({
     let playlistContainer = document.querySelector<HTMLDivElement>(
       "ytd-playlist-panel-renderer #items",
     );
-
-    fetchGist().then((gist) => {
-      gistFile = gist;
-    });
 
     try {
       fullCache = JSON.parse(localGet("ytSortMainCache") || "{}");
@@ -76,8 +72,8 @@ export default defineContentScript({
             video.currentTime = video.duration / 3;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
-            // video.remove();
-            // videoContainer.remove();
+            video.remove();
+            videoContainer.remove();
           }, 2000);
         }
       }
@@ -248,15 +244,13 @@ export default defineContentScript({
       });
     };
 
-    const hydrateCache = async (playlistContainer: HTMLDivElement) => {
+    const hydrateCache = async (
+      playlistContainer: HTMLDivElement,
+      playlistItems: NodeListOf<HTMLDivElement>,
+    ) => {
       if (!playlistContainer) return null;
 
-      if (!gistFile) gistFile = await fetchGist();
-
       if (prevListId !== playlistId) {
-        const playlistItems: NodeListOf<HTMLDivElement> =
-          playlistContainer.querySelectorAll(gistFile.playlistItemSelector);
-
         const renderedCache = getCache(
           "ytSortRenderedCache",
           getListId(location.href),
@@ -313,7 +307,13 @@ export default defineContentScript({
 
       if (!playlistContainer) return null;
 
-      const refreshedCache = await hydrateCache(playlistContainer);
+      const playlistItems: NodeListOf<HTMLDivElement> =
+        playlistContainer.querySelectorAll(playlistItemSelector);
+
+      const refreshedCache = await hydrateCache(
+        playlistContainer,
+        playlistItems,
+      );
 
       if (!refreshedCache) return null;
 
@@ -341,12 +341,7 @@ export default defineContentScript({
         fullCache,
       );
 
-      sortRenderedPlaylist(
-        playlistContainer,
-        refreshedCache,
-        refreshedCache.sortOrder,
-        refreshedCache.isReversed,
-      );
+      sortRenderedPlaylist(playlistContainer, refreshedCache);
 
       setTimeout(() => {
         navBlock = false;
@@ -388,12 +383,7 @@ export default defineContentScript({
         const playlistId = getListId(currUrl);
         const cache = fullCache[playlistId];
 
-        sortRenderedPlaylist(
-          playlistContainer,
-          cache,
-          cache.sortOrder,
-          cache.isReversed,
-        );
+        sortRenderedPlaylist(playlistContainer, cache);
       });
     });
   },

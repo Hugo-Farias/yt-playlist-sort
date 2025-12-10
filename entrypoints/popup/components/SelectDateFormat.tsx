@@ -72,7 +72,6 @@ const SelectDateFormat = (props: PropsT) => {
           value={settings.dateFormat}
           id={"dateFormat"}
         >
-          {/* TODO: find a solution to make this a loop */}
           {dateFormats(settings).map((date) => {
             if (dupCheck.includes(date.label)) return null;
             dupCheck.push(date.label);

@@ -8,6 +8,7 @@ import {
   localSet,
 } from "@/helper";
 import type { GistFile, YoutubePlaylistResponse } from "@/types.ts";
+import { API_URL, GIST_URL } from "./config";
 
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
@@ -40,9 +41,7 @@ export const fetchGist = async (): Promise<GistFile> => {
     : true;
 
   const data: GistFile | null = cacheIsOld
-    ? await fetchJson<GistFile>(
-        "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
-      )
+    ? await fetchJson<GistFile>(GIST_URL)
     : gistCache;
 
   if (!data) {
@@ -77,7 +76,7 @@ export const playlistAPI = async (
   const key = gist.keys[keyNum % gist.keys.length] || "";
 
   const data = await fetchJson<YoutubePlaylistResponse>(
-    `${gist.API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
+    `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
   );
 
   if (!data) {

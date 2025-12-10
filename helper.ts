@@ -4,9 +4,9 @@ import type {
   YoutubePlaylistResponse,
   YtSortOrder,
 } from "@/types.ts";
-import { gistFile } from "./entrypoints/content";
 import type { SettingsT } from "./entrypoints/popup/App";
 import "./data/LANGUAGES";
+import { playlistItemSelector } from "./config";
 
 const { log, error } = console;
 
@@ -246,12 +246,11 @@ export const parseLang = (langSetting: SettingsT | undefined) => {
 export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
   const dateEl = el.querySelector(".playlistSort-date");
   if (dateEl) dateEl.remove();
-  log();
 
   chrome.storage.local.get<SettingsT>((settings) => {
     if (!settings.date) return;
 
-    const itemEl = el.querySelector("#byline-container");
+    const itemEl = el.querySelector<HTMLSpanElement>("#byline-container");
     if (!itemEl) return null;
 
     const lang = parseLang(settings);
@@ -277,9 +276,13 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
       "playlistSort-date",
     );
     span.id = "byline";
-    span.style.marginLeft = "-5px";
+    span.style.marginLeft = "-5.2px";
+    span.style.marginRight = "-50px";
+    // span.style.margin = "-100px";
 
     itemEl.appendChild(span);
+    itemEl.style.paddingRight = "0";
+    itemEl.setAttribute("title", "test");
   });
 };
 
@@ -295,9 +298,9 @@ const getFromCache = (
 const sortList = (
   nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,
-  direction: YtSortOrder = "orig",
 ): HTMLDivElement[] => {
   let order: keyof ApiCacheItems;
+  const direction: YtSortOrder = cache.sortOrder || "orig";
   if (direction === "date") order = "publishedAt";
   if (direction === "orig") order = "index";
   if (direction === "title") order = "title";
@@ -393,18 +396,18 @@ const newLayout =
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
-  order: YtSortOrder,
-  reverse: boolean,
+  // order: YtSortOrder,
+  // reverse: boolean,
 ): void => {
   if (!playlistContainer) throw new Error("Playlist container not found");
   if (!apiCache) throw new Error("API cache missing");
 
   const playlistItems: NodeListOf<HTMLDivElement> =
-    playlistContainer.querySelectorAll(gistFile.playlistItemSelector);
+    playlistContainer.querySelectorAll(playlistItemSelector);
 
-  const sortedList = sortList(playlistItems, apiCache, order);
+  const sortedList = sortList(playlistItems, apiCache);
 
-  if (reverse) sortedList.reverse();
+  if (apiCache.isReversed) sortedList.reverse();
 
   sortedList.forEach(
     (el: HTMLDivElement, index: number, arr: HTMLDivElement[]) => {

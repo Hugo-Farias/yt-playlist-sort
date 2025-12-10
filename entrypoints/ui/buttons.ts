@@ -48,7 +48,7 @@ export const createDropdownMenu = (
 
     if (cache) fullCache[cache.listId].sortOrder = sortOrder;
 
-    sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);
+    sortRenderedPlaylist(playlistContainer, cache);
   });
 
   playlistMenuBtns?.appendChild(select);
@@ -92,7 +92,7 @@ export const createReverseBtn = (
 
     fullCache[cache.listId].isReversed = isReversed;
 
-    sortRenderedPlaylist(playlistContainer, cache, sortOrder, isReversed);
+    sortRenderedPlaylist(playlistContainer, cache);
   };
 
   reverseBtn.addEventListener("click", () => {
