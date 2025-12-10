@@ -51,6 +51,7 @@ export type ApiCacheItems = {
   title: string;
   index: number;
   publishedAt: number;
+  channelTitle: string;
 };
 
 export type ApiCache = {

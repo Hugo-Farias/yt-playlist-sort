@@ -169,6 +169,7 @@ export const storeMainCache = (
         title: removeEmojis(item.snippet.title),
         index: index,
         publishedAt: new Date(item.contentDetails.videoPublishedAt).getTime(),
+        channelTitle: item.snippet.channelTitle,
       };
 
       return acc;
@@ -253,6 +254,8 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     const itemEl = el.querySelector<HTMLSpanElement>("#byline-container");
     if (!itemEl) return null;
 
+    console.log("itemEl ==> ", itemEl.childNodes[0].textContent);
+
     const lang = parseLang(settings);
 
     const videoPublishedAt =
@@ -282,7 +285,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 
     itemEl.appendChild(span);
     itemEl.style.paddingRight = "0";
-    itemEl.setAttribute("title", "test");
+    itemEl.setAttribute("title", formattedDate);
   });
 };
 
