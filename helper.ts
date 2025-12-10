@@ -243,7 +243,6 @@ export const parseLang = (langSetting: SettingsT | undefined) => {
   return lang || navigator.language;
 };
 
-// TODO: add date to tooltip so it shows on hover
 export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
   const dateEl = el.querySelector(".playlistSort-date");
   if (dateEl) dateEl.remove();
@@ -254,15 +253,12 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     const itemEl = el.querySelector<HTMLSpanElement>("#byline-container");
     if (!itemEl) return null;
 
-    console.log("itemEl ==> ", itemEl.childNodes[0].textContent);
-
     const lang = parseLang(settings);
 
-    const videoPublishedAt =
-      cache.videos[getVideoId(el) ?? ""]?.publishedAt ?? Infinity;
+    const videoItem = cache.videos[getVideoId(el) ?? ""];
 
     const formattedDate = formatDate(
-      videoPublishedAt,
+      videoItem.publishedAt ?? Infinity,
       {
         day: "numeric",
         month: settings.dateFormat,
@@ -285,7 +281,10 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
 
     itemEl.appendChild(span);
     itemEl.style.paddingRight = "0";
-    itemEl.setAttribute("title", formattedDate);
+    itemEl.setAttribute(
+      "title",
+      `${videoItem.channelTitle} - ${formattedDate}`,
+    );
   });
 };
 

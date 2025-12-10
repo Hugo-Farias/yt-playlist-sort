@@ -26,6 +26,7 @@ export const createDropdownMenu = (
   select.style.paddingBlock = "0px";
   select.style.borderRadius = "5px";
   select.style.marginInline = "5px";
+  select.ariaLabel = i18n.t("buttonSelect");
 
   const options: { value: YtSortOrder; label: string }[] = [
     { value: "orig", label: i18n.t("selectDefaultOrder") },
@@ -75,7 +76,8 @@ export const createReverseBtn = (
   reverseBtn.style.borderRadius = "50%";
   reverseBtn.style.fontSize = "16px";
   reverseBtn.style.fontWeight = "200";
-  reverseBtn.ariaLabel = "Reverse playlist order";
+  reverseBtn.ariaLabel = i18n.t("buttonReverse");
+  reverseBtn.title = i18n.t("buttonReverse");
 
   const changeBtnEffect = () => {
     reverseBtn.style.transform = `scaleY(${isReversed ? "-1" : "1"})`;
