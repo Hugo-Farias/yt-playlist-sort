@@ -63,13 +63,14 @@ const SelectDateFormat = (props: PropsT) => {
   const dupCheck: string[] = [];
 
   return (
-    <div className="space-y-1">
+    <div className={"space-y-1"}>
       <div>
         <span>{i18n.t("settingsDateFormat")}: </span>
         <select
           className={className}
           onChange={onChange}
           value={settings.dateFormat}
+          aria-label={"Select Date Format"}
           id={"dateFormat"}
         >
           {dateFormats(settings).map((date) => {
@@ -79,6 +80,7 @@ const SelectDateFormat = (props: PropsT) => {
               <option
                 key={date.id}
                 className={"bg-stone-900 text-inherit"}
+                aria-label={`Select ${date.label}`}
                 value={date.opt}
               >
                 {date.label}
@@ -93,6 +95,7 @@ const SelectDateFormat = (props: PropsT) => {
           className={className}
           onChange={onChange}
           value={settings.dateLanguage}
+          aria-label={"Select Date Language"}
           id={"dateLanguage"}
         >
           {LANGUAGES.map((language) => {
@@ -100,6 +103,7 @@ const SelectDateFormat = (props: PropsT) => {
               <option
                 key={language.id}
                 className={"bg-stone-900 text-inherit"}
+                aria-label={`Select ${language.label}`}
                 value={language.opt}
               >
                 {language.label}

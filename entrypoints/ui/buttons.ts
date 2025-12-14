@@ -1,6 +1,6 @@
 import { i18n } from "#i18n";
 import { reversePlaylistSVG } from "@/entrypoints/ui/reverseBtn";
-import { localAdd, sortRenderedPlaylist } from "@/helper";
+import { debounce, localAdd, sortRenderedPlaylist } from "@/helper";
 import type { ApiCache, YtSortOrder } from "@/types";
 
 let isReversed: boolean = false;
@@ -49,7 +49,9 @@ export const createDropdownMenu = (
 
     if (cache) fullCache[cache.listId].sortOrder = sortOrder;
 
-    sortRenderedPlaylist(playlistContainer, cache);
+    debounce(() => {
+      sortRenderedPlaylist(playlistContainer, cache);
+    }, 250);
   });
 
   playlistMenuBtns?.appendChild(select);
@@ -94,7 +96,9 @@ export const createReverseBtn = (
 
     fullCache[cache.listId].isReversed = isReversed;
 
-    sortRenderedPlaylist(playlistContainer, cache);
+    debounce(() => {
+      sortRenderedPlaylist(playlistContainer, cache);
+    }, 250);
   };
 
   reverseBtn.addEventListener("click", () => {

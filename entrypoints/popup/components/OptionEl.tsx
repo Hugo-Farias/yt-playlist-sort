@@ -22,7 +22,7 @@ const OptionEl = (props: PropsT) => {
         <input
           className={"mr-3 cursor-pointer"}
           type={type || "checkbox"}
-          aria-label={label}
+          aria-label={`Toggle "${label}"`}
           checked={checked}
           id={id}
           onChange={onChange}

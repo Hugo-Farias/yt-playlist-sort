@@ -23,7 +23,7 @@ function isSettingKey(id: string): id is keyof SettingsT {
   return id in initialSettings;
 }
 
-// TODO: add setting to force the language of the app
+// TODO: add donate and report bug button
 chrome.storage.local.get<SettingsT>((settings) => {
   if (!settings) return;
   initialSettings = { ...initialSettings, ...settings };
@@ -73,6 +73,25 @@ function App() {
           />
         </OptionEl>
       </form>
+
+      <div className={"mt-3 flex justify-end space-x-3"}>
+        <a
+          className={"text-blue-400 underline"}
+          target="_blank"
+          href="https:\\google.com"
+          rel="noopener"
+        >
+          Donate
+        </a>
+        <a
+          className={"text-blue-400 underline"}
+          target="_blank"
+          href="https:\\google.com"
+          rel="noopener"
+        >
+          Report a bug
+        </a>
+      </div>
     </div>
   );
 }

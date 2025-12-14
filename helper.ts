@@ -268,14 +268,14 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     );
 
     const span = document.createElement("span");
-    span.textContent = `- ${formattedDate}`;
+    span.textContent = `• ${formattedDate}`;
     span.classList.add(
       "style-scope",
       "ytd-playlist-panel-video-renderer",
       "playlistSort-date",
     );
     span.id = "byline";
-    span.style.marginLeft = "-5.2px";
+    span.style.marginLeft = "-4.2px";
     span.style.marginRight = "-50px";
     // span.style.margin = "-100px";
 
