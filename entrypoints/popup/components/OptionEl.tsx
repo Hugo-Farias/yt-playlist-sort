@@ -11,10 +11,10 @@ const OptionEl = (props: PropsT) => {
   const { id, label, checked, onChange, children } = props;
 
   return (
-    <>
+    <div className={"py-1.5"}>
       <label
         className={
-          "flex cursor-pointer items-center whitespace-nowrap py-1 transition-colors hover:text-stone-100"
+          "flex cursor-pointer items-center whitespace-nowrap transition-colors hover:text-stone-100"
         }
         htmlFor={id}
       >
@@ -29,11 +29,12 @@ const OptionEl = (props: PropsT) => {
         {label}
       </label>
       <div
-        className={`ml-13 transition-opacity ${checked ? "pointer-events-auto" : "pointer-events-none opacity-15"}`}
+        className={`grid transition-[grid-template-rows] duration-500 ${checked ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}
+  `}
       >
-        {children}
+        <div className="overflow-hidden">{children}</div>
       </div>
-    </>
+    </div>
   );
 };
 

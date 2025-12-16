@@ -1,7 +1,7 @@
 import type LANGUAGES from "@/data/LANGUAGES";
+import CustomApiInput from "./components/CustomApiInput";
 import OptionEl from "./components/OptionEl";
 import SelectDateFormat from "./components/SelectDateFormat";
-import TextInput from "./components/TextInput";
 
 export type LanguageCodeT = Intl.Locale;
 
@@ -31,6 +31,7 @@ function isSettingKey(id: string): id is keyof SettingsT {
 chrome.storage.local.get<SettingsT>((settings) => {
   if (!settings) return;
   initialSettings = { ...initialSettings, ...settings };
+  console.log("initialSettings ==> ", initialSettings);
 });
 
 function App() {
@@ -43,8 +44,8 @@ function App() {
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const id = e.target.id;
-    const value = e.target.value;
+    const { id, value } = e.target;
+    console.log("id ==> ", id, value);
 
     if (!isSettingKey(id)) return null;
 
@@ -56,7 +57,9 @@ function App() {
   };
 
   return (
-    <div className={"select-none bg-stone-900 p-5 text-sm text-stone-300"}>
+    <div
+      className={"m-5 min-w-xs select-none bg-stone-900 text-sm text-stone-300"}
+    >
       <form>
         <OptionEl
           id="scroll"
@@ -79,11 +82,11 @@ function App() {
 
         <OptionEl
           id="optApi"
-          label="Use Custom Api (Optional)"
+          label="Use custom API key (Optional)"
           checked={settings.optApi}
           onChange={onChange}
         >
-          <TextInput className={"min-w-xs border border-stone-500"} />
+          <CustomApiInput />
         </OptionEl>
       </form>
 
