@@ -1,6 +1,7 @@
 import type LANGUAGES from "@/data/LANGUAGES";
 import OptionEl from "./components/OptionEl";
 import SelectDateFormat from "./components/SelectDateFormat";
+import TextInput from "./components/TextInput";
 
 export type LanguageCodeT = Intl.Locale;
 
@@ -10,6 +11,8 @@ export type SettingsT = {
   dateLanguage: (typeof LANGUAGES)[number]["opt"];
   scroll: boolean;
   lang?: string;
+  optApi: boolean;
+  apiString?: string;
 };
 
 let initialSettings: SettingsT = {
@@ -17,6 +20,7 @@ let initialSettings: SettingsT = {
   dateFormat: "short",
   dateLanguage: "youtube",
   scroll: true,
+  optApi: false,
 };
 
 function isSettingKey(id: string): id is keyof SettingsT {
@@ -52,7 +56,7 @@ function App() {
   };
 
   return (
-    <div className={"select-none bg-stone-900 p-2 text-sm text-stone-300"}>
+    <div className={"select-none bg-stone-900 p-5 text-sm text-stone-300"}>
       <form>
         <OptionEl
           id="scroll"
@@ -72,6 +76,15 @@ function App() {
             className={"block rounded-sm border border-stone-500"}
           />
         </OptionEl>
+
+        <OptionEl
+          id="optApi"
+          label="Use Custom Api (Optional)"
+          checked={settings.optApi}
+          onChange={onChange}
+        >
+          <TextInput className={"min-w-xs border border-stone-500"} />
+        </OptionEl>
       </form>
 
       <div className={"mt-3 flex justify-end space-x-3"}>
@@ -81,7 +94,7 @@ function App() {
           href="https:\\google.com"
           rel="noopener"
         >
-          Donate
+          {i18n.t("donate")}
         </a>
         <a
           className={"text-blue-400 underline"}
@@ -89,7 +102,7 @@ function App() {
           href="https:\\google.com"
           rel="noopener"
         >
-          Report a bug
+          {i18n.t("report")}
         </a>
       </div>
     </div>

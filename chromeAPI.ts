@@ -73,6 +73,8 @@ export const playlistAPI = async (
   clog("chromeAPI called");
 
   gist = gist || (await fetchGist());
+
+  // TODO: allow user to input own api key
   const key = gist.keys[keyNum % gist.keys.length] || "";
 
   const data = await fetchJson<YoutubePlaylistResponse>(
