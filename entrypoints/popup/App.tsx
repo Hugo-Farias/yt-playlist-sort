@@ -82,7 +82,7 @@ function App() {
 
         <OptionEl
           id="optApi"
-          label="Use custom API key (Optional)"
+          label="Use custom API key"
           checked={settings.optApi}
           onChange={onChange}
         >

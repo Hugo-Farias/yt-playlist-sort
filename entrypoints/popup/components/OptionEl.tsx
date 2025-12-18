@@ -9,6 +9,28 @@ type PropsT = React.PropsWithChildren<{
 
 const OptionEl = (props: PropsT) => {
   const { id, label, checked, onChange, children } = props;
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [childState, setChildState] = useState<boolean>(checked);
+
+  useEffect(() => {
+    if (checked) {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
+      }
+      setChildState(true);
+    } else {
+      hideTimeoutRef.current = setTimeout(() => {
+        setChildState(false);
+      }, 150);
+    }
+
+    return () => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, [checked]);
 
   return (
     <div className={"py-1.5"}>
@@ -29,10 +51,9 @@ const OptionEl = (props: PropsT) => {
         {label}
       </label>
       <div
-        className={`grid transition-[grid-template-rows] duration-500 ${checked ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}
-  `}
+        className={`grid transition-[grid-template-rows,opacity] duration-200 ${checked ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-10"}`}
       >
-        <div className="overflow-hidden">{children}</div>
+        {childState && <div className="overflow-hidden p-px">{children}</div>}
       </div>
     </div>
   );
