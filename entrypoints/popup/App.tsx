@@ -12,7 +12,7 @@ export type SettingsT = {
   scroll: boolean;
   lang?: string;
   optApi: boolean;
-  apiString?: string;
+  apiString: string;
 };
 
 let initialSettings: SettingsT = {
@@ -21,6 +21,7 @@ let initialSettings: SettingsT = {
   dateLanguage: "youtube",
   scroll: true,
   optApi: false,
+  apiString: "",
 };
 
 function isSettingKey(id: string): id is keyof SettingsT {
@@ -48,6 +49,7 @@ function App() {
     console.log("id ==> ", id, value);
 
     if (!isSettingKey(id)) return null;
+    if (value.length > 70) return null;
 
     if (value === "on" || value === "off") {
       setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -86,7 +88,11 @@ function App() {
           checked={settings.optApi}
           onChange={onChange}
         >
-          <CustomApiInput />
+          <CustomApiInput
+            apiInput={settings.apiString}
+            id={"apiString"}
+            onChange={onChange}
+          />
         </OptionEl>
       </form>
 
