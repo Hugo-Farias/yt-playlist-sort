@@ -99,6 +99,13 @@ export const localAdd = (
   );
 };
 
+export const getSettings = (): Promise<SettingsT> =>
+  new Promise((resolve) => {
+    chrome.storage.local.get((items) => {
+      resolve(items as SettingsT);
+    });
+  });
+
 let timeoutTimer: ReturnType<typeof setTimeout>;
 
 export const debounce = (callback: () => void, delay: number = 500) => {

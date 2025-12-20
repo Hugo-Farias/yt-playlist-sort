@@ -11,6 +11,7 @@ import {
   getCache,
   getInfoFromElement,
   getListId,
+  getSettings,
   getVideoId,
   isLoopOn,
   isShuffleOn,

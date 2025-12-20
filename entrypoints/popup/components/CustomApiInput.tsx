@@ -20,7 +20,6 @@ const CustomApiInput = (props: PropsT) => {
 
   return (
     <div>
-      {/* TODO: hook this to the settings */}
       <input
         className={
           "my-1 block min-w-[42ch] rounded-sm border border-stone-500 px-1 outline-0"
@@ -28,7 +27,7 @@ const CustomApiInput = (props: PropsT) => {
         id={id}
         type={`${hideApi ? "password" : "text"}`}
         placeholder="YoutubeV3 API KEY"
-        defaultValue={apiInput ? apiInput : ""}
+        defaultValue={apiInput}
         onChange={apiInputChange}
       />
       <div className="space-x-3">
@@ -36,6 +35,7 @@ const CustomApiInput = (props: PropsT) => {
           label={`${hideApi ? "Show" : "Hide"}`}
           onClick={() => setHideApi((prev) => !prev)}
         />
+        {/* TODO: finish the functionallity of this button */}
         <Button
           label={"Test API key"}
           onClick={() => console.log("Test button")}

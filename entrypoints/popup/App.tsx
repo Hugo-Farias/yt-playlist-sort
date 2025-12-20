@@ -29,10 +29,10 @@ function isSettingKey(id: string): id is keyof SettingsT {
 }
 
 // TODO: add donate and report bug button
+// TODO: add clear cache button
 chrome.storage.local.get<SettingsT>((settings) => {
   if (!settings) return;
   initialSettings = { ...initialSettings, ...settings };
-  console.log("initialSettings ==> ", initialSettings);
 });
 
 function App() {
@@ -46,7 +46,6 @@ function App() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { id, value } = e.target;
-    console.log("id ==> ", id, value);
 
     if (!isSettingKey(id)) return null;
     if (value.length > 70) return null;

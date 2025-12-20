@@ -4,6 +4,7 @@ import {
   clog,
   getCache,
   getListId,
+  getSettings,
   localGet,
   localSet,
 } from "@/helper";
@@ -72,10 +73,17 @@ export const playlistAPI = async (
 
   clog("chromeAPI called");
 
-  gist = gist || (await fetchGist());
+  const settings = await getSettings();
 
-  // TODO: allow user to input own api key
-  const key = gist.keys[keyNum % gist.keys.length] || "";
+  let key: string = "";
+
+  if (settings.optApi && settings.apiString && settings.apiString.length > 0) {
+    key = settings.apiString;
+  } else {
+    gist = gist || (await fetchGist());
+
+    key = gist.keys[keyNum % gist.keys.length] || "";
+  }
 
   const data = await fetchJson<YoutubePlaylistResponse>(
     `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
