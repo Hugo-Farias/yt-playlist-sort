@@ -22,7 +22,7 @@ const CustomApiInput = (props: PropsT) => {
     <div>
       <input
         className={
-          "my-1 block min-w-[42ch] rounded-sm border border-stone-500 px-1 outline-0"
+          "my-1 block min-w-[42ch] rounded-sm border border-stone-500 text-center outline-0"
         }
         id={id}
         type={`${hideApi ? "password" : "text"}`}

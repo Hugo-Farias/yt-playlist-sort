@@ -47,6 +47,7 @@ function App() {
   ) => {
     const { id, value } = e.target;
 
+    console.log("value.length ==> ", value.length);
     if (!isSettingKey(id)) return null;
     if (value.length > 70) return null;
 
