@@ -30,12 +30,12 @@ const CustomApiInput = (props: PropsT) => {
       />
       <div className="space-x-3">
         <Button
-          label={`${hideApi ? "Show" : "Hide"}`}
+          label={`${hideApi ? i18n.t("apiBtnShow") : i18n.t("apiBtnHide")}`}
           onClick={() => setHideApi((prev) => !prev)}
         />
         {/* TODO: finish the functionallity of this button */}
         <Button
-          label={"Test API key"}
+          label={i18n.t("apiBtnTest")}
           onClick={() => console.log("Test button")}
         />
       </div>

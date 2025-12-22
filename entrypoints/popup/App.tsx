@@ -98,7 +98,7 @@ function App() {
 
         <OptionEl
           id="optApi"
-          label="Use custom API key"
+          label={i18n.t("apiInputLabel")}
           checked={settings.optApi}
           onChange={onChange}
         >

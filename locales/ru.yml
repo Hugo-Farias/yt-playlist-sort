@@ -11,3 +11,7 @@ buttonReverse: "Изменить порядок плейлиста на обра
 buttonSelect: "Выбрать порядок"
 donate: "Пожертвовать"
 report: "Сообщить об ошибке"
+apiBtnShow: "Показать"
+apiBtnHide: "Скрыть"
+apiBtnTest: "Проверить ключ API"
+apiInputLabel: "Использовать пользовательский ключ API"

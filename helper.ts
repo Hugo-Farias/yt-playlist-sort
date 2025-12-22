@@ -25,13 +25,14 @@ type localStorageKeys =
   | "ytSortVersion"
   | "ytSortGist";
 
-export const clearOldCache = (version: string) => {
+export const clearOldCache = (msg?: string) => {
   Object.keys(localStorage).forEach((key: string) => {
     if (!key.startsWith("ytSort")) return;
     localStorage.removeItem(key);
   });
 
-  clog(`Updated to version ${version}, clearing cache 🧹`);
+  if (!msg) return;
+  clog(msg);
 };
 
 export const localSet = (

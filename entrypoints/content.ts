@@ -60,8 +60,9 @@ export default defineContentScript({
     cleanOldMainCacheEntries(fullCache);
 
     const extVersion = localGet("ytSortVersion");
+
     if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
-      clearOldCache(pkg.version);
+      clearOldCache(`Updated to version ${pkg.version}, clearing cache 🧹`);
       localSet("ytSortVersion", pkg.version);
     }
 
