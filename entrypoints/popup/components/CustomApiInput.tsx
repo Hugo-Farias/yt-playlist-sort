@@ -1,4 +1,3 @@
-import { debounce } from "@/helper";
 import type { SettingsT } from "../App";
 import Button from "./Button";
 
@@ -10,24 +9,23 @@ type PropsT = {
 
 const CustomApiInput = (props: PropsT) => {
   const { id, onChange, apiInput } = props;
-  const [hideApi, setHideApi] = useState<boolean>(true);
+  const [hideApi, setHideApi] = useState<boolean>(!!apiInput);
 
   const apiInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    debounce(() => {
-      onChange(e);
-    }, 250);
+    if (hideApi) return;
+    onChange(e);
   };
 
   return (
     <div>
       <input
-        className={
-          "my-1 block min-w-[42ch] rounded-sm border border-stone-500 text-center outline-0"
-        }
+        className={`my-1 block min-w-[42ch] rounded-sm border border-stone-500 text-center outline-0 transition-opacity ${hideApi && "cursor-not-allowed select-none opacity-40"}`}
         id={id}
         type={`${hideApi ? "password" : "text"}`}
         placeholder="YoutubeV3 API KEY"
         defaultValue={apiInput}
+        disabled={hideApi}
+        readOnly={hideApi}
         onChange={apiInputChange}
       />
       <div className="space-x-3">

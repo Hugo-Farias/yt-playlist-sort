@@ -22,7 +22,7 @@ const OptionEl = (props: PropsT) => {
     } else {
       hideTimeoutRef.current = setTimeout(() => {
         setChildState(false);
-      }, 150);
+      }, 130);
     }
 
     return () => {
@@ -51,9 +51,11 @@ const OptionEl = (props: PropsT) => {
         {label}
       </label>
       <div
-        className={`grid transition-[grid-template-rows,opacity] duration-200 ${checked ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-10"}`}
+        className={`grid transition-[grid-template-rows,opacity] ${checked ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-10"}`}
       >
-        {childState && <div className="overflow-hidden p-px">{children}</div>}
+        {children && childState && (
+          <div className="overflow-hidden p-px">{children}</div>
+        )}
       </div>
     </div>
   );

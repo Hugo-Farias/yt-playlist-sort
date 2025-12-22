@@ -1,7 +1,11 @@
 import { playlistAPI } from "@/chromeAPI.ts";
 import { playlistItemSelector } from "@/config";
-import { createDropdownMenu, createReverseBtn } from "@/entrypoints/ui/buttons";
 import {
+  createDropdownMenu,
+  createReverseBtn,
+} from "@/entrypoints/ui/playlistBtns";
+import {
+  cerr,
   checkCacheAge,
   cleanOldMainCacheEntries,
   clearOldCache,
@@ -11,7 +15,6 @@ import {
   getCache,
   getInfoFromElement,
   getListId,
-  getSettings,
   getVideoId,
   isLoopOn,
   isShuffleOn,
@@ -31,6 +34,7 @@ export let fullCache: { [key: string]: ApiCache } = {};
 
 export default defineContentScript({
   main() {
+    let navBlock = false; // prevent navigation events during playlist load
     let currUrl = location.href;
     let playlistId: string = getListId(currUrl);
     let firstRun = true;
@@ -42,17 +46,19 @@ export default defineContentScript({
     try {
       fullCache = JSON.parse(localGet("ytSortMainCache") || "{}");
     } catch (e) {
-      clog("Error parsing main cache JSON: \n", e);
+      cerr("Error parsing main cache JSON: \n", e);
       clog("Cleaning Cache");
       localRemove("ytSortMainCache");
       localRemove("ytSortRenderedCache");
     }
 
-    chrome.storage.local.set({ lang: document.querySelector("html")?.lang });
+    const lang = document.querySelector("html")?.lang;
+    if (lang) {
+      chrome.storage.local.set({ lang: lang });
+    }
 
     cleanOldMainCacheEntries(fullCache);
 
-    let navBlock = false; // prevent navigation events during playlist load
     const extVersion = localGet("ytSortVersion");
     if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
       clearOldCache(pkg.version);
@@ -73,8 +79,8 @@ export default defineContentScript({
             video.currentTime = video.duration / 3;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
-            video.remove();
-            videoContainer.remove();
+            // video.remove();
+            // videoContainer.remove();
           }, 2000);
         }
       }

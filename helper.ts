@@ -405,8 +405,6 @@ const newLayout =
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
-  // order: YtSortOrder,
-  // reverse: boolean,
 ): void => {
   if (!playlistContainer) throw new Error("Playlist container not found");
   if (!apiCache) throw new Error("API cache missing");

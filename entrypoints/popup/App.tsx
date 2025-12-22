@@ -1,4 +1,5 @@
 import type LANGUAGES from "@/data/LANGUAGES";
+import { debounce, getSettings } from "@/helper";
 import CustomApiInput from "./components/CustomApiInput";
 import OptionEl from "./components/OptionEl";
 import SelectDateFormat from "./components/SelectDateFormat";
@@ -15,7 +16,7 @@ export type SettingsT = {
   apiString: string;
 };
 
-let initialSettings: SettingsT = {
+const initialSettings: SettingsT = {
   date: true,
   dateFormat: "short",
   dateLanguage: "youtube",
@@ -28,18 +29,30 @@ function isSettingKey(id: string): id is keyof SettingsT {
   return id in initialSettings;
 }
 
-// TODO: add donate and report bug button
+// TODO: add functionality for donate and report bug button
 // TODO: add clear cache button
-chrome.storage.local.get<SettingsT>((settings) => {
-  if (!settings) return;
-  initialSettings = { ...initialSettings, ...settings };
-});
 
 function App() {
   const [settings, setSettings] = useState<SettingsT>(initialSettings);
+  const [ready, setReady] = useState<boolean>(false);
 
   useEffect(() => {
-    chrome.storage.local.set(settings);
+    getSettings().then((stored) => {
+      if (stored) {
+        setSettings((prev) => ({ ...prev, ...stored }));
+      }
+    });
+    setTimeout(() => {
+      setReady(true);
+    }, 20);
+  }, []);
+
+  useEffect(() => {
+    debounce(() => {
+      console.log("settings saved");
+
+      chrome.storage.local.set(settings);
+    }, 200);
   }, [settings]);
 
   const onChange = (
@@ -47,7 +60,6 @@ function App() {
   ) => {
     const { id, value } = e.target;
 
-    console.log("value.length ==> ", value.length);
     if (!isSettingKey(id)) return null;
     if (value.length > 70) return null;
 
@@ -58,9 +70,11 @@ function App() {
     }
   };
 
+  if (!ready) return;
+
   return (
     <div
-      className={"m-5 min-w-xs select-none bg-stone-900 text-sm text-stone-300"}
+      className={`m-5 min-w-xs select-none bg-stone-900 text-sm text-stone-300 transition-opacity duration-700`}
     >
       <form>
         <OptionEl
@@ -78,7 +92,7 @@ function App() {
           <SelectDateFormat
             settings={settings}
             onChange={onChange}
-            className={"block rounded-sm border border-stone-500"}
+            className={`block rounded-sm border border-stone-500`}
           />
         </OptionEl>
 
