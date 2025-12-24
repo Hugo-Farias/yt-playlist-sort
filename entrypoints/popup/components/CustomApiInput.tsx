@@ -1,3 +1,4 @@
+import { debounce } from "@/helper";
 import type { SettingsT } from "../App";
 import Button from "./Button";
 
@@ -13,7 +14,9 @@ const CustomApiInput = (props: PropsT) => {
 
   const apiInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (hideApi) return;
-    onChange(e);
+    debounce(() => {
+      onChange(e);
+    }, 200);
   };
 
   return (

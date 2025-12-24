@@ -1,5 +1,6 @@
 import type LANGUAGES from "@/data/LANGUAGES";
-import { debounce, getSettings } from "@/helper";
+import { cleanCache, debounce, getSettings } from "@/helper";
+import Button from "./components/Button";
 import CustomApiInput from "./components/CustomApiInput";
 import OptionEl from "./components/OptionEl";
 import SelectDateFormat from "./components/SelectDateFormat";
@@ -74,9 +75,9 @@ function App() {
 
   return (
     <div
-      className={`m-5 min-w-xs select-none bg-stone-900 text-sm text-stone-300 transition-opacity duration-700`}
+      className={"m-5 min-w-xs select-none bg-stone-900 text-sm text-stone-300"}
     >
-      <form>
+      <form className={"flex flex-col space-y-0.5"}>
         <OptionEl
           id="scroll"
           label={i18n.t("settingsScroll")}
@@ -108,6 +109,12 @@ function App() {
             onChange={onChange}
           />
         </OptionEl>
+
+        <Button
+          className="ml-auto"
+          label={i18n.t("clearCacheBtnLabel")}
+          onClick={() => cleanCache("Cleaning Cache")}
+        ></Button>
       </form>
 
       <div className={"mt-3 flex justify-end space-x-3"}>

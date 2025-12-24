@@ -8,7 +8,7 @@ import {
   cerr,
   checkCacheAge,
   cleanOldMainCacheEntries,
-  clearOldCache,
+  cleanCache,
   clog,
   comparePlaylist,
   debounce,
@@ -29,6 +29,7 @@ import {
 } from "@/helper";
 import type { ApiCache, YTNavigateEvent } from "@/types";
 import pkg from "../package.json";
+import { SettingsT } from "./popup/App";
 
 export let fullCache: { [key: string]: ApiCache } = {};
 
@@ -62,7 +63,7 @@ export default defineContentScript({
     const extVersion = localGet("ytSortVersion");
 
     if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
-      clearOldCache(`Updated to version ${pkg.version}, clearing cache 🧹`);
+      cleanCache(`Updated to version ${pkg.version}, clearing cache 🧹`);
       localSet("ytSortVersion", pkg.version);
     }
 
@@ -380,8 +381,14 @@ export default defineContentScript({
       navBlock = true;
     });
 
-    chrome.storage.onChanged.addListener(() => {
+    chrome.storage.onChanged.addListener((res) => {
       if (!playlistId) return null;
+      const optionId = Object.keys(res)[0] as keyof SettingsT;
+      const DATE_KEYS = ["date", "dateFormat", "dateLanguage"] as const;
+      type DateKey = (typeof DATE_KEYS)[number];
+
+      if (!DATE_KEYS.includes(optionId as DateKey)) return;
+
       debounce(() => {
         clog("Settings Updated");
         const playlistContainer = document.querySelector<HTMLDivElement>(
