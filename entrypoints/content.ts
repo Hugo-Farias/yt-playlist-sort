@@ -29,7 +29,7 @@ import {
 } from "@/helper";
 import type { ApiCache, YTNavigateEvent } from "@/types";
 import pkg from "../package.json";
-import { SettingsT } from "./popup/App";
+import type { SettingsT } from "./popup/App";
 
 export let fullCache: { [key: string]: ApiCache } = {};
 
@@ -81,8 +81,8 @@ export default defineContentScript({
             video.currentTime = video.duration / 3;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
-            // video.remove();
-            // videoContainer.remove();
+            video.remove();
+            videoContainer.remove();
           }, 2000);
         }
       }

@@ -33,7 +33,7 @@ const OptionEl = (props: PropsT) => {
   }, [checked]);
 
   return (
-    <div className={"py-1.5"}>
+    <div>
       <label
         className={
           "flex cursor-pointer items-center whitespace-nowrap transition-colors hover:text-stone-100"

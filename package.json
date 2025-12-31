@@ -19,6 +19,7 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@preact/signals-react": "^3.6.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

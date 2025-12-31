@@ -1,6 +1,5 @@
 import type LANGUAGES from "@/data/LANGUAGES";
-import { cleanCache, debounce, getSettings } from "@/helper";
-import Button from "./components/Button";
+import { debounce, getSettings } from "@/helper";
 import CustomApiInput from "./components/CustomApiInput";
 import OptionEl from "./components/OptionEl";
 import SelectDateFormat from "./components/SelectDateFormat";
@@ -31,8 +30,6 @@ function isSettingKey(id: string): id is keyof SettingsT {
 }
 
 // TODO: add functionality for donate and report bug button
-// TODO: add clear cache button
-
 function App() {
   const [settings, setSettings] = useState<SettingsT>(initialSettings);
   const [ready, setReady] = useState<boolean>(false);
@@ -75,9 +72,9 @@ function App() {
 
   return (
     <div
-      className={"m-5 min-w-xs select-none bg-stone-900 text-sm text-stone-300"}
+      className={"m-3 min-w-xs select-none bg-stone-900 text-sm text-stone-300"}
     >
-      <form className={"flex flex-col space-y-0.5"}>
+      <form className={"flex flex-col gap-3.5"}>
         <OptionEl
           id="scroll"
           label={i18n.t("settingsScroll")}
@@ -93,7 +90,7 @@ function App() {
           <SelectDateFormat
             settings={settings}
             onChange={onChange}
-            className={`block rounded-sm border border-stone-500`}
+            className={"block rounded-sm border border-stone-500"}
           />
         </OptionEl>
 
@@ -109,32 +106,26 @@ function App() {
             onChange={onChange}
           />
         </OptionEl>
-
-        <Button
-          className="ml-auto"
-          label={i18n.t("clearCacheBtnLabel")}
-          onClick={() => cleanCache("Cleaning Cache")}
-        ></Button>
       </form>
 
-      <div className={"mt-3 flex justify-end space-x-3"}>
-        <a
-          className={"text-blue-400 underline"}
-          target="_blank"
-          href="https:\\google.com"
-          rel="noopener"
-        >
-          {i18n.t("donate")}
-        </a>
-        <a
-          className={"text-blue-400 underline"}
-          target="_blank"
-          href="https:\\google.com"
-          rel="noopener"
-        >
-          {i18n.t("report")}
-        </a>
-      </div>
+      {/* <div className={"mt-3 flex justify-end space-x-3"}> */}
+      {/*   <a */}
+      {/*     className={"text-blue-400 underline"} */}
+      {/*     target="_blank" */}
+      {/*     href="https:\\google.com" */}
+      {/*     rel="noopener" */}
+      {/*   > */}
+      {/*     {i18n.t("donate")} */}
+      {/*   </a> */}
+      {/*   <a */}
+      {/*     className={"text-blue-400 underline"} */}
+      {/*     target="_blank" */}
+      {/*     href="https:\\google.com" */}
+      {/*     rel="noopener" */}
+      {/*   > */}
+      {/*     {i18n.t("report")} */}
+      {/*   </a> */}
+      {/* </div> */}
     </div>
   );
 }

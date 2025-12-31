@@ -26,8 +26,26 @@ const fetchJson = async <T = unknown>(
   }
 };
 
+export const testYTApiKey = async (key: string) => {
+  const testUrl = `${API_URL}&playlistId=PLBCF2DAC6FFB574DE&key=${key}&maxResults=1`;
+  try {
+    const testResponse = await fetch(testUrl);
+    console.log("testResponse ==>", testResponse.status);
+    if (!testResponse.ok) {
+      console.error("API Key test failed with status:", testResponse.status);
+      return testResponse.status;
+    } else {
+      console.log("API Key is valid.");
+      return 200;
+    }
+  } catch (error) {
+    console.error("Error during API Key test:", error);
+    return error;
+  }
+};
+
 const gistDefault: GistFile = {
-  keys: ["AIyzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY"],
+  keys: ["AIzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY"],
   API_URL:
     "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50",
   playlistItemSelector:
