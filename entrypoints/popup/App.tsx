@@ -1,3 +1,4 @@
+import { signal } from "@preact/signals-react";
 import type LANGUAGES from "@/data/LANGUAGES";
 import { debounce, getSettings } from "@/helper";
 import CustomApiInput from "./components/CustomApiInput";
@@ -28,6 +29,8 @@ const initialSettings: SettingsT = {
 function isSettingKey(id: string): id is keyof SettingsT {
   return id in initialSettings;
 }
+
+const test = signal<string>("asdfasdftest");
 
 // TODO: add functionality for donate and report bug button
 function App() {
