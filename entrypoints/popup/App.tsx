@@ -1,4 +1,4 @@
-import { signal } from "@preact/signals-react";
+import { effect, signal } from "@preact/signals-react";
 import type LANGUAGES from "@/data/LANGUAGES";
 import { debounce, getSettings } from "@/helper";
 import CustomApiInput from "./components/CustomApiInput";
@@ -26,35 +26,27 @@ const initialSettings: SettingsT = {
   apiString: "",
 };
 
+// Checks if the id is a valid setting key
 function isSettingKey(id: string): id is keyof SettingsT {
   return id in initialSettings;
 }
 
-const test = signal<string>("asdfasdftest");
+const settings = signal<SettingsT>(initialSettings);
+
+getSettings().then((storedSettings) => {
+  if (storedSettings) {
+    settings.value = { ...settings.value, ...storedSettings };
+  }
+});
 
 // TODO: add functionality for donate and report bug button
 function App() {
-  const [settings, setSettings] = useState<SettingsT>(initialSettings);
-  const [ready, setReady] = useState<boolean>(false);
-
-  useEffect(() => {
-    getSettings().then((stored) => {
-      if (stored) {
-        setSettings((prev) => ({ ...prev, ...stored }));
-      }
-    });
-    setTimeout(() => {
-      setReady(true);
-    }, 20);
-  }, []);
-
-  useEffect(() => {
+  effect(() => {
     debounce(() => {
       console.log("settings saved");
-
-      chrome.storage.local.set(settings);
-    }, 200);
-  }, [settings]);
+      chrome.storage.local.set(settings.value);
+    }, 260);
+  });
 
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -64,34 +56,31 @@ function App() {
     if (!isSettingKey(id)) return null;
     if (value.length > 70) return null;
 
-    if (value === "on" || value === "off") {
-      setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
-    } else {
-      setSettings((prev) => ({ ...prev, [id]: value }));
-    }
+    settings.value = {
+      ...settings.value,
+      [id]: value === "on" || value === "off" ? !settings.value[id] : value,
+    };
   };
-
-  if (!ready) return;
 
   return (
     <div
-      className={"m-3 min-w-xs select-none bg-stone-900 text-sm text-stone-300"}
+      className={`m-3 min-w-xs select-none bg-stone-900 text-sm text-stone-300`}
     >
       <form className={"flex flex-col gap-3.5"}>
         <OptionEl
           id="scroll"
           label={i18n.t("settingsScroll")}
-          checked={settings.scroll}
+          checked={settings.value.scroll}
           onChange={onChange}
         />
         <OptionEl
           id="date"
           label={i18n.t("settingsDate")}
-          checked={settings.date}
+          checked={settings.value.date}
           onChange={onChange}
         >
           <SelectDateFormat
-            settings={settings}
+            settings={settings.value}
             onChange={onChange}
             className={"block rounded-sm border border-stone-500"}
           />
@@ -100,11 +89,11 @@ function App() {
         <OptionEl
           id="optApi"
           label={i18n.t("apiInputLabel")}
-          checked={settings.optApi}
+          checked={settings.value.optApi}
           onChange={onChange}
         >
           <CustomApiInput
-            apiInput={settings.apiString}
+            apiInput={settings.value.apiString}
             id={"apiString"}
             onChange={onChange}
           />

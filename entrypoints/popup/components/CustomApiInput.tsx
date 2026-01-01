@@ -1,4 +1,4 @@
-import { useSignal } from "@preact/signals-react";
+import { signal, useSignal } from "@preact/signals-react";
 import { testYTApiKey } from "@/chromeAPI";
 import { debounce } from "@/helper";
 import type { SettingsT } from "../App";
@@ -16,14 +16,12 @@ const testBtnColors = {
   white: "",
 } as const;
 
+const testBtnLabel = signal<string>(i18n.t("apiBtnTest"));
+let testBtnStyle: keyof typeof testBtnColors = "white";
+
 const CustomApiInput = (props: PropsT) => {
   const { id, onChange, apiInput } = props;
   const hideApi = useSignal<boolean>(!!apiInput);
-  const [testBtnLabel, setTestBtnLabel] = useState<string>(
-    i18n.t("apiBtnTest"),
-  );
-  const [testBtnStyle, setTestBtnStyle] =
-    useState<keyof typeof testBtnColors>("white");
 
   const apiInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (hideApi.value) return;
@@ -33,21 +31,21 @@ const CustomApiInput = (props: PropsT) => {
   };
 
   const testBtn = async () => {
-    setTestBtnLabel(i18n.t("apiTestTesting"));
+    testBtnLabel.value = i18n.t("apiTestTesting");
     debounce(async () => {
       const testResponse = await testYTApiKey(apiInput);
       if (testResponse === 200) {
         // alert(i18n.t("apiTestSuccess"));
-        setTestBtnLabel(i18n.t("apiTestSuccess"));
-        setTestBtnStyle("green");
+        testBtnLabel.value = i18n.t("apiTestSuccess");
+        testBtnStyle = "green";
       } else {
         // alert(i18n.t("apiTestFail"));
-        setTestBtnLabel(i18n.t("apiTestFail"));
-        setTestBtnStyle("red");
+        testBtnLabel.value = i18n.t("apiTestFail");
+        testBtnStyle = "red";
       }
       setTimeout(() => {
-        setTestBtnLabel(i18n.t("apiBtnTest"));
-        setTestBtnStyle("white");
+        testBtnLabel.value = i18n.t("apiBtnTest");
+        testBtnStyle = "white";
       }, 3000);
     });
   };
@@ -72,9 +70,9 @@ const CustomApiInput = (props: PropsT) => {
           }}
         />
         <Button
-          label={testBtnLabel}
+          label={testBtnLabel.value}
           onClick={testBtn}
-          className={`transition-opacity duration-500 ${testBtnColors[testBtnStyle]} disabled:opacity-40`}
+          className={`transition-all duration-500 disabled:opacity-40 ${testBtnColors[testBtnStyle]}`}
           disabled={!apiInput}
         />
       </div>
