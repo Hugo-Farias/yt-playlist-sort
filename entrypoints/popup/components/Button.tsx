@@ -10,7 +10,7 @@ const Button = (props: PropsT) => {
 
   return (
     <button
-      className={`min-w-22 rounded-sm border border-stone-500 px-1 ${className}`}
+      className={`min-w-23 rounded-sm border border-stone-500 px-1 ${className}`}
       onClick={onClick}
       type="button"
       disabled={disabled}

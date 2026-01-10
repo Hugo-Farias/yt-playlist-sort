@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Youtube playlist sort",
-  "version": "0.0.2",
-  "description": "Sorts playlist items in youtube",
+  "description": "__MSG_extDescription__",
+  "version": "0.0.3",
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],

@@ -39,7 +39,6 @@ getSettings().then((storedSettings) => {
   }
 });
 
-// TODO: add functionality for donate and report bug button
 function App() {
   effect(() => {
     debounce(() => {
@@ -56,9 +55,12 @@ function App() {
     if (!isSettingKey(id)) return null;
     if (value.length > 70) return null;
 
+    const newValue =
+      value === "on" || value === "off" ? !settings.value[id] : value;
+
     settings.value = {
       ...settings.value,
-      [id]: value === "on" || value === "off" ? !settings.value[id] : value,
+      [id]: newValue,
     };
   };
 

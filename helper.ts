@@ -222,8 +222,7 @@ export const comparePlaylist = (
   if (!listA || !idList) return false;
   if (!listA.length || !idList.length) return false;
   if (listA.length !== idList.length) return false;
-  const listBsorted = idList.sort();
-  return listA.sort().every((id, index) => id === listBsorted[index]);
+  return listA.every((id, index) => id === idList[index]);
 };
 
 // Format the date to a human-readable format

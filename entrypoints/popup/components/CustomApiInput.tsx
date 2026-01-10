@@ -35,11 +35,9 @@ const CustomApiInput = (props: PropsT) => {
     debounce(async () => {
       const testResponse = await testYTApiKey(apiInput);
       if (testResponse === 200) {
-        // alert(i18n.t("apiTestSuccess"));
         testBtnLabel.value = i18n.t("apiTestSuccess");
         testBtnStyle = "green";
       } else {
-        // alert(i18n.t("apiTestFail"));
         testBtnLabel.value = i18n.t("apiTestFail");
         testBtnStyle = "red";
       }
@@ -72,7 +70,7 @@ const CustomApiInput = (props: PropsT) => {
         <Button
           label={testBtnLabel.value}
           onClick={testBtn}
-          className={`transition-all duration-500 disabled:opacity-40 ${testBtnColors[testBtnStyle]}`}
+          className={`transition-[opacity,background-color] duration-500 disabled:opacity-40 ${testBtnColors[testBtnStyle]}`}
           disabled={!apiInput}
         />
       </div>

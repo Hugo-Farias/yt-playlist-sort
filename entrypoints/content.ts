@@ -7,8 +7,8 @@ import {
 import {
   cerr,
   checkCacheAge,
-  cleanOldMainCacheEntries,
   cleanCache,
+  cleanOldMainCacheEntries,
   clog,
   comparePlaylist,
   debounce,
@@ -35,6 +35,7 @@ export let fullCache: { [key: string]: ApiCache } = {};
 
 export default defineContentScript({
   main() {
+    clog("init 🟢");
     let navBlock = false; // prevent navigation events during playlist load
     let currUrl = location.href;
     let playlistId: string = getListId(currUrl);
@@ -67,22 +68,23 @@ export default defineContentScript({
       localSet("ytSortVersion", pkg.version);
     }
 
-    clog("init 🟢");
-
     const devFunction = () => {
       if (firstRun) {
-        // clog(`${API_URL}&playlistId=${getListId(currUrl)}&key=${API_KEY}`);
+        // const apiUrl =
+        //   "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50";
+        // const apiKey = "AIzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY";
+        // clog(`${apiUrl}&playlistId=${getListId(currUrl)}&key=${apiKey}`);
 
         const videoContainer = document.querySelector("#full-bleed-container");
         if (videoContainer) {
           setTimeout(() => {
             const video = document.querySelector("video");
             if (!video) return null;
-            video.currentTime = video.duration / 3;
+            video.currentTime = video.duration - 5;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
-            video.remove();
-            videoContainer.remove();
+            // video.remove();
+            // videoContainer.remove();
           }, 2000);
         }
       }

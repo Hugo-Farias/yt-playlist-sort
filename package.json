@@ -1,8 +1,8 @@
 {
   "name": "Youtube playlist sort",
-  "description": "Sorts playlist items in youtube",
+  "description": "__MSG_extDescription__",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
     "git": "git add -A && tsc -noEmit && git commit -m",
@@ -23,7 +23,6 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.7",
     "@preact/signals-react": "^3.6.1",
     "@preact/signals-react-transform": "^0.6.0",
     "@tailwindcss/vite": "^4.1.17",
