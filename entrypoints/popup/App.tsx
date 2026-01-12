@@ -39,6 +39,7 @@ getSettings().then((storedSettings) => {
   }
 });
 
+// TODO: don't forget to add report a bug function
 function App() {
   effect(() => {
     debounce(() => {

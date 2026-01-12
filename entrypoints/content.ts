@@ -7,7 +7,7 @@ import {
 import {
   cerr,
   checkCacheAge,
-  cleanCache,
+  // cleanCache,
   cleanOldMainCacheEntries,
   clog,
   comparePlaylist,
@@ -28,7 +28,7 @@ import {
   waitForElement,
 } from "@/helper";
 import type { ApiCache, YTNavigateEvent } from "@/types";
-import pkg from "../package.json";
+// import pkg from "../package.json";
 import type { SettingsT } from "./popup/App";
 
 export let fullCache: { [key: string]: ApiCache } = {};
@@ -52,6 +52,7 @@ export default defineContentScript({
       clog("Cleaning Cache");
       localRemove("ytSortMainCache");
       localRemove("ytSortRenderedCache");
+      fullCache = {};
     }
 
     const lang = document.querySelector("html")?.lang;
@@ -61,12 +62,11 @@ export default defineContentScript({
 
     cleanOldMainCacheEntries(fullCache);
 
-    const extVersion = localGet("ytSortVersion");
-
-    if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
-      cleanCache(`Updated to version ${pkg.version}, clearing cache 🧹`);
-      localSet("ytSortVersion", pkg.version);
-    }
+    // const extVersion = localGet("ytSortVersion");
+    // if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
+    //   cleanCache(`Updated to version ${pkg.version}, clearing cache 🧹`);
+    //   localSet("ytSortVersion", pkg.version);
+    // }
 
     const devFunction = () => {
       if (firstRun) {
@@ -83,8 +83,8 @@ export default defineContentScript({
             video.currentTime = video.duration - 5;
             clog("Pausing video... 🔴🔴🔴");
             video.pause();
-            // video.remove();
-            // videoContainer.remove();
+            video.remove();
+            videoContainer.remove();
           }, 2000);
         }
       }
@@ -255,12 +255,7 @@ export default defineContentScript({
       });
     };
 
-    const hydrateCache = async (
-      playlistContainer: HTMLDivElement,
-      playlistItems: NodeListOf<HTMLDivElement>,
-    ) => {
-      if (!playlistContainer) return null;
-
+    const hydrateCache = async (playlistItems: NodeListOf<HTMLDivElement>) => {
       if (prevListId !== playlistId) {
         const renderedCache = getCache(
           "ytSortRenderedCache",
@@ -321,10 +316,7 @@ export default defineContentScript({
       const playlistItems: NodeListOf<HTMLDivElement> =
         playlistContainer.querySelectorAll(playlistItemSelector);
 
-      const refreshedCache = await hydrateCache(
-        playlistContainer,
-        playlistItems,
-      );
+      const refreshedCache = await hydrateCache(playlistItems);
 
       if (!refreshedCache) return null;
 

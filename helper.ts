@@ -11,11 +11,11 @@ import { playlistItemSelector } from "./config";
 const { log, error } = console;
 
 export const clog = (...content: Parameters<typeof log>) => {
-  log("YT-Playlist-Sort:", ...content);
+  log("Youtube Playlist Organizer:", ...content);
 };
 
 export const cerr = (...content: Parameters<typeof log>) => {
-  error("YT-Playlist-Sort:", ...content);
+  error("Youtube Playlist Organizer:", ...content);
 };
 
 type localStorageKeys =
