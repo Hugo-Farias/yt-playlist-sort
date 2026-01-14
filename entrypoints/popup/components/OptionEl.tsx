@@ -52,7 +52,7 @@ const OptionEl = (props: PropsT) => {
         {label}
       </label>
       <div
-        className={`grid transition-[grid-template-rows,opacity] ${checked ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-10"}`}
+        className={`transition-[grid-template-rows,opacity] ${checked ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-10"}`}
       >
         {children && childState.value && (
           <div className="overflow-hidden p-px">{children}</div>

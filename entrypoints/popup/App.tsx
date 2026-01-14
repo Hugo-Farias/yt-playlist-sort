@@ -39,7 +39,7 @@ getSettings().then((storedSettings) => {
   }
 });
 
-// TODO: don't forget to add report a bug function
+// TODO: add "report a bug" function
 function App() {
   effect(() => {
     debounce(() => {
@@ -102,25 +102,6 @@ function App() {
           />
         </OptionEl>
       </form>
-
-      {/* <div className={"mt-3 flex justify-end space-x-3"}> */}
-      {/*   <a */}
-      {/*     className={"text-blue-400 underline"} */}
-      {/*     target="_blank" */}
-      {/*     href="https:\\google.com" */}
-      {/*     rel="noopener" */}
-      {/*   > */}
-      {/*     {i18n.t("donate")} */}
-      {/*   </a> */}
-      {/*   <a */}
-      {/*     className={"text-blue-400 underline"} */}
-      {/*     target="_blank" */}
-      {/*     href="https:\\google.com" */}
-      {/*     rel="noopener" */}
-      {/*   > */}
-      {/*     {i18n.t("report")} */}
-      {/*   </a> */}
-      {/* </div> */}
     </div>
   );
 }
