@@ -1,4 +1,4 @@
-extDescription: "Sorts playlist items in youtube"
+extDescription: "Adds sorting options to YouTube playlists, allowing you to reorder videos by date or title."
 selectDefaultOrder: "Default Order"
 selectDate: "Sort by Date"
 selectTitle: "Sort by Title"

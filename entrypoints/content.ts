@@ -35,7 +35,7 @@ export let fullCache: { [key: string]: ApiCache } = {};
 
 export default defineContentScript({
   main() {
-    clog("init 🟢");
+    clog("🟢 init");
     let navBlock = false; // prevent navigation events during playlist load
     let currUrl = location.href;
     let playlistId: string = getListId(currUrl);
@@ -81,7 +81,7 @@ export default defineContentScript({
             const video = document.querySelector("video");
             if (!video) return null;
             video.currentTime = video.duration - 5;
-            clog("Pausing video... 🔴🔴🔴");
+            clog("🔴 Pausing video...");
             video.pause();
             video.remove();
             videoContainer.remove();
@@ -320,10 +320,6 @@ export default defineContentScript({
 
       if (!refreshedCache) return null;
 
-      const { totalResults } = refreshedCache;
-
-      if (totalResults > 500) return null;
-
       const playlistMenuBtns = document.querySelector<HTMLDivElement>(
         "div#playlist-actions > div > div > ytd-menu-renderer > #top-level-buttons-computed",
       );
@@ -369,6 +365,7 @@ export default defineContentScript({
       waitForElement("video").then(() => {
         firstRunEvent();
       });
+      clog("🟥 Finished");
     });
 
     document.addEventListener("yt-navigate-start", () => {

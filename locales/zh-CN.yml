@@ -1,3 +1,4 @@
+extDescription: "为 YouTube 播放列表添加排序选项，允许您按日期或标题对视频进行重新排序。"
 selectDefaultOrder: "默认顺序"
 selectDate: "按日期排序"
 selectTitle: "按标题排序"

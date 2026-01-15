@@ -1,3 +1,4 @@
+extDescription: "YouTubeの再生リストに並べ替えオプションを追加し、動画を日付やタイトルで並べ替えることができます。"
 selectDefaultOrder: "デフォルトの順序"
 selectDate: "日付で並べ替え"
 selectTitle: "タイトルで並べ替え"

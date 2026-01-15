@@ -1,3 +1,4 @@
+extDescription: "Adiciona opções de classificação às playlists do YouTube, permitindo reordenar os vídeos por data ou título."
 selectDefaultOrder: "Ordem Padrão"
 selectDate: "Ordenar por Data"
 selectTitle: "Ordenar por Título"

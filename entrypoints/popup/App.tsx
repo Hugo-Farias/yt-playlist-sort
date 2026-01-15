@@ -69,7 +69,7 @@ function App() {
     <div
       className={`m-3 min-w-xs select-none bg-stone-900 text-sm text-stone-300`}
     >
-      <form className={"flex flex-col gap-3.5"}>
+      <form className="space-y-3">
         <OptionEl
           id="scroll"
           label={i18n.t("settingsScroll")}
