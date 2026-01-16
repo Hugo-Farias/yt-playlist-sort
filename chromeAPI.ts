@@ -13,17 +13,17 @@ import { API_URL, GIST_URL } from "./config";
 
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
-  init?: RequestInit,
 ): Promise<T | null> => {
   clog("FetchJson Called with URL:", input);
-  try {
-    const res = await fetch(input, init);
-    return (await res.json()) as Promise<T>;
-  } catch (error) {
-    console.error("Fetch error:", error);
-    // throw error;
+  const res = await fetch(input);
+  if (res.status === 400) {
     return null;
   }
+  const text = await res.text();
+
+  if (!text) return null;
+
+  return JSON.parse(text) as T;
 };
 
 export const testYTApiKey = async (key: string) => {
@@ -80,8 +80,7 @@ export const fetchGist = async (): Promise<GistFile> => {
 
 let gist: GistFile;
 
-let keyNum: number = new Date().getSeconds();
-let tries = 0;
+let keyNum: number;
 
 export const playlistAPI = async (
   playlistId: string,
@@ -99,8 +98,8 @@ export const playlistAPI = async (
     key = settings.apiString;
   } else {
     gist = gist || (await fetchGist());
-
-    key = gist.keys[keyNum % gist.keys.length] || "";
+    keyNum = Math.floor(Math.random() * gist.keys.length);
+    key = gist.keys[keyNum] || "";
   }
 
   const data = await fetchJson<YoutubePlaylistResponse>(
@@ -108,13 +107,12 @@ export const playlistAPI = async (
   );
 
   if (!data) {
-    tries++;
-    if (tries >= gist.keys.length) {
-      console.error("All API keys have been tried and failed.");
+    if (gist.keys.length === 0) {
+      cerr("All API keys have been tried and failed.");
       return null;
     }
     clog("API key failed, rotating key");
-    keyNum++;
+    gist.keys.splice(keyNum, 1);
     return playlistAPI(playlistId, nextpageToken);
   }
 
