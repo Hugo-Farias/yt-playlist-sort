@@ -78,10 +78,10 @@ export default defineContentScript({
         const videoContainer = document.querySelector("#full-bleed-container");
         if (videoContainer) {
           setTimeout(() => {
+            clog("🟣 Running dev function...");
             const video = document.querySelector("video");
             if (!video) return null;
             video.currentTime = video.duration - 5;
-            clog("🔴 Pausing video...");
             video.pause();
             video.remove();
             videoContainer.remove();
@@ -279,7 +279,7 @@ export default defineContentScript({
           !apiCache?.videos ||
           checkCacheAge(apiCache.storeTime, 30)
         ) {
-          clog("Playlist Changed, Hydrating Cache!!! 🟡");
+          clog("🟡 Playlist Changed, Hydrating Cache!!!");
           localSet("ytSortRenderedCache", {
             ...JSON.parse(localGet("ytSortRenderedCache") ?? "{}"),
             [playlistId]: renderedPlaylistIds,

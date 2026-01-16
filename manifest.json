@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Playlist Sorter for YouTube",
+  "name": "__MSG_extName__",
   "description": "__MSG_extDescription__",
   "version": "0.0.4",
   "content_scripts": [
