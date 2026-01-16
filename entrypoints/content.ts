@@ -303,9 +303,10 @@ export default defineContentScript({
     document.addEventListener("yt-navigate-finish", async () => {
       // document.addEventListener("yt-page-data-updated", async () => {
       currUrl = location.href;
-
       playlistId = getListId(currUrl);
+
       if (!playlistId) return null;
+      if (!getVideoId(currUrl)) return null;
 
       playlistContainer = document.querySelector<HTMLDivElement>(
         "ytd-playlist-panel-renderer #items",

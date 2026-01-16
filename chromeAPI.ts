@@ -2,6 +2,7 @@ import {
   cerr,
   checkCacheAge,
   clog,
+  cwarn,
   getCache,
   getListId,
   getSettings,
@@ -16,14 +17,15 @@ const fetchJson = async <T = unknown>(
 ): Promise<T | null> => {
   clog("FetchJson Called with URL:", input);
   const res = await fetch(input);
-  if (res.status === 400) {
+  if (!res.ok) {
     return null;
   }
-  const text = await res.text();
 
-  if (!text) return null;
-
-  return JSON.parse(text) as T;
+  try {
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
 };
 
 export const testYTApiKey = async (key: string) => {
@@ -64,12 +66,13 @@ export const fetchGist = async (): Promise<GistFile> => {
     : gistCache;
 
   if (!data) {
+    cerr("Fetch failed.");
     if (gistCache) {
-      cerr("Fecth failed. Using cached gist data");
+      cerr("Using cached gist data");
       return gistCache;
     }
 
-    cerr("Gist file could not be accessed. Using default.");
+    cerr("Gist cache could not be accessed. Using default.");
     return gistDefault;
   }
 
@@ -111,7 +114,7 @@ export const playlistAPI = async (
       cerr("All API keys have been tried and failed.");
       return null;
     }
-    clog("API key failed, rotating key");
+    cwarn("API key failed, rotating key");
     gist.keys.splice(keyNum, 1);
     return playlistAPI(playlistId, nextpageToken);
   }

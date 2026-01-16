@@ -8,10 +8,14 @@ import type { SettingsT } from "./entrypoints/popup/App";
 import "./data/LANGUAGES";
 import { playlistItemSelector } from "./config";
 
-const { log, error } = console;
+const { log, error, warn } = console;
 
 export const clog = (...content: Parameters<typeof log>) => {
   log("Playlist Sorter for YouTube:", ...content);
+};
+
+export const cwarn = (...content: Parameters<typeof warn>) => {
+  warn("Playlist Sorter for YouTube:", ...content);
 };
 
 export const cerr = (...content: Parameters<typeof error>) => {
