@@ -43,7 +43,6 @@ getSettings().then((storedSettings) => {
 function App() {
   effect(() => {
     debounce(() => {
-      console.log("settings saved");
       chrome.storage.local.set(settings.value);
     }, 260);
   });

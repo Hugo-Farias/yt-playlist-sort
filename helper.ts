@@ -14,7 +14,7 @@ export const clog = (...content: Parameters<typeof log>) => {
   log("Playlist Sorter for YouTube:", ...content);
 };
 
-export const cerr = (...content: Parameters<typeof log>) => {
+export const cerr = (...content: Parameters<typeof error>) => {
   error("Playlist Sorter for YouTube: 🔴", ...content);
 };
 
