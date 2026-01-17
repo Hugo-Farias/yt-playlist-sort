@@ -478,8 +478,8 @@ export const sortRenderedPlaylist = (
   playlistContainer.appendChild(messageRender);
 };
 
-export const checkCacheAge = (cacheAge: number, days: number) => {
-  const maxAge = 1000 * 60 * 60 * 24 * days;
+export const checkCacheAge = (cacheAge: number, hours: number): boolean => {
+  const maxAge = 1000 * 60 * 60 * hours;
   const currentTime = Date.now();
   return currentTime - cacheAge >= maxAge;
 };
@@ -493,7 +493,7 @@ export const cleanOldMainCacheEntries = (fullCache: {
 
   keys.forEach((key) => {
     const entry = fullCache[key];
-    if (checkCacheAge(entry.storeTime, 60)) {
+    if (checkCacheAge(entry.storeTime, 300)) {
       clog(`Cleaning old cache entry for playlist ID: ${key} 🧹`);
       const updatedCache = JSON.parse(localGet("ytSortMainCache") ?? "{}");
       delete updatedCache[key];
