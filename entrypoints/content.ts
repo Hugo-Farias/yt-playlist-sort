@@ -276,8 +276,7 @@ export default defineContentScript({
         // or there is no cache, hydrate it
         if (
           !comparePlaylist(renderedCache, renderedPlaylistIds) ||
-          !apiCache?.videos ||
-          checkCacheAge(apiCache.storeTime, 300)
+          !apiCache?.videos
         ) {
           clog("🟡 Playlist Changed, Hydrating Cache!!!");
           localSet("ytSortRenderedCache", {

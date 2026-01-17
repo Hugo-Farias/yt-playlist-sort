@@ -58,10 +58,8 @@ export const fetchGist = async (): Promise<GistFile> => {
   const gistCache: GistFile = JSON.parse(localGet("ytSortGist") || "null");
 
   const cacheIsOld = gistCache
-    ? checkCacheAge(gistCache.fetchedAt || Infinity, 0.5)
+    ? checkCacheAge(gistCache.fetchedAt || Infinity, 0.3)
     : true;
-
-  console.log("cacheIsOld ==>", cacheIsOld);
 
   const data: GistFile | null = cacheIsOld
     ? await fetchJson<GistFile>(GIST_URL)
