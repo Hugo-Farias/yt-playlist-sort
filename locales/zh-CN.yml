@@ -1,5 +1,5 @@
 extName: "YouTube播放列表排序器"
-extDescription: "为 YouTube 播放列表添加排序选项，允许您按日期或标题对视频进行重新排序。让您更轻松地管理和浏览您的播放列表。"
+extDescription: "为 YouTube 播放列表添加排序选项，允许您按日期或标题对视频进行重新排序。"
 selectDefaultOrder: "默认"
 selectDate: "按日期"
 selectTitle: "按标题"

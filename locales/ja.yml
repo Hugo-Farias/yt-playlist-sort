@@ -1,5 +1,5 @@
 extName: "YouTube用プレイリストソーター"
-extDescription: "YouTubeのプレイリストに並べ替えオプションを追加し、動画を日付やタイトルで簡単に再整理できます。お気に入りのコンテンツをより見つけやすくなります。"
+extDescription: "YouTubeのプレイリストに並べ替えオプションを追加し、動画を日付やタイトルで並べ替えられるようにします。"
 selectDefaultOrder: "デフォルト"
 selectDate: "日付順"
 selectTitle: "タイトル順"

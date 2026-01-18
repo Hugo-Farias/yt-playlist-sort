@@ -1,5 +1,5 @@
 extName: "Playlist-Sortierer für YouTube"
-extDescription: "Erweitert YouTube-Wiedergabelisten um zusätzliche Sortierfunktionen. Sie können Videos einfach nach Datum oder Titel sortieren und so Ihre Wiedergabelisten mühelos organisieren und verwalten."
+extDescription: "Fügt YouTube-Wiedergabelisten Sortieroptionen hinzu, mit denen Sie Videos nach Datum oder Titel neu anordnen können."
 selectDefaultOrder: "Standard"
 selectDate: "Nach Datum"
 selectTitle: "Nach Titel"

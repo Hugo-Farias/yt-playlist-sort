@@ -1,5 +1,5 @@
 extName: "Trieur de Listes de Lecture pour YouTube"
-extDescription: "Ajoute des options de tri avancées à vos listes de lecture YouTube. Vous pouvez désormais réorganiser vos vidéos par date ou par titre, ce qui facilite la gestion et la navigation dans vos playlists."
+extDescription: "Ajoute des options de tri aux listes de lecture YouTube, vous permettant de réorganiser les vidéos par date ou par titre."
 selectDefaultOrder: "Défaut"
 selectDate: "Par date"
 selectTitle: "Par titre"
