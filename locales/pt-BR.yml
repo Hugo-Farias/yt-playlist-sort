@@ -1,5 +1,5 @@
 extName: "Organizador de Playlists para YouTube"
-extDescription: "Ordenar vídeos em playlists do YouTube"
+extDescription: "Adiciona opções de ordenação às playlists do YouTube, permitindo reordenar os vídeos por data ou título. Facilita a organização e a navegação em suas playlists, tornando mais simples encontrar o que você deseja assistir."
 selectDefaultOrder: "Padrão"
 selectDate: "Por data"
 selectTitle: "Por título"
@@ -21,3 +21,4 @@ clearCacheBtnLabel: "Limpar cache"
 apiTestSuccess: "Chave de API válida"
 apiTestFail: "Chave de API inválida!"
 apiTestTesting: "Testando..."
+

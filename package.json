@@ -31,6 +31,7 @@
     "@types/react-dom": "^19.0.2",
     "@wxt-dev/i18n": "^0.2.4",
     "@wxt-dev/module-react": "^1.1.2",
+    "baseline-browser-mapping": "^2.9.15",
     "tailwindcss": "^4.1.17",
     "ts-prune": "^0.10.3",
     "typescript": "^5.6.3",

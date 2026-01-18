@@ -1,5 +1,5 @@
 extName: "Clasificador de Listas de Reproducción para YouTube"
-extDescription: "Ordena vídeos en las listas de reproducción de YouTube"
+extDescription: "Añade opciones de clasificación a las listas de reproducción de YouTube, permitiéndote reordenar los vídeos por fecha o título. Organiza tus listas de reproducción de forma más eficiente y encuentra tus vídeos favoritos con facilidad."
 selectDefaultOrder: "Predeterminado"
 selectDate: "Por fecha"
 selectTitle: "Por título"

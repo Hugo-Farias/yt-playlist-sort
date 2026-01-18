@@ -1,5 +1,5 @@
 extName: "Playlist Sorter for YouTube"
-extDescription: "Sort videos in YouTube playlists"
+extDescription: "Adds sorting options to YouTube playlists, allowing you to reorder videos by date or title."
 selectDefaultOrder: "Default"
 selectDate: "By Date"
 selectTitle: "By Title"
@@ -21,4 +21,3 @@ clearCacheBtnLabel: "Clear Cache"
 apiTestSuccess: "API key valid"
 apiTestFail: "Invalid API key!"
 apiTestTesting: "Testing..."
-
