@@ -100,6 +100,16 @@ function App() {
           />
         </OptionEl>
       </form>
+      <div className="mt-5 flex">
+        <a
+          className="ml-auto text-blue-300 hover:underline"
+          href="https://chromewebstore.google.com/detail/playlist-sorter-for-youtu/pknlkjehmikkbfpmfoiboncjnlopopjf/support"
+          target="_blank"
+          rel="noopener"
+        >
+          {i18n.t("report")}
+        </a>
+      </div>
     </div>
   );
 }

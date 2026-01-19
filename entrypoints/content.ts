@@ -6,7 +6,6 @@ import {
 } from "@/entrypoints/ui/playlistBtns";
 import {
   cerr,
-  checkCacheAge,
   // cleanCache,
   cleanOldMainCacheEntries,
   clog,
