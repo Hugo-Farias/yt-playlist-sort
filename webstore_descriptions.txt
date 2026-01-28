@@ -1,0 +1,109 @@
+[ENGLISH]
+Title: Playlist Sorter for YouTube
+
+Adds sorting options to YouTube playlists, allowing you to reorder videos.
+
+- Sort by Title
+- Sort by Date
+- Reverse List Order
+- Show Video Upload Dates
+
+[DEUTSCH]
+Title: Playlist-Sortierer für YouTube
+
+Fügt YouTube-Wiedergabelisten Sortieroptionen hinzu, mit denen Sie Videos neu anordnen können.
+
+- Sortieren nach Titel
+- Sortieren nach Datum
+- Reihenfolge umkehren
+- Upload-Datum der Videos anzeigen
+
+[ESPAÑOL]
+Title: Clasificador de Listas de Reproducción para YouTube
+
+Añade opciones de clasificación a las listas de reproducción de YouTube, permitiendo reordenar los vídeos.
+
+- Ordenar por título
+- Ordenar por fecha
+- Invertir orden
+- Mostrar fechas de subida de los videos
+
+[FRANÇAIS]
+Title: Trieur de Listes de Lecture pour YouTube
+
+Ajoute des options de tri aux listes de lecture YouTube, vous permettant de réorganiser les vidéos.
+
+- Trier par titre
+- Trier par date
+- Inverser l'ordre
+- Afficher les dates de mise en ligne des vidéos
+
+[ITALIANO]
+Title: Ordinatore di Playlist per YouTube
+
+Aggiunge opzioni di ordinamento alle playlist di YouTube, consentendo di riordinare i video.
+
+- Ordina per titolo
+- Ordina per data
+- Inverti ordine
+- Mostra le date di caricamento dei video
+
+[日本語]
+Title: YouTube用プレイリストソーター
+
+YouTubeのプレイリストに並べ替えオプションを追加し、動画を並べ替えられるようにします。
+
+- タイトル順
+- 日付順
+- 順序を逆にする
+- 動画のアップロード日を表示
+
+[한국어]
+Title: YouTube용 재생목록 정렬기
+
+YouTube 재생 목록에 정렬 옵션을 추가하여 동영상을 재정렬할 수 있습니다.
+
+- 제목별 정렬
+- 날짜별 정렬
+- 순서 바꾸기
+- 동영상 업로드 날짜 표시
+
+[PORTUGUÊS (BRASIL)]
+Title: Organizador de Playlists para YouTube
+
+Adiciona opções de ordenação às playlists do YouTube, permitindo reordenar os vídeos.
+
+- Ordenar por título
+- Ordenar por data
+- Inverter ordem
+- Exibir datas de upload dos vídeos
+
+[PORTUGUÊS (PORTUGAL)]
+Title: Organizador de Playlists para YouTube
+
+Adiciona opções de ordenação às listas de reprodução do YouTube, permitindo reordenar os vídeos.
+
+- Ordenar por título
+- Ordenar por data
+- Inverter ordem
+- Mostrar datas de carregamento dos vídeos
+
+[РУССКИЙ]
+Title: Сортировщик плейлистов для YouTube
+
+Добавляет в плейлисты YouTube параметры сортировки, позволяющие изменять порядок видео.
+
+- Сортировать по названию
+- Сортировать по дате
+- Обратный порядок
+- Отображать даты загрузки видео
+
+[中文 (简体)]
+Title: YouTube播放列表排序器
+
+为 YouTube 播放列表添加排序选项，允许您对视频进行重新排序。
+
+- 按标题排序
+- 按日期排序
+- 反转顺序
+- 显示视频上传日期
