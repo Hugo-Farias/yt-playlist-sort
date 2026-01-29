@@ -17,8 +17,8 @@ export type SettingsT = {
   apiString: string;
 };
 
-const initialSettings: SettingsT = {
-  date: false,
+export const initialSettings: SettingsT = {
+  date: true,
   dateFormat: "short",
   dateLanguage: "youtube",
   scroll: true,

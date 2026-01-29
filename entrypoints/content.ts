@@ -14,6 +14,7 @@ import {
   getCache,
   getInfoFromElement,
   getListId,
+  getSettings,
   getVideoId,
   isLoopOn,
   isShuffleOn,
@@ -28,7 +29,7 @@ import {
 } from "@/helper";
 import type { ApiCache, YTNavigateEvent } from "@/types";
 // import pkg from "../package.json";
-import type { SettingsT } from "./popup/App";
+import { initialSettings, type SettingsT } from "./popup/App";
 
 export let fullCache: { [key: string]: ApiCache } = {};
 
@@ -38,11 +39,16 @@ export default defineContentScript({
     let navBlock = false; // prevent navigation events during playlist load
     let currUrl = location.href;
     let playlistId: string = getListId(currUrl);
-    let firstRun = true;
+    let firstSessionRun = true;
     let prevListId: string | null = null;
     let playlistContainer = document.querySelector<HTMLDivElement>(
       "ytd-playlist-panel-renderer #items",
     );
+
+    getSettings().then((settings) => {
+      if (settings.date !== undefined) return;
+      chrome.storage.local.set(initialSettings);
+    });
 
     try {
       fullCache = JSON.parse(localGet("ytSortMainCache") || "{}");
@@ -68,7 +74,7 @@ export default defineContentScript({
     // }
 
     const devFunction = () => {
-      if (firstRun) {
+      if (firstSessionRun) {
         // const apiUrl =
         //   "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50";
         // const apiKey = "AIzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY";
@@ -82,8 +88,8 @@ export default defineContentScript({
             if (!video) return null;
             video.currentTime = video.duration - 5;
             video.pause();
-            // video.remove();
-            // videoContainer.remove();
+            video.remove();
+            videoContainer.remove();
           }, 2000);
         }
       }
@@ -213,7 +219,7 @@ export default defineContentScript({
             });
           },
         );
-        firstRun = false;
+        firstSessionRun = false;
       });
 
       video?.addEventListener("pause", () => {
@@ -360,7 +366,7 @@ export default defineContentScript({
         devFunction();
       }
 
-      if (!firstRun) return;
+      if (!firstSessionRun) return;
       waitForElement("video").then(() => {
         firstRunEvent();
       });
