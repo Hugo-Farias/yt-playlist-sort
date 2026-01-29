@@ -82,8 +82,8 @@ export default defineContentScript({
             if (!video) return null;
             video.currentTime = video.duration - 5;
             video.pause();
-            video.remove();
-            videoContainer.remove();
+            // video.remove();
+            // videoContainer.remove();
           }, 2000);
         }
       }

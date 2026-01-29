@@ -246,7 +246,7 @@ export const formatDate = (
 export const parseLang = (langSetting: SettingsT | undefined) => {
   let lang = langSetting?.dateLanguage;
 
-  if (lang === "browser") {
+  if (lang === "browser" || !lang) {
     lang = navigator.language as "browser";
   } else if (lang === "youtube") {
     lang = langSetting?.lang as "youtube";
@@ -402,10 +402,6 @@ export const isLoopOn = (): boolean => {
   return output ? output : false;
 };
 
-const newLayout =
-  document.querySelector(".ytp-left-controls")?.firstElementChild?.className ===
-  "ytp-play-button ytp-button";
-
 export const sortRenderedPlaylist = (
   playlistContainer: HTMLDivElement | null,
   apiCache: ApiCache | null,
@@ -434,15 +430,6 @@ export const sortRenderedPlaylist = (
       if (indexMessage) indexMessage.textContent = `${index + 1}`;
 
       const nextVidInfo = getInfoFromElement(arr[index + 1]);
-
-      const prevVidInfo = arr[index - 1];
-      const prevBtn = document.querySelector(".ytp-prev-button.ytp-button");
-
-      if (!prevVidInfo && !newLayout) {
-        prevBtn?.setAttribute("hidden", "");
-      } else {
-        prevBtn?.removeAttribute("hidden");
-      }
 
       const nextLabel = document.querySelector(
         "#next-video-title > #next-label",

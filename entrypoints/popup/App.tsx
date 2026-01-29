@@ -18,7 +18,7 @@ export type SettingsT = {
 };
 
 const initialSettings: SettingsT = {
-  date: true,
+  date: false,
   dateFormat: "short",
   dateLanguage: "youtube",
   scroll: true,
