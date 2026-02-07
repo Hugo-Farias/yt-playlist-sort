@@ -47,7 +47,7 @@ export const testYTApiKey = async (key: string) => {
 };
 
 const gistDefault: GistFile = {
-  keys: ["AIzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY"],
+  keys: ["AIzaSyCs-inxP1vDU4lQRVG6aT8wLN4YFG10pzU"],
   API_URL:
     "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50",
   playlistItemSelector:
