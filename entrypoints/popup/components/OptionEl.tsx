@@ -1,12 +1,15 @@
-import { effect, useSignal } from "@preact/signals-react";
+import { effect, useSignal } from "@preact/signals";
+import type { ComponentChildren, TargetedEvent } from "preact";
+import { useRef } from "preact/hooks";
 import type { SettingsT } from "../App";
 
-type PropsT = React.PropsWithChildren<{
+type PropsT = {
   id: keyof SettingsT;
   label: string;
   checked: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}>;
+  onChange: (e: TargetedEvent<HTMLInputElement>) => void;
+  children?: ComponentChildren;
+};
 
 const OptionEl = (props: PropsT) => {
   const { id, label, checked, onChange, children } = props;

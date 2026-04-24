@@ -1,4 +1,5 @@
-import { signal, useSignal } from "@preact/signals-react";
+import { signal, useSignal } from "@preact/signals";
+import type { TargetedEvent } from "preact";
 import { testYTApiKey } from "@/chromeAPI";
 import { debounce } from "@/helper";
 import type { SettingsT } from "../App";
@@ -6,7 +7,7 @@ import Button from "./Button";
 
 type PropsT = {
   id: keyof SettingsT;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: TargetedEvent<HTMLInputElement>) => void;
   apiInput: string;
 };
 
@@ -23,7 +24,7 @@ const CustomApiInput = (props: PropsT) => {
   const { id, onChange, apiInput } = props;
   const hideApi = useSignal<boolean>(!!apiInput);
 
-  const apiInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const apiInputChange = (e: TargetedEvent<HTMLInputElement>) => {
     if (hideApi.value) return;
     debounce(() => {
       onChange(e);

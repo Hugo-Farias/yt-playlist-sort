@@ -1,4 +1,4 @@
-import type React from "react";
+import type { TargetedEvent } from "preact";
 import { i18n } from "#i18n";
 import LANGUAGES from "@/data/LANGUAGES";
 import { formatDate, parseLang } from "@/helper";
@@ -7,7 +7,7 @@ import type { SettingsT } from "../App";
 type PropsT = {
   className?: string;
   settings: SettingsT;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onChange: (e: TargetedEvent<HTMLSelectElement>) => void;
 };
 
 const SAMPLE_DATE = new Date(2025, 8, 24); // 23 April 2025

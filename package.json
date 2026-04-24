@@ -1,6 +1,6 @@
 {
-  "name": "__MSG_extName__",
-  "description": "__MSG_extDescription__",
+  "name": "Playlist Sorter for YouTube",
+  "description": "Adds sorting options to YouTube playlists, allowing you to reorder videos by date or title.",
   "private": true,
   "version": "0.0.6",
   "type": "module",
@@ -8,7 +8,7 @@
     "git": "git add -A && tsc -noEmit && git commit -m",
     "dev": "wxt -b chromium",
     "ext": "wxt -b chromium --extension",
-    "check": "tsc --noEmit && biome check && ts-prune",
+    "check": "tsc --noEmit & biome check && ts-prune",
     "dev:chromium": "wxt -b chromium",
     "dev:firefox": "wxt -b firefox",
     "build": "wxt build",
@@ -18,23 +18,20 @@
     "compile": "tsc --noEmit",
     "postinstall": "wxt prepare"
   },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
   "devDependencies": {
-    "@preact/signals-react": "^3.6.1",
-    "@preact/signals-react-transform": "^0.6.0",
+    "@biomejs/biome": "^2.4.13",
+    "@preact/preset-vite": "^2.10.5",
     "@tailwindcss/vite": "^4.1.17",
     "@types/chrome": "^0.0.280",
-    "@types/react": "^19.0.1",
-    "@types/react-dom": "^19.0.2",
     "@wxt-dev/i18n": "^0.2.4",
-    "@wxt-dev/module-react": "^1.1.2",
     "baseline-browser-mapping": "^2.9.15",
     "tailwindcss": "^4.1.17",
     "ts-prune": "^0.10.3",
     "typescript": "^5.6.3",
     "wxt": "^0.19.29"
+  },
+  "dependencies": {
+    "@preact/signals": "^2.9.0",
+    "preact": "^10.29.1"
   }
 }

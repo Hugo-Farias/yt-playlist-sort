@@ -1,4 +1,5 @@
-import { effect, signal } from "@preact/signals-react";
+import { effect, signal } from "@preact/signals";
+import type { TargetedEvent } from "preact";
 import type LANGUAGES from "@/data/LANGUAGES";
 import { debounce, getSettings } from "@/helper";
 import CustomApiInput from "./components/CustomApiInput";
@@ -46,10 +47,11 @@ function App() {
     }, 260);
   });
 
-  const onChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  const inputCallback = (
+    e: TargetedEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const { id, value } = e.target;
+    const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const { id, value } = target;
 
     if (!isSettingKey(id)) return null;
     if (value.length > 70) return null;
@@ -72,17 +74,17 @@ function App() {
           id="scroll"
           label={i18n.t("settingsScroll")}
           checked={settings.value.scroll}
-          onChange={onChange}
+          onChange={inputCallback}
         />
         <OptionEl
           id="date"
           label={i18n.t("settingsDate")}
           checked={settings.value.date}
-          onChange={onChange}
+          onChange={inputCallback}
         >
           <SelectDateFormat
             settings={settings.value}
-            onChange={onChange}
+            onChange={inputCallback}
             className={"block rounded-sm border border-stone-500"}
           />
         </OptionEl>
@@ -91,12 +93,12 @@ function App() {
           id="optApi"
           label={i18n.t("apiInputLabel")}
           checked={settings.value.optApi}
-          onChange={onChange}
+          onChange={inputCallback}
         >
           <CustomApiInput
             apiInput={settings.value.apiString}
             id={"apiString"}
-            onChange={onChange}
+            onChange={inputCallback}
           />
         </OptionEl>
       </form>
