@@ -5,6 +5,8 @@ import type { ApiCache, YtSortOrder } from "@/types";
 
 let isReversed: boolean = false;
 let sortOrder: YtSortOrder = "orig";
+const isDarkMode = document.querySelector("html")?.hasAttribute("dark");
+const textColor = isDarkMode ? "#fff" : "#212121";
 
 export const createDropdownMenu = (
   cache: ApiCache | null,
@@ -21,7 +23,7 @@ export const createDropdownMenu = (
 
   const select = document.createElement("select");
   select.className = "header ytd-playlist-panel-renderer ytSortDropdown";
-  select.style.color = "var(--yt-spec-text-primary)";
+  select.style.color = textColor;
   select.style.height = "25px";
   select.style.paddingBlock = "0px";
   select.style.borderRadius = "5px";
@@ -73,7 +75,7 @@ export const createReverseBtn = (
   reverseBtn.style.cursor = "pointer";
   reverseBtn.style.height = "40px";
   reverseBtn.style.aspectRatio = "1/1";
-  reverseBtn.style.color = "var(--yt-spec-text-primary)";
+  reverseBtn.style.color = textColor;
   reverseBtn.style.padding = "5px";
   reverseBtn.style.borderRadius = "50%";
   reverseBtn.style.fontSize = "16px";

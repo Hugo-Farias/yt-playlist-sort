@@ -86,7 +86,7 @@ export default defineContentScript({
             clog("🟣 Running dev function...");
             const video = document.querySelector("video");
             if (!video) return null;
-            video.currentTime = video.duration - 5;
+            // video.currentTime = video.duration - 5;
             video.pause();
             video.remove();
             videoContainer.remove();
