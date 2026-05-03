@@ -308,6 +308,7 @@ const getFromCache = (
   return cache.videos[videoId ?? ""]?.[type] ?? Infinity;
 };
 
+// TODO: Add option to remove duplicates
 const sortList = (
   nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,

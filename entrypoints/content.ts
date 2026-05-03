@@ -288,6 +288,7 @@ export default defineContentScript({
             ...JSON.parse(localGet("ytSortRenderedCache") ?? "{}"),
             [playlistId]: renderedPlaylistIds,
           });
+
           const data = await playlistAPI(playlistId);
 
           if (data) {
@@ -321,6 +322,7 @@ export default defineContentScript({
       const playlistItems: NodeListOf<HTMLDivElement> =
         playlistContainer.querySelectorAll(playlistItemSelector);
 
+      // TODO: Add spinner here
       const refreshedCache = await hydrateCache(playlistItems);
 
       if (!refreshedCache) return null;
