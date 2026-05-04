@@ -14,7 +14,7 @@ export default defineConfig({
     manifest_version: 3,
     name: "__MSG_extName__",
     description: "__MSG_extDescription__",
-    version: "0.0.7",
+    version: "0.0.8",
     action: {
       default_popup: "entrypoints/popup/index.html",
     },

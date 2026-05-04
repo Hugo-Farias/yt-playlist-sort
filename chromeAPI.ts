@@ -12,10 +12,14 @@ import {
 import type { GistFile, YoutubePlaylistResponse } from "@/types.ts";
 import { API_URL, GIST_URL } from "./config";
 
+let gist: GistFile;
+
+let keyNum: number;
+
 const fetchJson = async <T = unknown>(
   input: RequestInfo,
 ): Promise<T | null> => {
-  clog("FetchJson Called with URL:", input);
+  clog("FetchJson called with key", keyNum);
   const res = await fetch(input);
   if (!res.ok) {
     return null;
@@ -80,10 +84,6 @@ export const fetchGist = async (): Promise<GistFile> => {
 
   return data;
 };
-
-let gist: GistFile;
-
-let keyNum: number;
 
 export const playlistAPI = async (
   playlistId: string,

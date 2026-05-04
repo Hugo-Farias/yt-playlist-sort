@@ -6,7 +6,6 @@ import {
 } from "@/entrypoints/ui/playlistBtns";
 import {
   cerr,
-  // cleanCache,
   cleanOldMainCacheEntries,
   clog,
   comparePlaylist,
@@ -28,7 +27,6 @@ import {
   waitForElement,
 } from "@/helper";
 import type { ApiCache, YTNavigateEvent } from "@/types";
-// import pkg from "../package.json";
 import { initialSettings, type SettingsT } from "./popup/App";
 
 export let fullCache: { [key: string]: ApiCache } = {};
@@ -64,8 +62,6 @@ export default defineContentScript({
     if (lang) {
       chrome.storage.local.set({ lang: lang });
     }
-
-    cleanOldMainCacheEntries(fullCache);
 
     // const extVersion = localGet("ytSortVersion");
     // if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
@@ -162,6 +158,8 @@ export default defineContentScript({
 
     const firstRunEvent = () => {
       const video = document.querySelector("video");
+
+      cleanOldMainCacheEntries(fullCache);
 
       (["click", "mouseenter"] as const).forEach((eventType) => {
         ([".ytp-prev-button", ".ytp-next-button"] as const).forEach(

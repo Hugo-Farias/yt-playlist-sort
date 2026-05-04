@@ -2,7 +2,7 @@
   "name": "Playlist Sorter for YouTube",
   "description": "Adds sorting options to YouTube playlists, allowing you to reorder videos by date or title.",
   "private": true,
-  "version": "0.0.6",
+  "version": "0.0.8",
   "type": "module",
   "scripts": {
     "git": "git add -A && tsc -noEmit && git commit -m",

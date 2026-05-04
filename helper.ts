@@ -172,7 +172,6 @@ export const storeMainCache = (
   playlistId: string,
 ) => {
   if (!data || !playlistId) return null;
-  clog("storeCache =>", data);
   const originalCache = getCache("ytSortMainCache", playlistId);
 
   const newItems = data.items.reduce(
