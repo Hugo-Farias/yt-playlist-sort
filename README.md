@@ -40,6 +40,10 @@ Once installed, the "Playlist Sorter for YouTube" extension will automatically i
 3. Click on your desired sorting method (e.g., "Sort by Title", "Sort by Date", "Reverse Order") to instantly reorder the playlist.
 4. The "Show Video Upload Dates" setting will display the upload date next to each video when active.
 
+## Report a Bug
+
+If you encounter any bugs or issues, please report them on the [Chrome Web Store support page](https://chromewebstore.google.com/detail/playlist-sorter-for-youtu/pknlkjehmikkbfpmfoiboncjnlopopjf/support).
+
 ## Using a custom api:
 
 #### 1. Create a project
@@ -69,4 +73,4 @@ Once installed, the "Playlist Sorter for YouTube" extension will automatically i
 - Open the extension's settings page by clicking on the extension icon in your browser toolbar
 - Select **"Use custom API key"**
 - Paste your API key into the provided input field
-- Lastly click **"Test API key"** to verify that the key is working correctly, if the test is successful, you should see a confirmation message
+- Click **"Test API key"** to verify that the key is working correctly, if the test is successful, you should see a confirmation message
