@@ -9,6 +9,8 @@ import {
   cleanOldMainCacheEntries,
   clog,
   comparePlaylist,
+  createLoadingLabel,
+  createSpinner,
   debounce,
   getCache,
   getInfoFromElement,
@@ -320,16 +322,28 @@ export default defineContentScript({
       const playlistItems: NodeListOf<HTMLDivElement> =
         playlistContainer.querySelectorAll(playlistItemSelector);
 
-      // TODO: Add spinner here
-      const refreshedCache = await hydrateCache(playlistItems);
-
-      if (!refreshedCache) return null;
-
       const playlistMenuBtns = document.querySelector<HTMLDivElement>(
         "div#playlist-actions > div > div > ytd-menu-renderer > #top-level-buttons-computed",
       );
 
       if (!playlistMenuBtns) return null;
+
+      playlistMenuBtns.appendChild(createSpinner("ytSortSpinner"));
+      playlistMenuBtns.appendChild(createLoadingLabel("ytSortLoadingLabel"));
+
+      let refreshedCache: ApiCache | null = null;
+
+      try {
+        clog("Loading playlist, please wait...");
+        refreshedCache = await hydrateCache(playlistItems);
+      } catch (e) {
+        cerr("Error hydrating cache: \n", e);
+      } finally {
+        playlistMenuBtns.querySelector("span.ytSortSpinner")?.remove();
+        playlistMenuBtns.querySelector("span.ytSortLoadingLabel")?.remove();
+      }
+
+      if (!refreshedCache) return null;
 
       createDropdownMenu(
         refreshedCache,
