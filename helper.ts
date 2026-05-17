@@ -307,7 +307,7 @@ const getFromCache = (
   return cache.videos[videoId ?? ""]?.[type] ?? Infinity;
 };
 
-// TODO: Add option to remove duplicates
+// TODO: Add option to remove duplicates entries
 const sortList = (
   nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,
@@ -489,45 +489,7 @@ export const cleanOldMainCacheEntries = (fullCache: {
   });
 };
 
-// Spinner Element used during loading of playlist data
-export function createSpinner(className: string) {
-  const spinner = document.createElement("span");
-
-  spinner.className = className;
-
-  const style = document.createElement("style");
-
-  style.textContent =
-    "." +
-    className +
-    " {" +
-    "border: 2px solid rgba(0, 0, 0, 0.1);" +
-    "border-top: 2px solid #888;" +
-    "border-radius: 50%;" +
-    "width: 20px;" +
-    "height: 20px;" +
-    "animation: spin 750ms linear infinite;" +
-    "margin: auto;" +
-    "}" +
-    "@keyframes spin {" +
-    "to { transform: rotate(360deg); }" +
-    "}";
-
-  spinner.appendChild(style);
-
-  return spinner;
-}
-
 export function sleep(ms: number) {
+  if (!import.meta.env.DEV) return;
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
-export const createLoadingLabel = (className: string) => {
-  const loadingSpan = document.createElement("span");
-  loadingSpan.textContent = "Loading playlist...";
-  loadingSpan.style.color = "#888";
-  loadingSpan.className = className;
-  loadingSpan.style.marginInline = "10px";
-
-  return loadingSpan;
-};

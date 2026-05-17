@@ -2,15 +2,15 @@ import { playlistAPI } from "@/chromeAPI.ts";
 import { playlistItemSelector } from "@/config";
 import {
   createDropdownMenu,
+  createLoadingLabel,
   createReverseBtn,
+  createSpinner,
 } from "@/entrypoints/ui/playlistBtns";
 import {
   cerr,
   cleanOldMainCacheEntries,
   clog,
   comparePlaylist,
-  createLoadingLabel,
-  createSpinner,
   debounce,
   getCache,
   getInfoFromElement,
@@ -334,7 +334,6 @@ export default defineContentScript({
       let refreshedCache: ApiCache | null = null;
 
       try {
-        clog("Loading playlist, please wait...");
         refreshedCache = await hydrateCache(playlistItems);
       } catch (e) {
         cerr("Error hydrating cache: \n", e);
