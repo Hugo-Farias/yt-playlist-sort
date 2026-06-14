@@ -21,4 +21,5 @@ clearCacheBtnLabel: "Limpar cache"
 apiTestSuccess: "Chave de API válida"
 apiTestFail: "Chave de API inválida!"
 apiTestTesting: "Testando..."
+spinnerLoading: "Carregando..."
 
