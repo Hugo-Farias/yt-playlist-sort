@@ -149,7 +149,7 @@ export function createSpinner(className: string) {
 
 export const createLoadingLabel = (className: string) => {
   const loadingSpan = document.createElement("span");
-  loadingSpan.textContent = "Loading playlist...";
+  loadingSpan.textContent = i18n.t("spinnerLoading");
   loadingSpan.style.color = "#888";
   loadingSpan.className = className;
   loadingSpan.style.marginInline = "10px";
