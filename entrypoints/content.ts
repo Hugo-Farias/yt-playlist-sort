@@ -8,7 +8,6 @@ import {
 } from "@/entrypoints/ui/playlistBtns";
 import {
   cerr,
-  cleanOldMainCacheEntries,
   clog,
   comparePlaylist,
   debounce,
@@ -23,19 +22,24 @@ import {
   localRemove,
   localSet,
   navigateEvent,
+  removeOldMainCacheEntries,
   replaceTooltipInfo,
   sortRenderedPlaylist,
   storeMainCache,
+  updateStoreTime,
   waitForElement,
 } from "@/helper";
+import pkg from "@/package.json";
 import type { ApiCache, YTNavigateEvent } from "@/types";
 import { initialSettings, type SettingsT } from "./popup/App";
 
-export let fullCache: { [key: string]: ApiCache } = {};
+let fullCache: { [key: string]: ApiCache } = {};
 
 export default defineContentScript({
   main() {
     clog("🟢 init");
+    console.log(pkg.version);
+
     let navBlock = false; // prevent navigation events during playlist load
     let currUrl = location.href;
     let playlistId: string = getListId(currUrl);
@@ -161,7 +165,11 @@ export default defineContentScript({
     const firstRunEvent = () => {
       const video = document.querySelector("video");
 
-      cleanOldMainCacheEntries(fullCache);
+      fullCache = updateStoreTime(fullCache, playlistId);
+
+      console.log("fullCache ==>", fullCache);
+
+      removeOldMainCacheEntries(fullCache);
 
       (["click", "mouseenter"] as const).forEach((eventType) => {
         ([".ytp-prev-button", ".ytp-next-button"] as const).forEach(
@@ -283,7 +291,7 @@ export default defineContentScript({
           !comparePlaylist(renderedCache, renderedPlaylistIds) ||
           !apiCache?.videos
         ) {
-          clog("🟡 Playlist Changed, Hydrating Cache!!!");
+          clog("🟡 Playlist not cached or changed. Hydrating cache!!!");
           localSet("ytSortRenderedCache", {
             ...JSON.parse(localGet("ytSortRenderedCache") ?? "{}"),
             [playlistId]: renderedPlaylistIds,
@@ -299,6 +307,7 @@ export default defineContentScript({
             ) as ApiCache;
           }
         }
+
         prevListId = playlistId;
       }
 

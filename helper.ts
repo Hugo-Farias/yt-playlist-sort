@@ -29,16 +29,6 @@ type localStorageKeys =
   | "ytSortVersion"
   | "ytSortGist";
 
-export const cleanCache = (msg?: string) => {
-  Object.keys(localStorage).forEach((key: string) => {
-    if (!key.startsWith("ytSort")) return;
-    localStorage.removeItem(key);
-  });
-
-  if (!msg) return;
-  clog(msg);
-};
-
 export const localSet = (
   keyname: localStorageKeys,
   obj: object | string[] | string | boolean,
@@ -155,6 +145,32 @@ export const getVideoId = (url: string | undefined | Element): string => {
   }
   if (!url || url.length <= 0) return "";
   return new URL(url).searchParams.get("v") ?? "";
+};
+
+export const updateStoreTime = (
+  data: { [key: string]: ApiCache },
+  playlistId: string,
+): { [key: string]: ApiCache } => {
+  if (Object.keys(data).length === 0 || !playlistId) {
+    console.log("No Data to update storeTime");
+    return data;
+  }
+
+  const now = Date.now();
+
+  clog(`Updating storeTime for playlist ID: ${playlistId} to ${now}`);
+
+  const newData = {
+    ...data,
+    [playlistId]: {
+      ...data[playlistId],
+      storeTime: now,
+    } as ApiCache,
+  };
+
+  localSet("ytSortMainCache", newData);
+
+  return newData;
 };
 
 function removeEmojis(str: string): string {
@@ -337,10 +353,6 @@ type GetInfoFromElementRT = {
   href: string;
 };
 
-export const unusedFunction = () => {
-  return null;
-};
-
 export const getInfoFromElement = (
   el: Element | null,
 ): GetInfoFromElementRT | null => {
@@ -471,7 +483,7 @@ export const checkCacheAge = (cacheAge: number, days: number): boolean => {
   return currentTime - cacheAge >= maxAge;
 };
 
-export const cleanOldMainCacheEntries = (fullCache: {
+export const removeOldMainCacheEntries = (fullCache: {
   [key: string]: ApiCache;
 }) => {
   if (!fullCache) return null;
@@ -489,8 +501,3 @@ export const cleanOldMainCacheEntries = (fullCache: {
     }
   });
 };
-
-export function sleep(ms: number) {
-  if (!import.meta.env.DEV) return;
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
