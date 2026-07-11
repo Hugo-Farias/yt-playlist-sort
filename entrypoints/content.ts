@@ -29,7 +29,6 @@ import {
   updateStoreTime,
   waitForElement,
 } from "@/helper";
-import pkg from "@/package.json";
 import type { ApiCache, YTNavigateEvent } from "@/types";
 import { initialSettings, type SettingsT } from "./popup/App";
 
@@ -37,8 +36,7 @@ let fullCache: { [key: string]: ApiCache } = {};
 
 export default defineContentScript({
   main() {
-    clog("🟢 init");
-    console.log(pkg.version);
+    clog("▶ init");
 
     let navBlock = false; // prevent navigation events during playlist load
     let currUrl = location.href;
@@ -166,8 +164,6 @@ export default defineContentScript({
       const video = document.querySelector("video");
 
       fullCache = updateStoreTime(fullCache, playlistId);
-
-      console.log("fullCache ==>", fullCache);
 
       removeOldMainCacheEntries(fullCache);
 

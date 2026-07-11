@@ -14,6 +14,11 @@ export const clog = (...content: Parameters<typeof log>) => {
   log("Playlist Sorter for YouTube:", ...content);
 };
 
+const devlog = (...content: Parameters<typeof log>) => {
+  if (!import.meta.env.DEV) return;
+  log("Playlist Sorter for YouTube: 🟣", ...content);
+};
+
 export const cwarn = (...content: Parameters<typeof warn>) => {
   warn("Playlist Sorter for YouTube:", ...content);
 };
@@ -152,13 +157,12 @@ export const updateStoreTime = (
   playlistId: string,
 ): { [key: string]: ApiCache } => {
   if (Object.keys(data).length === 0 || !playlistId) {
-    console.log("No Data to update storeTime");
     return data;
   }
 
   const now = Date.now();
 
-  clog(`Updating storeTime for playlist ID: ${playlistId} to ${now}`);
+  devlog(`Updating storeTime for playlist ID: ${playlistId} to ${now}`);
 
   const newData = {
     ...data,
