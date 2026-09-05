@@ -15,6 +15,7 @@ export const createDropdownMenu = (
   fullCache: { [key: string]: ApiCache },
 ) => {
   const dropdownElList = document.querySelectorAll(".ytSortDropdown");
+
   dropdownElList.forEach((el) => {
     el.remove();
   });

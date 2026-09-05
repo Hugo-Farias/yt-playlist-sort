@@ -51,9 +51,14 @@ export const testYTApiKey = async (key: string) => {
 };
 
 const gistDefault: GistFile = {
-  keys: ["AIzaSyCFJpygTRz9la7c7lSHJM3Q7ez_RkKztic"],
+  keys: [
+    "AIzaSyDFOxhO49IgS86Jp3DGYOWuFNlrJvqjDPg",
+    "AIzaSyATvBkZZuIozXHff3RQToHK_6XdgCXyvCE",
+    "AIzaSyD9ByeJ-rnx_0V2EiMQzWVNmnvx679KOcY",
+    "AIzaSyAwewKbm-UQxTH81fI4Wl5JGlKR8UQ6mbU",
+  ],
   API_URL:
-    "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50",
+    "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=100",
   playlistItemSelector:
     "ytd-playlist-panel-video-renderer#playlist-items:not([within-miniplayer])",
 };

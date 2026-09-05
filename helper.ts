@@ -327,7 +327,6 @@ const getFromCache = (
   return cache.videos[videoId ?? ""]?.[type] ?? Infinity;
 };
 
-// TODO: Add option to remove duplicates entries
 const sortList = (
   nodeList: NodeListOf<HTMLDivElement>,
   cache: ApiCache,
@@ -363,6 +362,7 @@ export const getInfoFromElement = (
   if (!el) return null;
 
   const videoId = getVideoId(el);
+
   return {
     videoTitle:
       el?.querySelector("#video-title")?.textContent?.trim() ??
@@ -481,8 +481,8 @@ export const sortRenderedPlaylist = (
   playlistContainer.appendChild(messageRender);
 };
 
-export const checkCacheAge = (cacheAge: number, days: number): boolean => {
-  const maxAge = 1000 * 60 * 60 * 24 * days;
+export const checkCacheAge = (cacheAge: number, maxDays: number): boolean => {
+  const maxAge = 1000 * 60 * 60 * 24 * maxDays;
   const currentTime = Date.now();
   return currentTime - cacheAge >= maxAge;
 };

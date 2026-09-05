@@ -172,8 +172,10 @@ export default defineContentScript({
           (btnSelector) => {
             const btnElement =
               document.querySelector<HTMLAnchorElement>(btnSelector);
+
             btnElement?.addEventListener(eventType, () => {
               if (!video) return null;
+
               if (
                 btnSelector === ".ytp-prev-button" &&
                 eventType === "mouseenter" &&
@@ -181,6 +183,7 @@ export default defineContentScript({
               ) {
                 return null;
               }
+
               setTimeout(
                 () => {
                   const currentVidEl = document.querySelector<HTMLDivElement>(
@@ -310,6 +313,7 @@ export default defineContentScript({
       return fullCache?.[playlistId];
     };
 
+    // INIT: on page load/update
     document.addEventListener("yt-navigate-finish", async () => {
       // document.addEventListener("yt-page-data-updated", async () => {
       currUrl = location.href;
