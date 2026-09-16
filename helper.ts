@@ -305,7 +305,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
       "playlistSort-date",
     );
     span.id = "byline";
-    span.style.marginLeft = "-4.2px";
+    span.style.marginLeft = "3.8px";
     span.style.marginRight = "-50px";
     // span.style.margin = "-100px";
 
