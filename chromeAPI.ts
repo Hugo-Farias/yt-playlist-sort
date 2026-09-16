@@ -119,7 +119,7 @@ export const playlistAPI = async (
       cerr("All API keys have been tried and failed.");
       return null;
     }
-    cwarn("API key failed, rotating key");
+    cwarn(`API key number ${keyNum} failed`);
     gist.keys.splice(keyNum, 1);
     return playlistAPI(playlistId, nextpageToken);
   }

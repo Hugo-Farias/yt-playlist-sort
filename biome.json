@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
+  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -19,6 +19,9 @@
       "correctness": {
         "noUnusedVariables": "off",
         "noUnusedFunctionParameters": "off"
+      },
+      "complexity": {
+        "noUselessRename": "error"
       },
       "nursery": {
         "useSortedClasses": "on"
