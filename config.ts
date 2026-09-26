@@ -1,5 +1,5 @@
 export const API_URL =
-  "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50";
+  "https://www.googleapis.com/youtube/v3/playlistItems?&part=snippet,contentDetails&fields=etag,nextPageToken,items(snippet(title,channelTitle),contentDetails(videoPublishedAt,videoId)),pageInfo&maxResults=50";
 
 export const playlistItemSelector =
   "ytd-playlist-panel-video-renderer#playlist-items:not([within-miniplayer])";

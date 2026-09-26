@@ -9,35 +9,9 @@ export type GistFile = {
   fetchedAt?: number;
 };
 
-export type YouTubePlaylistItem = {
-  kind: "youtube#playlistItem";
-  etag: string;
-  id: string;
-  available?: boolean;
-  contentDetails: {
-    videoId: string;
-    videoPublishedAt: string; // ISO 8601 date-time string
-  };
-  snippet: {
-    title: string;
-    description: string;
-    channelTitle: string;
-    publishedAt: string; // ISO 8601 date-time string
-    thumbnails: {
-      default?: { url: string; width?: number; height?: number };
-      medium?: { url: string; width?: number; height?: number };
-      high?: { url: string; width?: number; height?: number };
-      standard?: { url: string; width?: number; height?: number };
-      maxres?: { url: string; width?: number; height?: number };
-    };
-  };
-};
-
 export type YoutubePlaylistResponse = {
-  kind: "youtube#playlistItemListResponse";
   etag: string;
-  nextPageToken?: string;
-  prevPageToken?: string;
+  nextPageToken: string;
   items: YouTubePlaylistItem[];
   pageInfo: {
     totalResults: number;
@@ -45,13 +19,24 @@ export type YoutubePlaylistResponse = {
   };
 };
 
+type YouTubePlaylistItem = {
+  snippet: {
+    title: string;
+    channelTitle: string;
+  };
+  contentDetails: {
+    videoId: string;
+    videoPublishedAt: string;
+  };
+};
+
 export type YtSortOrder = "orig" | "date" | "title";
 
 export type ApiCacheItems = {
-  title: string;
+  channelTitle: string;
   index: number;
   publishedAt: number;
-  channelTitle: string;
+  title: string;
 };
 
 export type ApiCache = {
@@ -64,40 +49,6 @@ export type ApiCache = {
   isReversed: boolean;
   sortOrder: YtSortOrder;
   etag: string;
-};
-
-export type YouTubeVideoResponse = {
-  kind: "youtube#videoListResponse";
-  etag: string;
-  items: Array<{
-    kind: "youtube#video";
-    etag: string;
-    id: string;
-    contentDetails: {
-      duration: string;
-      dimension: "2d" | "3d";
-      definition: "sd" | "hd";
-      caption: "true" | "false";
-      licensedContent: boolean;
-      regionRestriction?: {
-        blocked?: string[];
-      };
-      contentRating: Record<string, unknown>; // could be more specific if needed
-      projection: string;
-    };
-    status: {
-      uploadStatus: string;
-      privacyStatus: string;
-      license: string;
-      embeddable: boolean;
-      publicStatsViewable: boolean;
-      madeForKids: boolean;
-    };
-  }>;
-  pageInfo: {
-    totalResults: number;
-    resultsPerPage: number;
-  };
 };
 
 type YTWatchEndpoint = {

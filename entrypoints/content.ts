@@ -34,6 +34,7 @@ import { initialSettings, type SettingsT } from "./popup/App";
 
 let fullCache: { [key: string]: ApiCache } = {};
 
+// TODO: Create a notification system
 export default defineContentScript({
   main() {
     clog("▶ init");

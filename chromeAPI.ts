@@ -90,6 +90,10 @@ export const fetchGist = async (): Promise<GistFile> => {
   return data;
 };
 
+// export const playlistAPI = (playlistId: string) => {
+//   if (!playlistId) return null;
+// };
+
 export const playlistAPI = async (
   playlistId: string,
   nextpageToken: string | null = null,
