@@ -1,4 +1,3 @@
-import { playlistAPI } from "@/chromeAPI.ts";
 import CONFIG from "@/config.json";
 import {
   createDropdownMenu,
@@ -32,6 +31,7 @@ import {
   updateStoreTime,
   waitForElement,
 } from "@/utils/helper";
+import { playlistAPI } from "@/utils/youtube";
 import { initialSettings, type SettingsT } from "./popup/App";
 
 let fullCache: { [key: string]: ApiCache } = {};

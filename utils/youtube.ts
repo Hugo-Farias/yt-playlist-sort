@@ -1,3 +1,4 @@
+import CONFIG from "@/config.json";
 import type { GistFile, YoutubePlaylistResponse } from "@/types.ts";
 import {
   cerr,
@@ -11,7 +12,6 @@ import {
   localGet,
   localSet,
 } from "@/utils/helper";
-import CONFIG from "./config.json";
 
 let gist: GistFile;
 

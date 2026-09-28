@@ -1,9 +1,9 @@
 import { signal, useSignal } from "@preact/signals";
 import type { TargetedEvent } from "preact";
-import { testYTApiKey } from "@/chromeAPI";
+import type { SettingsT } from "@/entrypoints/popup/App";
+import Button from "@/entrypoints/popup/components/Button";
 import { debounce } from "@/utils/helper";
-import type { SettingsT } from "../App";
-import Button from "./Button";
+import { testYTApiKey } from "@/utils/youtube";
 
 type PropsT = {
   id: keyof SettingsT;
