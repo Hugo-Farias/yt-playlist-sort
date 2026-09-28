@@ -1,4 +1,4 @@
-import { playlistAPI } from "@/chromeAPI.ts";
+import { callPlaylistAPI } from "@/chromeAPI";
 import { playlistItemSelector } from "@/config";
 import {
   createDropdownMenu,
@@ -47,6 +47,8 @@ export default defineContentScript({
     let playlistContainer = document.querySelector<HTMLDivElement>(
       "ytd-playlist-panel-renderer #items",
     );
+
+    // callPlaylistAPI(playlistId);
 
     getSettings().then((settings) => {
       if (settings.date !== undefined) return;
@@ -284,7 +286,8 @@ export default defineContentScript({
             return getListId(anchor?.href) === playlistId;
           })
           .map((v) => getVideoId(v));
-
+        console.log("✔️ renderedPlaylistIds ==>", renderedPlaylistIds);
+        console.log("✔️ renderedCache ==>", renderedCache);
         // If the rendered playlist items are different from the cache
         // or there is no cache, hydrate it
         if (
@@ -297,7 +300,7 @@ export default defineContentScript({
             [playlistId]: renderedPlaylistIds,
           });
 
-          const data = await playlistAPI(playlistId);
+          const data = await callPlaylistAPI(playlistId);
 
           if (data) {
             storeMainCache(data, playlistId);

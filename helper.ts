@@ -7,6 +7,7 @@ import type {
 import type { SettingsT } from "./entrypoints/popup/App";
 import "./data/LANGUAGES";
 import { playlistItemSelector } from "./config";
+import type { BackgroundMsg } from "./entrypoints/background";
 
 const { log, error, warn } = console;
 
@@ -504,4 +505,8 @@ export const removeOldMainCacheEntries = (fullCache: {
       localSet("ytSortMainCache", updatedCache);
     }
   });
+};
+
+export const sendBackgroundMsg = (msg: BackgroundMsg) => {
+  return browser.runtime.sendMessage(msg);
 };
