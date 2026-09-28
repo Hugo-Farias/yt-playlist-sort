@@ -1,12 +1,13 @@
 import CONFIG from "@/config.json";
+import { initialSettings, type SettingsT } from "@/entrypoints/popup/App";
+import pkg from "@/package.json";
+import type { ApiCache, YTNavigateEvent } from "@/types";
 import {
   createDropdownMenu,
   createLoadingLabel,
   createReverseBtn,
   createSpinner,
-} from "@/entrypoints/ui/playlistBtns";
-import pkg from "@/package.json";
-import type { ApiCache, YTNavigateEvent } from "@/types";
+} from "@/ui/playlistBtns";
 import {
   cerr,
   clog,
@@ -32,7 +33,6 @@ import {
   waitForElement,
 } from "@/utils/helper";
 import { playlistAPI } from "@/utils/youtube";
-import { initialSettings, type SettingsT } from "./popup/App";
 
 let fullCache: { [key: string]: ApiCache } = {};
 
@@ -348,6 +348,7 @@ export default defineContentScript({
         cerr("Error hydrating cache: \n", e);
         playlistMenuBtns.querySelector("span.ytSortSpinner")?.remove();
         playlistMenuBtns.querySelector("span.ytSortLoadingLabel")?.remove();
+        // TODO: Send error notification
         createLoadingLabel("loadingError");
         return null;
       } finally {

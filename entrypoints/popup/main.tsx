@@ -1,6 +1,6 @@
 import { render } from "preact";
 import { StrictMode } from "preact/compat";
-import App from "./App.tsx";
+import App from "@/entrypoints/popup/App";
 import "./global.css";
 
 const rootElement = document.getElementById("root");

@@ -1,10 +1,10 @@
 import { effect, signal } from "@preact/signals";
 import type { TargetedEvent } from "preact";
 import type LANGUAGES from "@/data/LANGUAGES";
+import CustomApiInput from "@/entrypoints/popup/components/CustomApiInput";
+import OptionEl from "@/entrypoints/popup/components/OptionEl";
+import SelectDateFormat from "@/entrypoints/popup/components/SelectDateFormat";
 import { debounce, getSettings } from "@/utils/helper";
-import CustomApiInput from "./components/CustomApiInput";
-import OptionEl from "./components/OptionEl";
-import SelectDateFormat from "./components/SelectDateFormat";
 
 export type LanguageCodeT = Intl.Locale;
 

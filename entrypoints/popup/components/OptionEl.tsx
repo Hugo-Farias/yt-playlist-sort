@@ -1,7 +1,7 @@
 import { effect, useSignal } from "@preact/signals";
 import type { ComponentChildren, TargetedEvent } from "preact";
 import { useRef } from "preact/hooks";
-import type { SettingsT } from "../App";
+import type { SettingsT } from "@/entrypoints/popup/App";
 
 type PropsT = {
   id: keyof SettingsT;
