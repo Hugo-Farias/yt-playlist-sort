@@ -346,8 +346,6 @@ export default defineContentScript({
         refreshedCache = await hydrateCache(playlistItems);
       } catch (e) {
         cerr("Error hydrating cache: \n", e);
-        playlistMenuBtns.querySelector("span.ytSortSpinner")?.remove();
-        playlistMenuBtns.querySelector("span.ytSortLoadingLabel")?.remove();
         // TODO: Send error notification
         createLoadingLabel("loadingError");
         return null;
