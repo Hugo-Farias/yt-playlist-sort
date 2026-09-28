@@ -1,6 +1,6 @@
 import { effect, signal } from "@preact/signals";
 import type { TargetedEvent } from "preact";
-import type LANGUAGES from "@/data/LANGUAGES";
+import type LANGUAGES from "@/constants/LANGUAGES";
 import CustomApiInput from "@/entrypoints/popup/components/CustomApiInput";
 import OptionEl from "@/entrypoints/popup/components/OptionEl";
 import SelectDateFormat from "@/entrypoints/popup/components/SelectDateFormat";

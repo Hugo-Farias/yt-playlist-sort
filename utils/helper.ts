@@ -5,7 +5,7 @@ import type {
   YoutubePlaylistResponse,
   YtSortOrder,
 } from "@/types";
-import "@/data/LANGUAGES";
+import "@/constants/LANGUAGES";
 import CONFIG from "@/config.json";
 
 const { log, error, warn } = console;

@@ -1,6 +1,6 @@
 import type { TargetedEvent } from "preact";
 import { i18n } from "#i18n";
-import LANGUAGES from "@/data/LANGUAGES";
+import LANGUAGES from "@/constants/LANGUAGES";
 import type { SettingsT } from "@/entrypoints/popup/App";
 import { formatDate, parseLang } from "@/utils/helper";
 
