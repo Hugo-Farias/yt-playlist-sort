@@ -1,4 +1,4 @@
-import { i18n } from "#i18n";
+import { type GeneratedI18nStructure, i18n } from "#i18n";
 import { reversePlaylistSVG } from "@/entrypoints/ui/reverseBtn";
 import { debounce, localAdd, sortRenderedPlaylist } from "@/helper";
 import type { ApiCache, YtSortOrder } from "@/types";
@@ -120,16 +120,16 @@ export const createReverseBtn = (
 };
 
 // Spinner Element used during loading of playlist data
-export function createSpinner(className: string) {
+export function createSpinner() {
   const spinner = document.createElement("span");
 
-  spinner.className = className;
+  spinner.className = "ytSortSpinner";
 
   const style = document.createElement("style");
 
   style.textContent =
     "." +
-    className +
+    "ytSortSpinner" +
     " {" +
     "border: 2px solid rgba(0, 0, 0, 0.1);" +
     "border-top: 2px solid #888;" +
@@ -148,11 +148,11 @@ export function createSpinner(className: string) {
   return spinner;
 }
 
-export const createLoadingLabel = (className: string) => {
+export const createLoadingLabel = (msg: keyof GeneratedI18nStructure) => {
   const loadingSpan = document.createElement("span");
-  loadingSpan.textContent = i18n.t("spinnerLoading");
+  loadingSpan.textContent = i18n.t(msg);
   loadingSpan.style.color = "#888";
-  loadingSpan.className = className;
+  loadingSpan.className = "ytSortLoadingLabel";
   loadingSpan.style.marginInline = "10px";
 
   return loadingSpan;

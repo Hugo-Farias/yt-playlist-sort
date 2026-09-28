@@ -337,8 +337,8 @@ export default defineContentScript({
 
       if (!playlistMenuBtns) return null;
 
-      playlistMenuBtns.appendChild(createSpinner("ytSortSpinner"));
-      playlistMenuBtns.appendChild(createLoadingLabel("ytSortLoadingLabel"));
+      playlistMenuBtns.appendChild(createSpinner());
+      playlistMenuBtns.appendChild(createLoadingLabel("loadingSpinner"));
 
       let refreshedCache: ApiCache | null = null;
 
@@ -346,6 +346,10 @@ export default defineContentScript({
         refreshedCache = await hydrateCache(playlistItems);
       } catch (e) {
         cerr("Error hydrating cache: \n", e);
+        playlistMenuBtns.querySelector("span.ytSortSpinner")?.remove();
+        playlistMenuBtns.querySelector("span.ytSortLoadingLabel")?.remove();
+        createLoadingLabel("loadingError");
+        return null;
       } finally {
         playlistMenuBtns.querySelector("span.ytSortSpinner")?.remove();
         playlistMenuBtns.querySelector("span.ytSortLoadingLabel")?.remove();
