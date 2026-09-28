@@ -22,4 +22,5 @@ apiTestSuccess: "Chave de API válida"
 apiTestFail: "Chave de API inválida!"
 apiTestTesting: "Testando..."
 loadingSpinner: "Carregando..."
+loadingError: "Erro"
 
