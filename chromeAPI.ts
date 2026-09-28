@@ -1,3 +1,4 @@
+import type { GistFile, YoutubePlaylistResponse } from "@/types.ts";
 import {
   cerr,
   checkCacheAge,
@@ -9,8 +10,7 @@ import {
   getSettings,
   localGet,
   localSet,
-} from "@/helper";
-import type { GistFile, YoutubePlaylistResponse } from "@/types.ts";
+} from "@/utils/helper";
 import CONFIG from "./config.json";
 
 let gist: GistFile;

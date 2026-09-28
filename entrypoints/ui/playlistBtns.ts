@@ -1,7 +1,7 @@
 import { type GeneratedI18nStructure, i18n } from "#i18n";
 import { reversePlaylistSVG } from "@/entrypoints/ui/reverseBtn";
-import { debounce, localAdd, sortRenderedPlaylist } from "@/helper";
 import type { ApiCache, YtSortOrder } from "@/types";
+import { debounce, localAdd, sortRenderedPlaylist } from "@/utils/helper";
 
 let isReversed: boolean = false;
 let sortOrder: YtSortOrder = "orig";

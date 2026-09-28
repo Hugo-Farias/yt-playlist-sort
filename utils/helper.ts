@@ -1,11 +1,11 @@
+import type { SettingsT } from "@/entrypoints/popup/App";
 import type {
   ApiCache,
   ApiCacheItems,
   YoutubePlaylistResponse,
   YtSortOrder,
 } from "@/types.ts";
-import type { SettingsT } from "./entrypoints/popup/App";
-import "./data/LANGUAGES";
+import "@/data/LANGUAGES";
 import CONFIG from "@/config.json";
 
 const { log, error, warn } = console;

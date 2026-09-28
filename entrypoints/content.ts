@@ -6,6 +6,8 @@ import {
   createReverseBtn,
   createSpinner,
 } from "@/entrypoints/ui/playlistBtns";
+import pkg from "@/package.json";
+import type { ApiCache, YTNavigateEvent } from "@/types";
 import {
   cerr,
   clog,
@@ -29,9 +31,7 @@ import {
   storeMainCache,
   updateStoreTime,
   waitForElement,
-} from "@/helper";
-import pkg from "@/package.json";
-import type { ApiCache, YTNavigateEvent } from "@/types";
+} from "@/utils/helper";
 import { initialSettings, type SettingsT } from "./popup/App";
 
 let fullCache: { [key: string]: ApiCache } = {};

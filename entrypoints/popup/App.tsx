@@ -1,7 +1,7 @@
 import { effect, signal } from "@preact/signals";
 import type { TargetedEvent } from "preact";
 import type LANGUAGES from "@/data/LANGUAGES";
-import { debounce, getSettings } from "@/helper";
+import { debounce, getSettings } from "@/utils/helper";
 import CustomApiInput from "./components/CustomApiInput";
 import OptionEl from "./components/OptionEl";
 import SelectDateFormat from "./components/SelectDateFormat";

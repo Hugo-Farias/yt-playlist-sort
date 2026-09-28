@@ -1,7 +1,7 @@
 import type { TargetedEvent } from "preact";
 import { i18n } from "#i18n";
 import LANGUAGES from "@/data/LANGUAGES";
-import { formatDate, parseLang } from "@/helper";
+import { formatDate, parseLang } from "@/utils/helper";
 import type { SettingsT } from "../App";
 
 type PropsT = {

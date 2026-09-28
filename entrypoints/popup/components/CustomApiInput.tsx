@@ -1,7 +1,7 @@
 import { signal, useSignal } from "@preact/signals";
 import type { TargetedEvent } from "preact";
 import { testYTApiKey } from "@/chromeAPI";
-import { debounce } from "@/helper";
+import { debounce } from "@/utils/helper";
 import type { SettingsT } from "../App";
 import Button from "./Button";
 
