@@ -4,7 +4,7 @@ import type {
   ApiCacheItems,
   YoutubePlaylistResponse,
   YtSortOrder,
-} from "@/types.ts";
+} from "@/types";
 import "@/data/LANGUAGES";
 import CONFIG from "@/config.json";
 

@@ -1,5 +1,5 @@
 import CONFIG from "@/config.json";
-import type { GistFile, YoutubePlaylistResponse } from "@/types.ts";
+import type { GistFile, YoutubePlaylistResponse } from "@/types";
 import {
   cerr,
   checkCacheAge,
