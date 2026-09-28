@@ -11,6 +11,7 @@ import {
   clog,
   comparePlaylist,
   debounce,
+  deleteCache,
   getCache,
   getInfoFromElement,
   getListId,
@@ -29,6 +30,7 @@ import {
   updateStoreTime,
   waitForElement,
 } from "@/helper";
+import pkg from "@/package.json";
 import type { ApiCache, YTNavigateEvent } from "@/types";
 import { initialSettings, type SettingsT } from "./popup/App";
 
@@ -56,10 +58,7 @@ export default defineContentScript({
     try {
       fullCache = JSON.parse(localGet("ytSortMainCache") || "{}");
     } catch (e) {
-      cerr("Error parsing main cache JSON: \n", e);
-      clog("Cleaning Cache");
-      localRemove("ytSortMainCache");
-      localRemove("ytSortRenderedCache");
+      deleteCache("Error parsing main cache JSON: \n", e);
       fullCache = {};
     }
 
@@ -68,11 +67,11 @@ export default defineContentScript({
       chrome.storage.local.set({ lang: lang });
     }
 
-    // const extVersion = localGet("ytSortVersion");
-    // if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
-    //   cleanCache(`Updated to version ${pkg.version}, clearing cache 🧹`);
-    //   localSet("ytSortVersion", pkg.version);
-    // }
+    const extVersion = localGet("ytSortVersion");
+    if (!extVersion || pkg.version !== extVersion.replaceAll('"', "")) {
+      deleteCache(`Updated to version ${pkg.version}, clearing cache 🧹`);
+      localSet("ytSortVersion", pkg.version);
+    }
 
     const devFunction = () => {
       if (firstSessionRun) {

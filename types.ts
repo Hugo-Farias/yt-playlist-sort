@@ -22,7 +22,7 @@ export type YoutubePlaylistResponse = {
 type YouTubePlaylistItem = {
   snippet: {
     title: string;
-    channelTitle: string;
+    videoOwnerChannelTitle: string;
   };
   contentDetails: {
     videoId: string;

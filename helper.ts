@@ -200,7 +200,7 @@ export const storeMainCache = (
         title: removeEmojis(item.snippet.title),
         index: index,
         publishedAt: new Date(item.contentDetails.videoPublishedAt).getTime(),
-        channelTitle: item.snippet.channelTitle,
+        channelTitle: item.snippet.videoOwnerChannelTitle,
       };
 
       return acc;
@@ -278,7 +278,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
   if (dateEl) dateEl.remove();
 
   chrome.storage.local.get<SettingsT>((settings) => {
-    if (!settings.date) return;
+    if (!settings.date) return null;
 
     const itemEl = el.querySelector<HTMLSpanElement>("#byline-container");
     if (!itemEl) return null;
@@ -286,6 +286,8 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     const lang = parseLang(settings);
 
     const videoItem = cache.videos[getVideoId(el) ?? ""];
+
+    if (!videoItem) return null;
 
     const formattedDate = formatDate(
       videoItem.publishedAt ?? 0,
@@ -313,7 +315,7 @@ export const renderDateToElement = (el: HTMLDivElement, cache: ApiCache) => {
     itemEl.style.paddingRight = "0";
     itemEl.setAttribute(
       "title",
-      `${videoItem.channelTitle} - ${formattedDate}`,
+      `${videoItem.channelTitle} • ${formattedDate}`,
     );
   });
 };
@@ -504,4 +506,11 @@ export const removeOldMainCacheEntries = (fullCache: {
       localSet("ytSortMainCache", updatedCache);
     }
   });
+};
+
+export const deleteCache = (...msg: Parameters<typeof log>) => {
+  localRemove("ytSortMainCache");
+  localRemove("ytSortRenderedCache");
+  clog(...msg);
+  clog("🔴Cleaning Cache🔴");
 };

@@ -11,7 +11,6 @@ export default defineConfig({
     plugins: [tailwindcss(), preact()],
   }),
   manifest: {
-    manifest_version: 3,
     name: "__MSG_extName__",
     description: "__MSG_extDescription__",
     action: {
