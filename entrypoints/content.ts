@@ -1,5 +1,5 @@
 import { playlistAPI } from "@/chromeAPI.ts";
-import { playlistItemSelector } from "@/config";
+import CONFIG from "@/config.json";
 import {
   createDropdownMenu,
   createLoadingLabel,
@@ -329,7 +329,7 @@ export default defineContentScript({
       if (!playlistContainer) return null;
 
       const playlistItems: NodeListOf<HTMLDivElement> =
-        playlistContainer.querySelectorAll(playlistItemSelector);
+        playlistContainer.querySelectorAll(CONFIG.playlistItemSelector);
 
       const playlistMenuBtns = document.querySelector<HTMLDivElement>(
         "div#playlist-actions > div > div > ytd-menu-renderer > #top-level-buttons-computed",

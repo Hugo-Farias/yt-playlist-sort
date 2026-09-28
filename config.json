@@ -1,0 +1,5 @@
+{
+  "API_URL": "https://www.googleapis.com/youtube/v3/playlistItems?&part=snippet,contentDetails&fields=etag,nextPageToken,items(snippet(title,videoOwnerChannelTitle),contentDetails(videoPublishedAt,videoId)),pageInfo&maxResults=50",
+  "GIST_URL": "https://gist.githubusercontent.com/Hugo-Farias/73ecbbbf06598d234bd795b9d8696a0f/raw/ytSort.json",
+  "playlistItemSelector": "ytd-playlist-panel-video-renderer#playlist-items:not([within-miniplayer])"
+}

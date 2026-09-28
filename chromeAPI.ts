@@ -2,6 +2,7 @@ import {
   cerr,
   checkCacheAge,
   clog,
+  constructApiUrl,
   cwarn,
   getCache,
   getListId,
@@ -10,7 +11,7 @@ import {
   localSet,
 } from "@/helper";
 import type { GistFile, YoutubePlaylistResponse } from "@/types.ts";
-import { API_URL, GIST_URL } from "./config";
+import CONFIG from "./config.json";
 
 let gist: GistFile;
 
@@ -33,7 +34,7 @@ const fetchJson = async <T = unknown>(
 };
 
 export const testYTApiKey = async (key: string) => {
-  const testUrl = `${API_URL}&playlistId=PLBCF2DAC6FFB574DE&key=${key}&maxResults=1`;
+  const testUrl = constructApiUrl("PLBCF2DAC6FFB574DE", key);
   try {
     const testResponse = await fetch(testUrl);
     clog("testResponse ==>", testResponse.status);
@@ -71,7 +72,7 @@ export const fetchGist = async (): Promise<GistFile> => {
     : true;
 
   const data: GistFile | null = cacheIsOld
-    ? await fetchJson<GistFile>(GIST_URL)
+    ? await fetchJson<GistFile>(CONFIG.GIST_URL)
     : gistCache;
 
   if (!data) {
@@ -115,7 +116,7 @@ export const playlistAPI = async (
   }
 
   const data = await fetchJson<YoutubePlaylistResponse>(
-    `${API_URL}&playlistId=${playlistId}&key=${key}${nextpageToken ? `&pageToken=${nextpageToken}` : ""}`,
+    constructApiUrl(playlistId, key, nextpageToken),
   );
 
   if (!data) {

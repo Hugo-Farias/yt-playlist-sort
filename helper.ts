@@ -6,7 +6,7 @@ import type {
 } from "@/types.ts";
 import type { SettingsT } from "./entrypoints/popup/App";
 import "./data/LANGUAGES";
-import { playlistItemSelector } from "./config";
+import CONFIG from "@/config.json";
 
 const { log, error, warn } = console;
 
@@ -428,7 +428,7 @@ export const sortRenderedPlaylist = (
   if (!apiCache) throw new Error("API cache missing");
 
   const playlistItems: NodeListOf<HTMLDivElement> =
-    playlistContainer.querySelectorAll(playlistItemSelector);
+    playlistContainer.querySelectorAll(CONFIG.playlistItemSelector);
 
   const sortedList = sortList(playlistItems, apiCache);
 
@@ -513,4 +513,15 @@ export const deleteCache = (...msg: Parameters<typeof log>) => {
   localRemove("ytSortRenderedCache");
   clog(...msg);
   clog("🔴Cleaning Cache🔴");
+};
+
+export const constructApiUrl = (
+  playlistId: string,
+  key: string,
+  nextpageToken: string | null = null,
+) => {
+  const playlistUrl = `&playlistId=${playlistId}`;
+  const keyUrl = `&key=${key}`;
+  const nextPageUrl = nextpageToken ? `&pageToken=${nextpageToken}` : "";
+  return `${CONFIG.API_URL}${playlistUrl}${keyUrl}${nextPageUrl}`;
 };
