@@ -74,6 +74,7 @@ export default defineContentScript({
     }
 
     const devFunction = () => {
+      if (!import.meta.env.DEV) return null;
       if (firstSessionRun) {
         // const apiUrl =
         //   "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50";
@@ -363,12 +364,7 @@ export default defineContentScript({
         fullCache,
       );
 
-      createReverseBtn(
-        refreshedCache,
-        playlistContainer,
-        playlistMenuBtns,
-        fullCache,
-      );
+      createReverseBtn(refreshedCache, playlistContainer, playlistMenuBtns);
 
       sortRenderedPlaylist(playlistContainer, refreshedCache);
 
@@ -387,9 +383,7 @@ export default defineContentScript({
         localRemove("ytSortLoop", true);
       }
 
-      if (import.meta.env.DEV) {
-        devFunction();
-      }
+      devFunction();
 
       if (!firstSessionRun) return;
       waitForElement("video").then(() => {

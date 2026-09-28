@@ -1,4 +1,4 @@
-export const reversePlaylistSVG = `
+export const reverseBtnSvg = `
 <svg 
   viewBox="0 0 24 24" 
   stroke="currentColor"

@@ -1,6 +1,6 @@
 import { type GeneratedI18nStructure, i18n } from "#i18n";
 import type { ApiCache, YtSortOrder } from "@/types";
-import { reversePlaylistSVG } from "@/ui/reverseBtn";
+import { reverseBtnSvg } from "@/ui/reverseBtnSvg.ts";
 import { debounce, localAdd, sortRenderedPlaylist } from "@/utils/helper";
 
 let isReversed: boolean = false;
@@ -64,13 +64,12 @@ export const createReverseBtn = (
   cache: ApiCache,
   playlistContainer: HTMLDivElement,
   playlistMenuBtns: HTMLDivElement | null,
-  fullCache: { [key: string]: ApiCache },
 ) => {
   isReversed = cache.isReversed;
 
   const reverseBtn = document.createElement("button");
   reverseBtn.className = "ytSortReverseBtn ytSortDropdown";
-  reverseBtn.innerHTML = reversePlaylistSVG;
+  reverseBtn.innerHTML = reverseBtnSvg;
   reverseBtn.style.backgroundColor = "transparent";
   reverseBtn.style.border = "transparent";
   reverseBtn.style.cursor = "pointer";
@@ -84,11 +83,13 @@ export const createReverseBtn = (
   reverseBtn.ariaLabel = i18n.t("buttonReverse");
   reverseBtn.title = i18n.t("buttonReverse");
 
+  console.log("✔️ reverseBtn ==>", reverseBtn);
   const changeBtnEffect = () => {
-    reverseBtn.style.transform = `scaleY(${isReversed ? "-1" : "1"})`;
     reverseBtn.ariaPressed = String(isReversed);
+    reverseBtn.style.transform = `scaleY(${isReversed ? "-1" : "1"})`;
     reverseBtn.children[0].setAttribute("stroke-width", isReversed ? "2" : "1");
   };
+
   changeBtnEffect();
 
   const reverseBtnFunc = () => {
@@ -97,7 +98,7 @@ export const createReverseBtn = (
 
     localAdd("ytSortMainCache", { isReversed: isReversed });
 
-    fullCache[cache.listId].isReversed = isReversed;
+    cache.isReversed = isReversed;
 
     debounce(() => {
       sortRenderedPlaylist(playlistContainer, cache);
