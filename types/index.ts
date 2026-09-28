@@ -1,22 +1,8 @@
-export type RenderedPlaylistItem = {
-  videoId: string | null;
-};
-
 export type GistFile = {
   keys: string[];
   API_URL: string;
   playlistItemSelector: string;
   fetchedAt?: number;
-};
-
-export type YoutubePlaylistResponse = {
-  etag: string;
-  nextPageToken: string;
-  items: YouTubePlaylistItem[];
-  pageInfo: {
-    totalResults: number;
-    resultsPerPage: number;
-  };
 };
 
 type YouTubePlaylistItem = {
@@ -27,6 +13,16 @@ type YouTubePlaylistItem = {
   contentDetails: {
     videoId: string;
     videoPublishedAt: string;
+  };
+};
+
+export type YoutubePlaylistResponse = {
+  etag: string;
+  nextPageToken: string;
+  items: YouTubePlaylistItem[];
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
   };
 };
 
@@ -51,12 +47,6 @@ export type ApiCache = {
   etag: string;
 };
 
-type YTWatchEndpoint = {
-  videoId: string;
-  playlistId?: string;
-  index?: number;
-};
-
 export type YTNavigateEvent = CustomEvent<{
   ytSort?: "next" | "prev" | "videoEnd";
   tempData?: {
@@ -64,7 +54,11 @@ export type YTNavigateEvent = CustomEvent<{
     lact?: number;
   };
   endpoint?: {
-    watchEndpoint?: YTWatchEndpoint;
+    watchEndpoint?: {
+      videoId: string;
+      playlistId?: string;
+      index?: number;
+    };
     commandMetadata?: {
       webCommandMetadata?: {
         url?: string;
