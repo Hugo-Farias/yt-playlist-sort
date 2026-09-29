@@ -520,3 +520,8 @@ export const constructApiUrl = (
   const nextPageUrl = nextpageToken ? `&pageToken=${nextpageToken}` : "";
   return `${CONFIG.API_URL}${playlistUrl}${keyUrl}${nextPageUrl}`;
 };
+
+export const capitalize = (msg: string) => {
+  if (!msg || msg.length <= 0) return "";
+  return msg.charAt(0).toUpperCase() + msg.slice(1);
+};

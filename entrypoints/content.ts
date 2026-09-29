@@ -2,6 +2,7 @@ import CONFIG from "@/config.json";
 import { initialSettings, type SettingsT } from "@/entrypoints/popup/App";
 import pkg from "@/package.json";
 import type { ApiCache, YTNavigateEvent } from "@/types";
+import { showToast } from "@/ui/notification";
 import {
   createDropdownMenu,
   createLoadingLabel,
@@ -343,12 +344,27 @@ export default defineContentScript({
 
       let refreshedCache: ApiCache | null = null;
 
+      // TEST: Test block
+      const fakeError = `
+      Uncaught TypeError: Cannot read properties of undefined (reading 'foo')
+      at handleRequest (app.js:42:17)
+      at main (app.js:18:3)
+      `;
+
+      showToast(
+        `Youtube Playlist Sorter Error Loading Playlist ${fakeError}`,
+        10000,
+        "error",
+      );
+      // TEST: End of test block
+
       try {
         refreshedCache = await hydrateCache(playlistItems);
       } catch (e) {
         cerr("Error hydrating cache: \n", e);
         // TODO: Send error notification
         createLoadingLabel("loadingError");
+        showToast(`Youtube Playlist Sorter Error Loading Playlist: ${e}`);
         return null;
       } finally {
         playlistMenuBtns.querySelector("span.ytSortSpinner")?.remove();
