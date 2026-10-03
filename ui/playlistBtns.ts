@@ -149,7 +149,9 @@ export function createSpinner() {
   return spinner;
 }
 
-export const createLoadingLabel = (msg: keyof GeneratedI18nStructure) => {
+export const createLoadingLabel = (
+  msg: keyof GeneratedI18nStructure,
+): HTMLSpanElement => {
   const loadingSpan = document.createElement("span");
   loadingSpan.textContent = i18n.t(msg);
   loadingSpan.style.color = "#888";
@@ -157,4 +159,21 @@ export const createLoadingLabel = (msg: keyof GeneratedI18nStructure) => {
   loadingSpan.style.marginInline = "10px";
 
   return loadingSpan;
+};
+
+export const createErrorWarningBtn = (content: string): HTMLButtonElement => {
+  const button = document.createElement("button");
+  const span = document.createElement("span");
+  span.textContent = content;
+  span.style.color = "#888888";
+  span.style.whiteSpace = "pre";
+
+  button.className = "ytSortTestPopup";
+  button.style.marginInline = "10px";
+  button.style.cursor = "pointer";
+  button.style.backgroundColor = "transparent";
+  button.style.border = "transparent";
+  button.appendChild(span);
+
+  return button;
 };

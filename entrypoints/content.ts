@@ -5,6 +5,7 @@ import type { ApiCache, YTNavigateEvent } from "@/types";
 import { showToast } from "@/ui/notification";
 import {
   createDropdownMenu,
+  createErrorWarningBtn,
   createLoadingLabel,
   createReverseBtn,
   createSpinner,
@@ -351,11 +352,21 @@ export default defineContentScript({
       at main (app.js:18:3)
       `;
 
+      const testSpanEl = createErrorWarningBtn("test Pop");
+
       showToast(
         `Youtube Playlist Sorter Error Loading Playlist ${fakeError}`,
-        10000,
-        "error",
+        1000 * 60,
       );
+      testSpanEl.addEventListener("click", () => {
+        showToast(
+          `Youtube Playlist Sorter Error Loading Playlist ${fakeError}`,
+          1000 * 60,
+        );
+      });
+
+      playlistMenuBtns.appendChild(testSpanEl);
+
       // TEST: End of test block
 
       try {
@@ -363,6 +374,7 @@ export default defineContentScript({
       } catch (e) {
         cerr("Error hydrating cache: \n", e);
         // TODO: Send error notification
+        // TODO: Maybe a popup attached to an element
         createLoadingLabel("loadingError");
         showToast(`Youtube Playlist Sorter Error Loading Playlist: ${e}`);
         return null;
